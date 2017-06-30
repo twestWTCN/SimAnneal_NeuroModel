@@ -6,7 +6,7 @@ Tm(1) =  R.SimAn.Tm;
 pSkewSave{1} = spm_unvec(zeros(size(spm_vec(p))),p);
 pPrecSave{1} = spm_unvec(ones(size(spm_vec(p))),p);
 for ii = 1:searchN
-    stdev = (1)*Tm(ii); % Set maximum width of distribution from which to mutate
+    stdev = (1)*(Tm(ii)^2); % Set maximum width of distribution from which to mutate
     if ii == 1
         rep = 1;
     else
@@ -179,7 +179,7 @@ for ii = 1:searchN
     if ii<2
         csdplotter_220517({R.data.meancsd_data},{csd_rep{I}},R.frqz,R)
     else
-        csdplotter_220517({R.data.meancsd_data},{csd_rep{Ilist(1:4)}},R.frqz,R,I)
+        csdplotter_220517({R.data.meancsd_data},{csd_rep{Ilist(1:8)}},R.frqz,R,I)
     end
     drawnow; shg
     

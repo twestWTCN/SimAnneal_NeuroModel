@@ -1,13 +1,14 @@
 function R = fitDepSimPar(R,fitscore)
 % RMSE = linspace(0,1,50);
-% df = -log(RMSE)+0.5;
+% df = (-log(RMSE)*0.5)+0.2;
 % df(RMSE<0.1) = min(df(RMSE<0.1))
+% hold on
 % plot(RMSE,df)
 % shg
 if fitscore<0.1
     R.obs.csd.df = R.obs.csd.df;
 else
-    R.obs.csd.df = -log(fitscore)+0.25;
+    R.obs.csd.df = (-log(fitscore)*0.5)+0.2;
 end
 
 fsamp = 1/R.IntP.dt;    % sample rate

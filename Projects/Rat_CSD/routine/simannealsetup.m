@@ -12,7 +12,7 @@ R.out.tag = 'autost';
 % Set SimAn Parameters 
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 1; % Initial temperature
-R.SimAn.alpha = 0.999; % alpha increment
+R.SimAn.alpha = 0.99; % alpha increment
 R.SimAn.rep = 32; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
@@ -41,8 +41,8 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 1.5;
-R.obs.csd.reps = 16;
+R.obs.csd.df = 1;
+R.obs.csd.reps = 24;
 % OR specify fft of 2^N:
 % R.obs.csd.pow2_exp = 8;
 % R.obs.csd.pow2_sim = 11;
