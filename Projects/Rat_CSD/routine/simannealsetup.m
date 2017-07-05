@@ -10,6 +10,8 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'autost';
 % Set SimAn Parameters 
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.C','.D','.A','.obs.LF','.obs.mixing'};
+R.SimAn.pOptBound = [-6 6];
 R.SimAn.searchN = 50;
 R.SimAn.Tm = 1; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
@@ -17,7 +19,7 @@ R.SimAn.rep = 16; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
-R.SimAn.gradtol = [0.02 0.0085];
+R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
 R.SimAn.maxdev = 6;
 R.SimAn.jitter = 4;

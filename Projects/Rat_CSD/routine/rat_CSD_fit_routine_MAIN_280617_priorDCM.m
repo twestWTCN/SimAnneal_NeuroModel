@@ -105,7 +105,7 @@ for i = 1:4
     if i>1
         p = xobs1.out.P;
     end
-    [xobs1] = SimAn_290617(x,u,p,m,R);
+    [xobs1] = SimAn_050717(x,u,p,m,R);
 end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 mkdir(folname)
