@@ -9,22 +9,27 @@ end
 %
 % Written by Moshe Lindner , Bar-Ilan University, Israel.
 % September 2010 (C)
-for i = 1:2
-    if i == 1
+for K = 1:3
+    if K == 1
         file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\csdtrack\' R.out.tag '\'];
-    else
+    elseif K == 2
         file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\r2track\' R.out.tag '\'];
+    elseif K == 3
+        file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\dist_track\' R.out.tag '\'];
     end
     a = dir([file_path,'\*.jpg']);
     a = {a.name};
     file_name=sort_nat(a);
     
-    if i== 1
+    if K== 1
         file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
         file_name2 = [R.out.tag '_csdtrack_gif.gif'];
-    else
+    elseif K == 2
         file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
         file_name2 = [R.out.tag '_r2track_gif.gif'];
+elseif K == 3
+        file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
+        file_name2 = [R.out.tag '_dist_track_gif.gif'];
     end
     mkdir(file_path2)
     loops = R.plot.gif.loops;
@@ -52,5 +57,5 @@ for i = 1:2
         waitbar(i/length(file_name),h,[num2str(round(100*i/length(file_name))),'% done']) ;
     end
     close(h);
-%     msgbox('Finished Successfully!')
+    %     msgbox('Finished Successfully!')
 end

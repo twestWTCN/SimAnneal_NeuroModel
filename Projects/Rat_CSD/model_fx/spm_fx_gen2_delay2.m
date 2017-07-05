@@ -182,7 +182,7 @@ D(5,4) = 5/1000;    % STR to GP (Kita and Kitai 1991)
 
 D = ceil(D.*exp(P.D).*(1/dt)); % As expectation of priors and convert units to steps
 D(D>size(xback,2)) = size(xback,2)-1; % Ensure not bigger than nback - 2nd check in script!!
-    
+D(D<(10/dt)) = 10; % Minimum 1ms    
 
 % synaptic activation function
 %--------------------------------------------------------------------------

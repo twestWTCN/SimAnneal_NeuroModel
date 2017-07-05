@@ -5,8 +5,6 @@
 % Extrinsic Inputs arent signed - all summed together.
 % Check extrinsic connections - something isnt being carried over from the
 % DCM Prior structure
-
-
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD'))
@@ -65,6 +63,10 @@ DCM(2).Ep.A{4}=DCM(1).Ep.A{4}+DCM(1).Ep.B{2}; % if model contains 2 modulatory b
 
 % MODEL OFF CONDITION!
 DCM = DCM(2);
+DCM.Ep.A{1}(6,5) = 0;
+% DCM.Ep.A{2}(6,5) = 0;
+DCM.Ep.A{1}(2,6) = 0;
+% DCM.Ep.A{2}(2,6) = 0;
 
 % Keep only some fields
 
@@ -99,7 +101,12 @@ m.Bmod = DCM.B;
 tic
 % p.A{3}(6,5) = -32; p.A{4}(6,5) = -32;
 %  p = xobs.out.P;
-[xobs1] = SimAn_290617(x,u,p,m,R);
+for i = 1:4
+    if i>1
+        p = xobs1.out.P;
+    end
+    [xobs1] = SimAn_290617(x,u,p,m,R);
+end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 mkdir(folname)
 save([folname '\xobs1'],'xobs1');
@@ -112,7 +119,7 @@ R.IntP.intFunc = @stepintegrator_delay;
 R.SimAn.saveout = 'xobs2';
 R.out.tag = 'crossst';
 
-[xobs2] = SimAn_010617(x,u,xobs1.out.P,m,R);
+[xobs1] = SimAn_290617(x,u,p,m,R);
 save([folname '\xobs2'],'xobs2');
 gif_maker_siman(R)
 toc
@@ -134,7 +141,7 @@ legend(R.chsim_name{2:3})
 
 % % Integrate in time master fx function
  xstore = zeros(6,nt);
-% for t = 1:nt
+% for t = 1:nt5
 %     [x xobs] = simAn_master_fx_bgc(x,u,p,m,dt,t);
 %     xstore(:,t) = xobs';
 %     t

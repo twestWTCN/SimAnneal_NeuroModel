@@ -6,7 +6,7 @@ Tm(1) =  R.SimAn.Tm;
 pSkewSave{1} = spm_unvec(zeros(size(spm_vec(p))),p);
 pPrecSave{1} = spm_unvec(ones(size(spm_vec(p))),p);
 for ii = 1:searchN
-    stdev = (1)*(Tm(ii)^2); % Set maximum width of distribution from which to mutate
+    stdev = (1)*((0.95*Tm(ii)^2)+0.01); % Set maximum width of distribution from which to mutate
     if ii == 1
         rep = 1;
     else
@@ -22,7 +22,7 @@ for ii = 1:searchN
     parfor jj = 1:rep % Replicates for each temperature
         x = ic;
         %% Resample Parameters
-        xMax = 5; xMin = -5; % Set maximum distance moved from prior
+        xMax = 6; xMin = -6; % Set maximum distance moved from prior
         pnew = p;
         %         mnew = m;
         if ii>1
@@ -61,20 +61,33 @@ for ii = 1:searchN
                 end
                 C(C>xMax) = xMax; C(C<xMin) = xMin;
                 pnew.C = C;
+
+                
+                % Extrinsic Delays (noise)
+                D_old =pold.D;
+                D_skew = PSS.D;
+                D_prec = PPS.D;
+                Da = zeros(size(D_old,1),1);
+                for Q = 1:numel(D_old)
+                    Da(Q,1) = pearsrnd(D_old(Q),D_prec(Q)*stdev,D_skew(Q),3,1,1); % Kurtosis set to 3 (normal)
+                end
+                Da(Da<-20) = -32; 
+                Da(Da>xMax & Da>-30) = xMax; Da(Da<xMin & Da>-30) = xMin;
+                D = reshape(Da,size(D_old));
+                pnew.D = D;
                 
                 % Extrinsic connection strength
                 for Ai = 1:2
-                    A_old = reshape(pold.A{Ai*2},1,[]);
+                    A_old = pold.A{Ai*2};
                     A_skew = PSS.A{Ai*2};
                     A_prec = PPS.A{Ai*2};
-                    A = zeros(size(A_old));
-                    for Q = 1:length(A_old)
-                        A(Q) = pearsrnd(A_old(Q),A_prec(Q)*stdev,A_skew(Q),3,1,1); % Kurtosis set to 3 (normal)
+                    Aa = zeros(size(A_old,1),1);
+                    for Q = 1:numel(A_old)
+                        Aa(Q,1) = pearsrnd(A_old(Q),A_prec(Q)*stdev,A_skew(Q),3,1,1); % Kurtosis set to 3 (normal)
                     end
-                    A(A>(xMax)) = xMax; A(A<xMin) = xMin;
-                    A = A.*reshape(m.Bmod{Ai},1,[]);
-                    A(A<-30) = -32;
-                    A = reshape(A,m.m,m.m);
+                    Aa(Aa<-30) = -32;
+                    Aa(Aa>xMax & Aa>-30) = xMax; Aa(Aa<xMin & Aa>-30) = xMin;
+                    A = reshape(Aa,size(A_old));
                     pnew.A{Ai*2} = A;
                     pnew.A{(Ai*2)-1} = A;
                 end
@@ -160,17 +173,28 @@ for ii = 1:searchN
             [y i] = max(tbr2);
             p = psave(i);
         end
-        if tbr2(ii)>R.SimAn.rtol_repeat
-            repset = R.SimAn.rep(2);
+%         if tbr2(ii)>R.SimAn.rtol_repeat
+%             repset = R.SimAn.rep(2);
+%         end
+%         R = fitDepSimPar(R,tbr2(ii)); % Set fit dependent sim parameters
+        if (tbr2(ii)/m.m)>R.SimAn.rtol_converge
+            disp('Model Reached Convergence')
+            break
         end
-        R = fitDepSimPar(R,tbr2(ii)); % Set fit dependent sim parameters
-        %         if (tbr2(ii)/m.m)>R.SimAn.rtol_converge
-        %             disp('Model Reached Convergence')
-        %             break
-        %         end
         figure(3)
         clf
         plotDistChange(psave,pPrecSave,pSkewSave,stdev,ii)
+    end
+    
+    if ii>5
+        grad = max(tbr2(ii-5:ii)) - min(tbr2(ii-5:ii));
+        disp(sprintf('Optimization gradient over 5 steps is %d',grad))
+        if grad< R.SimAn.gradtol(1)
+            repset = 8;
+        elseif grad < R.SimAn.gradtol(2)
+            disp('Model Reached Convergence')
+            break
+        end
     end
     Tm(ii+1) = Tm(ii)*alpha;
     d = clock;
@@ -200,15 +224,16 @@ for ii = 1:searchN
     
     drawnow;shg
     % figure(3)
-    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\csdtrack\' sprintf('%d',[d(1:3)]) '\complexcross\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
-    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\r2track\' sprintf('%d',[d(1:3)]) '\complexcross\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
-    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\dist_track\' sprintf('%d',[d(1:3)]) '\complexcross\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
+    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\csdtrack\' sprintf('%d',[d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
+    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\r2track\' sprintf('%d',[d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
+    saveallfiguresFIL_n(['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\csd_gif\dist_track\' sprintf('%d',[d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
     %     close all
-    disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']})
+    disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag})
     
 end
 
 R.out.CSD = csd_rep{I};
 R.out.P = p;
+
 % Plot CSD
 % csdplotter(R.data.meancsd_data,meancsd_sim,F_sim,R)

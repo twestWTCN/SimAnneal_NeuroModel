@@ -28,4 +28,5 @@ for i = 1:2
 end
 xlabel('Connection Strength')
 ylabel('P(X)')
+ylim([0 1]);
 

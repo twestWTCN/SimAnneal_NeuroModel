@@ -10,24 +10,24 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'autost';
 % Set SimAn Parameters 
-R.SimAn.searchN = 100;
+R.SimAn.searchN = 50;
 R.SimAn.Tm = 1; % Initial temperature
-R.SimAn.alpha = 0.99; % alpha increment
-R.SimAn.rep = 32; % Repeats per temperature
+R.SimAn.alpha = 0.98; % alpha increment
+R.SimAn.rep = 16; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
-R.SimAn.gradtol = [0.00085 0.0005];
+R.SimAn.gradtol = [0.02 0.0085];
 R.SimAn.saveout = 'xobs1';
 R.SimAn.maxdev = 6;
 R.SimAn.jitter = 4;
-R.SimAn.dSkew = 25;
-R.SimAn.dPrec = 5;
+R.SimAn.dSkew = 30;
+R.SimAn.dPrec = 25;
 
-R.SimAn.opPar = {'T','G','C','A','LF','mix'};
+R.SimAn.opPar = {'T','G','C','D','A','LF','mix'};
 % Set simulation parameters
 R.IntP.intFunc = @stepintegrator_delay;
-R.IntP.dt = .0002;
+R.IntP.dt = .0001;
 R.IntP.tend = 8;
 R.IntP.nt = R.IntP.tend/R.IntP.dt;
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
@@ -41,8 +41,15 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 1;
-R.obs.csd.reps = 24;
+R.obs.csd.df = 1.5;
+R.obs.csd.reps = 22;
+
+fsamp = 1/R.IntP.dt;    % sample rate
+N = floor(fsamp/R.obs.csd.df);  % segment length
+R.IntP.tend = (N*R.obs.csd.reps)/fsamp; % Target time
+disp(sprintf('The simulation length is %.2f seconds',R.IntP.tend))
+disp(sprintf('The simulation df is %.2f Hz',R.obs.csd.df))
+
 % OR specify fft of 2^N:
 % R.obs.csd.pow2_exp = 8;
 % R.obs.csd.pow2_sim = 11;
@@ -63,8 +70,8 @@ R.obs.LF = LF;
 R.obs.mixing = 0.1;
 
 R.obs.gainmeth = {'unitvar','mixing'};  %'leadfield'
-R.objfx.feattype = 'absolute';
-R.objfx.specspec = 'auto'; % which part of spectra to fit
+R.objfx.feattype = 'complex';
+R.objfx.specspec = 'cross'; % which part of spectra to fit
 
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;

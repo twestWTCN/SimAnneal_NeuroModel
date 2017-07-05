@@ -6,12 +6,12 @@ dTheta = full(p1-p2);
 b = dTheta./dA;
 
 skew = -(dTheta./dA);
-skew = skew/R.SimAn.dSkew; 
+skew = skew./R.SimAn.dSkew ;
 skew = spm_vec(pSkew{ii-1}) + skew; skew(skew>0.7) = 0.7; skew(skew<-0.7) = -0.7;
 pSkew{ii} = spm_unvec(skew,psave(ii));
 
-prec = (-abs(b/3))+1;
-prec = prec/R.SimAn.dPrec;
+prec = (-abs(b./3))+1;
+prec = prec./R.SimAn.dPrec;
 prec = spm_vec(pPrec{ii-1}) + prec; prec(prec<0.25) = 0.25; prec(prec>1) = 1;
 pPrec{ii} = spm_unvec(prec,psave(ii));
 
