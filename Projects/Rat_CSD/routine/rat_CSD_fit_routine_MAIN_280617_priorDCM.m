@@ -6,9 +6,11 @@
 % Check extrinsic connections - something isnt being carried over from the
 % DCM Prior structure
 clear ; close all
-addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD'))
 R = simannealsetup;
+
+addpath(genpath([R.rootdir 'sim_machinery']))
+addpath(genpath([R.rootdir 'Projects\Rat_CSD']))
+
 d = R.d; % clock
 %% Prepare the data
 % % 
@@ -27,7 +29,7 @@ d = R.d; % clock
 % [F_data,meancsd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,[],R);
 % save('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\data\storage\datafeat_csd','meancsd_data','F_data')
 %%
-load('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\data\storage\datafeat_csd');
+load([R.rootdir 'Projects\Rat_CSD\data\storage\datafeat_csd']);
 R.data.meancsd_data = meancsd_data;
 R.data.meancsd_hz = F_data;
 
@@ -44,7 +46,7 @@ csdplotter_220517({meancsd_data},[],F_data,R)
 
 % load priors!
 % load('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\priors\rat_inversion\onerat_bgm_DCM_multipass_split_finished.mat')
-load('C:\Users\twest\Documents\Work\PhD\LitvakProject\Bernadette_DCM\outputs\splitup_BGM\onerat_bgm_DCM_multipass_280617','DCM')
+load([R.rootdir 'Projects\Rat_CSD\priors\onerat_bgm_DCM_multipass_280617'],'DCM')
 clear u
 % Initialise with random priors
 % [x,p,m] = setup_new_priors(P,M); % Assign Priors to correct structure

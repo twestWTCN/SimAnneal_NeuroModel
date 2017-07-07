@@ -78,7 +78,11 @@ R.plot.gif.start_t = 1;
 R.plot.gif.end_t = 1;
 R.plot.gif.loops = 2;
 
-
+if strmatch(getenv('COMPUTERNAME'),'SFLAP-2')
+    R.rootdir = 'C:\Users\Tim\Documents\Work\LitvakProject\SimAnneal_NeuroModel\';
+elseif strmatch(getenv('COMPUTERNAME'),'FREE')
+    R.rootdir = 'C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\';
+end
 
 
 
