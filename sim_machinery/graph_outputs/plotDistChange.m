@@ -1,4 +1,4 @@
-function [] = plotDistChange(psave,pPrecSave,pSkewSave,stdev,ii)
+function [] = plotDistChange(R,psave,pPrecSave,pSkewSave,stdev,ii)
 
 for i = 1:2
     if i == 1
@@ -28,5 +28,6 @@ for i = 1:2
 end
 xlabel('Connection Strength')
 ylabel('P(X)')
-ylim([0 1]);
+ylim([0 1.5]);
+xlim(R.SimAn.pOptBound)
 

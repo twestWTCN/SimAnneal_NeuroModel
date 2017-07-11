@@ -12,6 +12,7 @@ R.out.tag = 'autost';
 % Set SimAn Parameters 
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.C','.D','.A','.obs.LF','.obs.mixing'};
 R.SimAn.pOptBound = [-6 6];
+
 R.SimAn.searchN = 50;
 R.SimAn.Tm = 1; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
@@ -37,6 +38,7 @@ R.IntP.Utype = 'white_covar'; %'white_covar'; % DCM_Str_Innov
 R.IntP.buffer = ceil(0.050*(1/R.IntP.dt)); % buffer for delays
 
 % Set Observer variables
+R.obs.fx = @observe_data;
 R.obs.brn =1; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'True'; % z-transform CSDs

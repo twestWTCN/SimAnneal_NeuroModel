@@ -22,14 +22,13 @@ for ii = 1:searchN
         PSS = pSkewSave{ii};
         PPS = pPrecSave{ii};
     end
-    for jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         x = ic;
         %% Resample Parameters
-        xMax = 6; xMin = -6; % Set maximum distance moved from prior
-        pnew = p;
-        %         mnew = m;
         if ii>1
                 pnew = resampleParameters_050717(R,p,PSS,PPS,stdev,m.m); % Resample parameters
+        else
+                pnew = p;
         end % only do outside first run
         
         %% Simulate New Data
@@ -94,7 +93,7 @@ for ii = 1:searchN
         end
         figure(3)
         clf
-        plotDistChange(psave,pPrecSave,pSkewSave,stdev,ii)
+        plotDistChange(R,psave,pPrecSave,pSkewSave,stdev,ii)
     end
     
     if ii>5

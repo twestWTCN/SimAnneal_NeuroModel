@@ -11,25 +11,25 @@ end
 % September 2010 (C)
 for K = 1:3
     if K == 1
-        file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\csdtrack\' R.out.tag '\'];
+        file_path = [R.rootn '\' R.projectn '\outputs\csd_gif\dist_track\' d '\' R.out.tag '\'];
     elseif K == 2
-        file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\r2track\' R.out.tag '\'];
+        file_path = [R.rootn '\' R.projectn '\outputs\csd_gif\r2track\' d '\' R.out.tag '\'];
     elseif K == 3
-        file_path = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\dist_track\' R.out.tag '\'];
+        file_path = [R.rootn '\' R.projectn '\outputs\csd_gif\feattrack\' d '\' R.out.tag '\'];
     end
     a = dir([file_path,'\*.jpg']);
     a = {a.name};
     file_name=sort_nat(a);
     
     if K== 1
-        file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
-        file_name2 = [R.out.tag '_csdtrack_gif.gif'];
+        file_path2 = [R.rootn '\' R.projectn '\outputs\csd_gif\' d '\gifs\'];
+        file_name2 = [R.out.tag '_dist_track_gif.gif'];
     elseif K == 2
-        file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
+        file_path2 = [R.rootn '\' R.projectn '\outputs\csd_gif\' d '\gifs\'];
         file_name2 = [R.out.tag '_r2track_gif.gif'];
 elseif K == 3
-        file_path2 = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\delayed\' d '\gifs\'];
-        file_name2 = [R.out.tag '_dist_track_gif.gif'];
+        file_path2 = [R.rootn '\' R.projectn '\outputs\csd_gif\' d '\gifs\'];
+        file_name2 = [R.out.tag '_feat_track_gif.gif'];
     end
     mkdir(file_path2)
     loops = R.plot.gif.loops;
