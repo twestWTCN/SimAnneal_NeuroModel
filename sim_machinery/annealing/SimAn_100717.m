@@ -25,7 +25,7 @@ for ii = 1:searchN
         PSS = pSkewSave{ii};
         PPS = pPrecSave{ii};
     end
-    parfor jj = 1:rep % Replicates for each temperature
+    for jj = 1:rep % Replicates for each temperature
         x = ic;
         %% Resample Parameters
         if ii>1
@@ -40,21 +40,22 @@ for ii = 1:searchN
         fx = R.IntP.intFx;
         xsims = fx(R,x,u,m,p);
         
-        if isfield(R.obs,'obsFx') % Run Observer function
-            fx = R.obs.obsFx;
-            xsims = fx(xsims,m,pnew,R);
-        end
+%         if isfield(R.obs,'obsFx') % Run Observer function
+%             fx = R.obs.obsFx;
+%             xsims = fx(xsims,m,pnew,R);
+%         end
         if isfield(R.obs,'transFx') % Run Data Transform
             %% Construct CSD and compare to data
             fx = R.obs.transFx;
-            [~,feat_sim] = fx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R);
+            [~,feat_sim] = fx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,10,R);
         else
             feat_sim = xsims; % else take raw time series
         end
         % Now using NRMSE
         fx = R.IntP.compFx;
         r2mean  = fx(R,feat_sim);
-        
+        fx = R.plot.outFeatFx;
+        fx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1)
         r2rep{jj} = r2mean;
         par_rep{jj} = pnew;
         feat_sim_rep{jj} = feat_sim;

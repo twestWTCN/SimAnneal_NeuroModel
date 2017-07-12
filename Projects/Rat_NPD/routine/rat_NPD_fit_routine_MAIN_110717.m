@@ -24,7 +24,7 @@ d = R.d; % clock
 %     data(i,:) = xtmp;
 % end
 % %compute CSD data features
-% [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,[],R);
+% [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,8,R);
 % save([R.rootn R.projectn '\data\storage\datafeat_npd'],'meannpd_data','F_data')
 %%
 load([R.rootn R.projectn '\data\storage\datafeat_npd']);

@@ -34,7 +34,7 @@ R.IntP.intFxArgs = '(R,x,u,m,p)';
 R.IntP.compFx= @compareData_100717;
 R.IntP.compFxArgs = '(R,feat_sim)';
 
-R.IntP.dt = .0001;
+R.IntP.dt = .0002;
 R.IntP.tend = 10;
 R.IntP.nt = R.IntP.tend/R.IntP.dt;
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
