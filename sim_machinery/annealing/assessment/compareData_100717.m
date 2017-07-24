@@ -61,15 +61,21 @@ switch R.data.datatype
                         if i==j
                             yfx = (squeeze(NPDsim(i,j,1,:)));
                             ffx = (squeeze(NPDemp(i,j,1,:)));
+                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
+                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
                             r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
                             r2loop(i,j) = r(2);
                         else
                             yfx = (squeeze(NPDsim(i,j,2,:)));
                             ffx = (squeeze(NPDemp(i,j,2,:)));
+                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
+                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
                             r(1) = goodnessOfFit(yfx,ffx,'NRMSE');
                             
                             yfx = (squeeze(NPDsim(i,j,3,:)));
                             ffx = (squeeze(NPDemp(i,j,3,:)));
+                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
+                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
                             r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
                             
                             r2loop(i,j) = mean(r);
@@ -77,13 +83,13 @@ switch R.data.datatype
                 end
             end
         end
-        switch R.objfx.specspec;
+        switch R.objfx.specspec
             case 'auto'
-                r2mean = mean(diag(r2loop));
+                r2mean = nanmean(diag(r2loop));
                 %         r2mean = sum(diag(r2loop));
                 
             case 'cross'
-                r2mean = mean(r2loop(triu(r2loop)~=0));
+                r2mean = nanmean(r2loop(triu(r2loop)~=0));
                 %         r2mean = sum(r2loop(triu(r2loop)~=0));
         end
         %% TIME

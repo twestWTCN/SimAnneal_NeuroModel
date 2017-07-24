@@ -2,16 +2,16 @@ function [] = plotDistChange(R,psave,pPrecSave,pSkewSave,stdev,ii)
 
 for i = 1:2
     if i == 1
-        ls = '-';
+        ls = '--';
         nind = 1;
     else
-        ls = '--';
+        ls = '-';
         nind = ii;
     end
-
-    M = psave(ii-(i-1)).A{1}; M(M==0) = [];
-    P = full(pPrecSave{nind}.A{1}); P(P==0) = [];
-    S = full(pSkewSave{nind}.A{1}); %S(S==0) = [];
+%{'.params','.noisecov'}
+    M = psave(nind).params; M(M==0) = [];
+    P = full(pPrecSave{nind}.params); P(P==0) = [];
+    S = full(pSkewSave{nind}.params); %S(S==0) = [];
     
     Ma = M(M>-30); 
     P = P(M>-30).*stdev;
@@ -27,7 +27,6 @@ for i = 1:2
     
 end
 xlabel('Connection Strength')
-ylabel('P(X)')
 ylim([0 1.5]);
 xlim(R.SimAn.pOptBound)
 

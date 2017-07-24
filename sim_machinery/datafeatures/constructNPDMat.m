@@ -16,6 +16,8 @@ for chI = 1:size(chloc_name,2)
                 chindsR = chinds{chJ};
                 if chI == chJ
                     [Pxy,F] = cpsd(data(chindsP(p),:),data(chindsR(r),:),hanning(2^N),[],2^N,fsamp);
+%                     Pxy = (Pxy-mean(Pxy))./std(Pxy);
+%                     Pxy = Pxy - min(Pxy);
                     if nargin>5
                         Pxy = interp1(F,Pxy,F_scale);
                     else
@@ -23,7 +25,7 @@ for chI = 1:size(chloc_name,2)
                     end
                     xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
                 else
-                    [f13,~,~]=sp2a2_R2(data(chindsP(p),:)',data(chindsR(r),:)',fsamp,N);
+                    [f13,~,~]=sp2a2_R2(data(chindsP(p),:)',data(chindsR(r),:)',fsamp,N-1);
                     F = f13(:,1);
                     zl = [10 11 12];
                     for z = 1:3
