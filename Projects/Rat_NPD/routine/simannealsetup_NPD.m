@@ -21,8 +21,8 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.obs.LF','.C'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-8 8];
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptBound = [-5 5];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
@@ -33,11 +33,11 @@ R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
-R.SimAn.maxdev = 8;
-R.SimAn.jitter = 8;
+R.SimAn.maxdev = 4;
+R.SimAn.jitter = 4;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 32; %40;
+R.SimAn.minRank = 38; %40;
 
 % Set simulation parameters
 R.IntP.intFx = @stepintegrator_delay;
@@ -64,7 +64,7 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 0.5;
+R.obs.csd.df = 0.45;
 R.obs.csd.reps = 18;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
@@ -97,9 +97,9 @@ LF = [20 2 2 2 2 2]; % Fit visually
 R.obs.LF = LF;
 R.obs.mixing = 0.1;
 
-R.obs.gainmeth = {'unitvar','leadfield'};  %'mixing'
+R.obs.gainmeth = {'leadfield','unitvar'};  %'mixing'
 R.objfx.feattype = 'ForRev'; %
-R.objfx.specspec = 'cross'; % which part of spectra to fit
+R.objfx.specspec = 'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @npdplotter_110717;
 R.plot.save = 'False';

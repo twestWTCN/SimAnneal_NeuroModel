@@ -16,7 +16,7 @@ for i = 1:length(R.obs.gainmeth)
             xsims = LFF*xsims;
         case 'unitvar'
             for i = 1:size(xsims,1)
-                xsims(i,:) = (xsims(i,:) - mean(xsims(i,:)))/std(xsims(i,:));
+                xsims(i,:) = (xsims(i,:) - mean(xsims(i,:))); %/std(xsims(i,:));
             end
         case 'mixing'
                 mixdeg = R.obs.mixing.*exp(p.obs.mixing);
