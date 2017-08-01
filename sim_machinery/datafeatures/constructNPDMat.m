@@ -16,7 +16,7 @@ for chI = 1:size(chloc_name,2)
                 chindsR = chinds{chJ};
                 if chI == chJ
                     [Pxy,F] = pwelch(data(chindsP(p),:),hanning(2^N),[],2^N,fsamp);
-%                     Pxy = (Pxy-mean(Pxy))./std(Pxy);
+                     Pxy = (Pxy-mean(Pxy))./std(Pxy);
 %                     Pxy = Pxy - min(Pxy);
                     if nargin>5
                         Pxy = interp1(F,Pxy,F_scale);
