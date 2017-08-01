@@ -1,4 +1,4 @@
-function plotDistChange_KS(Rho,nu,xf,psave,pPrecSave,pSkewSave,stdev,R)
+function plotDistChange_KS(Rho,nu,xf,psave,R)
 % Univariate plots
 subplot(1,2,1)
 for i = 1:2
@@ -7,25 +7,22 @@ for i = 1:2
         nind = 1;
         
         %{'.params','.noisecov'}
-        M = psave(nind).params; M(M==0) = [];
-        P = full(pPrecSave{nind}.params); P(P==0) = [];
-        S = full(pSkewSave{nind}.params); %S(S==0) = [];
-        
+%         M = psave(nind).params; M(M==0) = []; 
+        M = psave(nind).A{1}; M(M==0) = []; 
         Ma = M(M>-30);
-        P = P(M>-30).*stdev;
-        S = S(M>-30);
-        
-        cmap = linspecer(3);
+       
+        cmap = linspecer(5);
         X = -5:.1:5;
-        for Q = 1:3 %length(Ma)
-            [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,S(Q),3);
+        for Q = 1:5 %length(Ma)
+            p = normpdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm);
+%             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
             plot(X,p,ls,'color',cmap(Q,:))
             hold on
         end
     else % Copula
         ls = '-';
         r = copularnd('t',Rho,nu,500);
-        for Q = 1:3 %size(xf,1)
+        for Q = 1:5 %size(xf,1)
             x1 = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
             [x1,f] = ksdensity(x1,R.SimAn.pOptRange);
             plot(f,x1,ls,'color',cmap(Q,:))

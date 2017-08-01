@@ -1,6 +1,6 @@
 function [xint,T] = fx_simulateMVAR(x,m,p,R)
 % Log Normal Priors
-a = fieldnames(p);
+a = m.fn;
 P = m;
 for i = 1:numel(a)
     y = eval(['m.' a{i}]); ys = eval(['p.' a{i}]);

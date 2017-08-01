@@ -2,32 +2,37 @@
 % This script will fit BvW's BGM/MC model using simulated annealing, from
 % the real part of the CSD for the group average OFF spectra
 % TO DO:
-% Update to generic SimAn Platform (SimAn_100717)
-
+% REMOVE SPM_VEC/UNVEC  - they are super slow!!
+% NEED TO CHANGE SUCH THAT THERE IS A TABLE - PARAMETER VECTOR but
+% STRUCTURE that INDEXs the VECTOR - no need to keep transforming between
+% structure and vector - extremely inefficient...
+% Time of 1 loop (end of parfor) ~ 100s (270717)
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 R = simannealsetup_NPD;
-addpath(genpath([R.rootn R.projectn]))
-
 
 d = R.d; % clock
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
-% load([R.filepathn '\average_rat_lesion'])
-% % Set data as working version
-% ftdata = ftdata_lesion;
-% data = ftdata.trial{1}; fsamp = ftdata.fsample;
-% %Normalise Data
-% for i = 1:4
-%     xtmp = data(i,:);
-%     xtmp = (xtmp-mean(xtmp))/std(xtmp);
-%     data(i,:) = xtmp;
-% end
-% %compute CSD data features
-% [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,8,R);
-% save([R.rootn R.projectn '\data\storage\datafeat_npd'],'meannpd_data','F_data')
-%%
-load([R.rootn R.projectn '\data\storage\datafeat_npd']);
+load([R.filepathn '\average_rat_lesion.mat'])
+% % % Set data as working version
+
+ftdata = ftdata_lesion;
+data = ftdata.trial{1}; fsamp = ftdata.fsample;
+%Normalise Data
+for i = 1:4
+    xtmp = data(i,:);
+    xtmp = (xtmp-mean(xtmp))/std(xtmp);
+    data(i,:) = xtmp;
+end
+%compute CSD data features
+R.data.fs = ftdata_lesion.fsample;
+
+R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
+[F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
+% %%
+load([R.rootn 'data\storage\datafeat_npd']);
 R.data.feat_emp = meannpd_data;
 R.data.feat_xscale = F_data;
 % Plot CSD
@@ -42,7 +47,7 @@ npdplotter_110717({meannpd_data},[],F_data,R)
 % 6 THAL
 
 % load priors!
-load('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\priors\rat_inversion\onerat_bgm_DCM_multipass_split_finished.mat')
+load([R.rootn 'priors\onerat_bgm_DCM_multipass_split_finished.mat'])
 % load('C:\Users\twest\Documents\Work\PhD\LitvakProject\Bernadette_DCM\outputs\splitup_BGM\onerat_bgm_DCM_multipass_280617','DCM')
 clear u
 % Initialise with random priors
@@ -76,18 +81,20 @@ p.obs.LF = zeros(1,size(p.C,1));
 p.obs.mixing = zeros(1,size(p.C,1));
 m = DCM.M;
 x = m.x;
+A =  p.A; p = rmfield(p,'A');
+p.A{1} = A{1}; p.A{2} = A{3};
 % setup exogenous noise
 
 % m.uset.p = DCM;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1/8;
+m.uset.p.scale = 1/4;
 
 u = innovate_timeseries(R,m);
 % u = u./R.IntP.dt;
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*abs((DCM.B{1}+DCM.B{2})-1);
-
+m.n =  size([m.x{:}],2);
 m.fxord = DCM.Sname;
 m.Bmod = DCM.B;
 % set params to zero
@@ -104,7 +111,7 @@ for i = 1:4
     if i>1
         p = xobs1.out.P;
     end
-    [xobs1] = SimAn_100717(x,u,p,m,R);
+    [xobs1] = SimAn_ABC_230717(x,u,p,m,R);
 end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 mkdir(folname)

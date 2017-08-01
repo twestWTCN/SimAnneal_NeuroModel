@@ -197,8 +197,10 @@ S     = @(x,R,B)1./(1 + exp(-R*x(:) + B)) - 1/(1 + exp(B));
 
 % Extrinsic connections
 %--------------------------------------------------------------------------
+alist = [1 2; 3 4];
 for i = 1:numel(P.A)
-    A{i} = exp(P.A{i});
+    A{alist(i,1)} = exp(P.A{i});
+    A{alist(i,2)} = exp(P.A{i});
 end
 
 

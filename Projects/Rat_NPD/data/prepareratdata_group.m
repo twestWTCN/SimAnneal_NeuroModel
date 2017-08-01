@@ -1,7 +1,7 @@
 function [nl] = prepareratdata_group(root,projectn)
 % clear all
 R = buildheader_rat();
-srclist = {'fEEG','STN','GP','STR'};
+srclist = {'M1','STN','GPe','STR'};
 for cond = 1:2
     datacomb = [];
     for sub  = 1:length(R.subnames{cond})
@@ -78,7 +78,7 @@ else
     ftdata_lesion.trial{1} = ftdata_lesion.trial{1}(:,1:length(ftdata_control.trial{1}));ftdata_lesion.time = ftdata_control.time;
 end
 
-mkdir([root,projectn],'data\storage')
-filepathn = [root projectn '\data\storage']
+mkdir([root],'data\storage')
+filepathn = [root  '\data\storage']
 save([filepathn '\average_rat_control'],'ftdata_control')
 save([filepathn '\average_rat_lesion'],'ftdata_lesion')

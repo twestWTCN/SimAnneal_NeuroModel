@@ -12,7 +12,7 @@ for i = 1:length(plist)
                 X_prec = eval(['PPS' plist{i} '{Ai*2}']);
                 Xa = zeros(size(X_old,1),1);
                 for Q = 1:numel(X_old)
-                    Xa(Q,1) = pearsrnd(X_old(Q),X_prec(Q)*stdev,X_skew(Q),3,1,1); % Kurtosis set to 3 (normal)
+                    Xa(Q,1) = pearsrnd(X_old(Q),1*stdev,0,3,1,1); % Kurtosis set to 3 (normal)
                 end
                 Xa(Xa<-20) = -32;
                 Xa(Xa>xMax & Xa>-30) = xMax; Xa(Xa<xMin & Xa>-30) = xMin;

@@ -27,4 +27,5 @@ x = [];
 P = setupParPriors_MVAR(M);
 % [xobs1] = SimAn_100717(x,[],P,M,R);
 [R] = SimAn_ABC_230717(x,[],P,M,R)
-% gif_maker_siman(R)
+
+% gif_maker_siman(R,'2017724')
