@@ -34,7 +34,7 @@ function [f,J,Q] = spm_fx_mmc(x,u,P,M)
  
 % get dimensions and configure state variables
 %--------------------------------------------------------------------------
-x  = spm_unvec(x,M.x);            % neuronal states
+% x  = spm_unvec(x,M.x);            % neuronal states
 n  = size(x,1);                   % number of sources
 
 
@@ -64,22 +64,22 @@ end
 % dp = deep pyramidal
 % ii = inhibitory interneurons
 %--------------------------------------------------------------------------
-if n > 1
-    E    = [1 1/2 1 1/2]*200;     % extrinsic (forward and backward)
-    A{1} = exp(P.A{1})*E(1);      % forward  connections (sp -> mp)
-    A{2} = exp(P.A{2})*E(2);      % forward  connections (sp -> sp)
-    A{3} = exp(P.A{3})*E(3);      % backward connections (dp -> dp)
-    
-else
-    A    = {0,0,0,0};
-end
+% if n > 1
+%     E    = [1 1/2 1 1/2]*200;     % extrinsic (forward and backward)
+%     A{1} = exp(P.A{1})*E(1);      % forward  connections (sp -> mp)
+%     A{2} = exp(P.A{2})*E(2);      % forward  connections (sp -> sp)
+%     A{3} = exp(P.A{3})*E(3);      % backward connections (dp -> dp)
+%     
+% else
+%     A    = {0,0,0,0};
+% end
 
 % detect and reduce the strength of reciprocal (lateral) connections
 %--------------------------------------------------------------------------
-for i = 1:length(A)
-    L    = (A{i} > exp(-8)) & (A{i}' > exp(-8));
-    A{i} = A{i}./(1 + 4*L);
-end
+% for i = 1:length(A)
+%     L    = (A{i} > exp(-8)) & (A{i}' > exp(-8));
+%     A{i} = A{i}./(1 + 4*L);
+% end
 
 % input connections
 %--------------------------------------------------------------------------
@@ -95,19 +95,19 @@ S    = F - 1/(1 + exp(B));       % deviation from baseline firing
 
 % input
 %==========================================================================
-if isfield(M,'u')
-    
-    % endogenous input
-    %----------------------------------------------------------------------
-    U = u(:)*1536;
-    
-else
-    % exogenous input
-    %----------------------------------------------------------------------
-    U = C*u(:)*32;
-    
-end
-
+% if isfield(M,'u')
+%     
+%     % endogenous input
+%     %----------------------------------------------------------------------
+%     U = u(:)*1536;
+%     
+% else
+%     % exogenous input
+%     %----------------------------------------------------------------------
+%     U = C*u(:)*32;
+%     
+% end
+U = C*u(:)*32;
  
 % time constants and intrinsic connections
 %==========================================================================
@@ -202,7 +202,8 @@ f(:,1) = x(:,2);
 f(:,3) = x(:,4);
 f(:,5) = x(:,6);
 f(:,7) = x(:,8);
-f      = spm_vec(f);
+f = f';
+% f      = spm_vec(f);
  
 
 
@@ -210,9 +211,9 @@ if nargout < 2; return, end
 
 % Jacobian
 %==========================================================================
-if isfield(M,'x'), x = spm_vec(M.x); else,  x = sparse(M.n,1); end
-if isfield(M,'u'), u = spm_vec(M.u); else,  u = sparse(M.m,1); end
-J  = spm_diff(M.f,x,u,P,M,1);
+% if isfield(M,'x'), x = spm_vec(M.x); else,  x = sparse(M.n,1); end
+% if isfield(M,'u'), u = spm_vec(M.u); else,  u = sparse(M.m,1); end
+% J  = spm_diff(M.f,x,u,P,M,1);
 
 
 if nargout < 3; return, end
@@ -231,7 +232,7 @@ if nargout < 3; return, end
 % Implement: dx(t)/dt = f(x(t - d)) = inv(1 + D.*dfdx)*f(x(t))
 %                     = Q*f = Q*J*x(t)
 %--------------------------------------------------------------------------
-Q  = spm_dcm_delay(P,M,J);
+% Q  = spm_dcm_delay(P,M,J);
  
 
 return

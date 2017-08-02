@@ -17,7 +17,7 @@ ii = 1;
 while ii <= searchN
     stdev = (R.SimAn.jitter*Tm(ii)); % Set maximum width of distribution from which to mutate
     rep = repset;
-    parfor jj = 1:rep % Replicates for each temperature
+    for jj = 1:rep % Replicates for each temperature
         x = ic;
         %% Resample Parameters
         if iflag == 1
@@ -31,8 +31,9 @@ while ii <= searchN
         %% Simulate New Data
         % Integrate in time master fx function
         %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
-        xsims = R.IntP.intFx(x,m,pnew,R,u);
-        
+%         xsims = R.IntP.intFx(x,m,pnew,R,u);
+        xsims = R.IntP.intFx(R,x,u,p,m);
+% (R,x,u,p,m)
         if isfield(R.obs,'obsFx') % Run Observer function
             xsims = R.obs.obsFx(xsims,m,pnew,R);
         end
@@ -46,7 +47,7 @@ while ii <= searchN
         end
         % Now using NRMSE
         r2mean  = R.IntP.compFx(R,feat_sim);
-%         R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
+        R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
         r2rep{jj} = r2mean;
         par_rep{jj} = pnew;
         feat_sim_rep{jj} = feat_sim;

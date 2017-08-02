@@ -22,7 +22,7 @@ R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC';
 % Set SimAn Parameters
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-5 5];
+R.SimAn.pOptBound = [-5 3];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
@@ -33,14 +33,15 @@ R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
-R.SimAn.maxdev = 4;
+R.SimAn.maxdev = 3;
 R.SimAn.jitter = 4;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
 R.SimAn.minRank = 38; %40;
 
 % Set simulation parameters
-R.IntP.intFx = @stepintegrator_delay;
+% R.IntP.intFx = @stepintegrator_delay_Vec;
+R.IntP.intFx = @spm_fx_compile;
 R.IntP.intFxArgs = '(R,x,u,m,p)';
 R.IntP.compFx= @compareData_100717;
 R.IntP.compFxArgs = '(R,feat_sim)';
@@ -48,7 +49,7 @@ R.IntP.compFxArgs = '(R,feat_sim)';
 R.IntP.dt = .0005;
 % R.IntP.tend = 10;
 % R.IntP.nt = R.IntP.tend/R.IntP.dt;
-% R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
+% R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.n_Vet);
 R.IntP.Utype = 'white_covar'; %'white_covar'; % DCM_Str_Innov
 R.IntP.buffer = ceil(0.050*(1/R.IntP.dt)); % buffer for delays
 

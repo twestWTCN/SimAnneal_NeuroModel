@@ -10,27 +10,30 @@
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 R = simannealsetup_NPD;
-
+rng(222)
 d = R.d; % clock
+
+
+
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
-load([R.filepathn '\average_rat_lesion.mat'])
-% % % Set data as working version
-
-ftdata = ftdata_lesion;
-data = ftdata.trial{1}; fsamp = ftdata.fsample;
-%Normalise Data
-for i = 1:4
-    xtmp = data(i,:);
-    xtmp = (xtmp-mean(xtmp))/std(xtmp);
-    data(i,:) = xtmp;
-end
-%compute CSD data features
-R.data.fs = ftdata_lesion.fsample;
-
-R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
-[F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
+% load([R.filepathn '\average_rat_lesion.mat'])
+% % % % Set data as working version
+% 
+% ftdata = ftdata_lesion;
+% data = ftdata.trial{1}; fsamp = ftdata.fsample;
+% %Normalise Data
+% for i = 1:4
+%     xtmp = data(i,:);
+%     xtmp = (xtmp-mean(xtmp))/std(xtmp);
+%     data(i,:) = xtmp;
+% end
+% %compute CSD data features
+% R.data.fs = ftdata_lesion.fsample;
+% 
+% R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
+% [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+% save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
 % %%
 load([R.rootn 'data\storage\datafeat_npd']);
 R.data.feat_emp = meannpd_data;
@@ -67,10 +70,10 @@ DCM(2).Ep.A{4}=DCM(1).Ep.A{4}+DCM(1).Ep.B{2}; % if model contains 2 modulatory b
 
 % MODEL OFF CONDITION!
 DCM = DCM(2);
-% DCM.Ep.A{1}(6,5) = 0;
-% % DCM.Ep.A{2}(6,5) = 0;
-% DCM.Ep.A{1}(2,6) = 0;
-% DCM.Ep.A{2}(2,6) = 0;
+DCM.Ep.A{1}(6,5) = 0; % Excitatory GPe to Thalamus
+%DCM.Ep.A{2}(6,5) = 0;
+DCM.Ep.A{1}(1,6) = 0; % Excitatory Thal to M1
+DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
 
 % Keep only some fields
 
@@ -87,13 +90,13 @@ p.A{1} = A{1}; p.A{2} = A{3};
 
 % m.uset.p = DCM;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1/4;
+m.uset.p.scale = 1/16; %.*R.IntP.dt;
 
 u = innovate_timeseries(R,m);
 % u = u./R.IntP.dt;
 
 % Delays
-p.D = repmat(-32,size(p.A{1})).*abs((DCM.B{1}+DCM.B{2})-1);
+p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
 m.n =  size([m.x{:}],2);
 m.fxord = DCM.Sname;
 m.Bmod = DCM.B;
@@ -103,6 +106,21 @@ m.Bmod = DCM.B;
 % 
 % p0 = spm_unvec(p0,p);
 % p0.B = p.B;
+
+% Precompute xinds to make things easier with indexing
+% Compute X inds (removes need to spm_unvec which is slow)
+xinds = zeros(size(m.x,2),2);
+for i = 1:size(m.x,2)
+    if i == 1
+    xinds(i,1) = 1;
+    xinds(i,2) = size(m.x{i},2);
+    else
+        xinds(i,1) = xinds(i-1,2)+1;
+        xinds(i,2) = xinds(i,1) + (size(m.x{i},2)-1);
+    end
+end
+m.xinds = xinds;
+
 
 tic
 % p.A{3}(6,5) = -32; p.A{4}(6,5) = -32;
