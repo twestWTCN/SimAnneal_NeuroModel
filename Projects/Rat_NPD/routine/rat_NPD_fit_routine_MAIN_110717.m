@@ -17,29 +17,32 @@ d = R.d; % clock
 
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
-% load([R.filepathn '\average_rat_lesion.mat'])
-% % % % Set data as working version
-% 
-% ftdata = ftdata_lesion;
-% data = ftdata.trial{1}; fsamp = ftdata.fsample;
-% %Normalise Data
-% for i = 1:4
-%     xtmp = data(i,:);
-%     xtmp = (xtmp-mean(xtmp))/std(xtmp);
-%     data(i,:) = xtmp;
-% end
-% %compute CSD data features
-% R.data.fs = ftdata_lesion.fsample;
-% 
-% R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
-% [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-% save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
+load([R.filepathn '\average_rat_lesion.mat'])
+% % % Set data as working version
+
+ftdata = ftdata_lesion;
+data = ftdata.trial{1}; fsamp = ftdata.fsample;
+%Normalise Data
+for i = 1:4
+    xtmp = data(i,:);
+    xtmp = (xtmp-mean(xtmp))/std(xtmp);
+    data(i,:) = xtmp;
+end
+%compute CSD data features
+R.data.fs = ftdata_lesion.fsample;
+
+R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
+[F_data,meannpd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+
+% % [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
 % %%
 load([R.rootn 'data\storage\datafeat_npd']);
 R.data.feat_emp = meannpd_data;
 R.data.feat_xscale = F_data;
 % Plot CSD
-npdplotter_110717({meannpd_data},[],F_data,R)
+csdplotter_220517({meannpd_data},[],F_data,R)
+% npdplotter_110717({meannpd_data},[],F_data,R)
 
 %% SIMULATION OF TIME SERIES
 % 1 MMC

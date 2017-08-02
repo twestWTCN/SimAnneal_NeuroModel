@@ -14,7 +14,7 @@ for chI = 1:size(chloc_name,2)
             chindsP = chinds{chI};
             for r = 1:size(chinds{chJ},1)
                 chindsR = chinds{chJ};
-                [Pxy,F] = cpsd(data(chindsP(p),:),data(chindsR(r),:),hanning(N),[],N,fsamp);
+                [Pxy,F] = cpsd(data(chindsP(p),:),data(chindsR(r),:),hanning(2^N),[],2^N,fsamp);
                 if nargin>5
                     Pxy = interp1(F,Pxy,F_scale);
                 else

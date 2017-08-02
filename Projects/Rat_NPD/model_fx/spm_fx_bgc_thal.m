@@ -15,7 +15,7 @@ try, P.G; catch, P.G = 0; end
 
 % get dimensions and configure state variables
 %--------------------------------------------------------------------------
-x  = spm_unvec(x,M.x);               % neuronal states
+% x  = spm_unvec(x,M.x);               % neuronal states
 n  = size(x,1);                      % number of sources
 
 % [default] fixed parameters
@@ -50,18 +50,18 @@ S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
 
 % input
 %==========================================================================
-if isfield(M,'u')
-
-    % endogenous input
-    %----------------------------------------------------------------------
-    U = u(:)*2048;
-
-else
-    % exogenous input
-    %----------------------------------------------------------------------
+% if isfield(M,'u')
+% 
+%     % endogenous input
+%     %----------------------------------------------------------------------
+%     U = u(:)*2048;
+% 
+% else
+%     % exogenous input
+%     %----------------------------------------------------------------------
+%     U = C*u(:)*32;
+% end
     U = C*u(:)*32;
-end
-
 
 % time constants and intrinsic connections
 %==========================================================================
@@ -93,7 +93,7 @@ f(:,2) =  (u - 2*x(:,2) - x(:,1)./T(1,1))./T(1,1);
 % Voltage
 %==========================================================================
 f(:,1) = x(:,2);
-f      = spm_vec(f);
+f      = f'; %spm_vec(f);
 
 if nargout < 2; return, end
 
