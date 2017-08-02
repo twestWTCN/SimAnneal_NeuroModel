@@ -125,10 +125,10 @@ D(1,6) = 6/1000;    % Thal to M1
 
 
 D = ceil(D.*exp(p.D).*(1/R.IntP.dt)); % As expectation of priors and convert units to steps
-D(D>R.IntP.buffer) = R.IntP.buffer-1; % Ensure not bigger than nback - 2nd check in script!!
+D(D>R.IntP.buffer) = R.IntP.buffer-1; % Ensure delay not bigger than buffer
 D(D<((1e-3)/R.IntP.dt)&D>0) = floor((1e-3)/R.IntP.dt); % Minimum 1ms   
 
-Ds = zeros(size(D));
+Ds = zeros(size(D));Dt = zeros(size(D));
 % Now find indices of inputs
 % Currently no seperation between inh and excitatory
 for i = 1:length(nmm) % target
@@ -201,11 +201,14 @@ for i = 1:n % targets
     for j = 1:n % sources
         for k = 1:numel(p.A) % connection type
             if abs(A{k}(i,j)) > TOL
-%                 ik       = afferent(nmm(i),k);
-%                 jk       = efferent(nmm(j),k);
-%                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
+                %                 ik       = afferent(nmm(i),k);
+                %                 jk       = efferent(nmm(j),k);
+                %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
+                if tstep-D(i,j)<=0
+                    disp('Borked')
+                end
                 xD = xint(Ds(i,j),tstep-D(i,j));
-                f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);  
+                f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);
             end
         end
     end

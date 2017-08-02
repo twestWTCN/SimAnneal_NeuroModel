@@ -9,7 +9,7 @@
 % Time of 1 loop (end of parfor) ~ 100s (270717)
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-R = simannealsetup_NPD;
+R = simannealsetup_CSD_app;
 rng(222)
 d = R.d; % clock
 

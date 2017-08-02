@@ -17,7 +17,7 @@ ii = 1;
 while ii <= searchN
     stdev = (R.SimAn.jitter*Tm(ii)); % Set maximum width of distribution from which to mutate
     rep = repset;
-    for jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         x = ic;
         %% Resample Parameters
         if iflag == 1
@@ -32,7 +32,7 @@ while ii <= searchN
         % Integrate in time master fx function
         %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
 %         xsims = R.IntP.intFx(x,m,pnew,R,u);
-        xsims = R.IntP.intFx(R,x,u,p,m);
+        xsims = R.IntP.intFx(R,x,u,pnew,m);
 % (R,x,u,p,m)
         if isfield(R.obs,'obsFx') % Run Observer function
             xsims = R.obs.obsFx(xsims,m,pnew,R);

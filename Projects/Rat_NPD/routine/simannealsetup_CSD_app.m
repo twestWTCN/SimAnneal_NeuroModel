@@ -37,7 +37,7 @@ R.SimAn.maxdev = 3;
 R.SimAn.jitter = 4;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 38; %40;
+R.SimAn.minRank = 32; %40;
 
 % Set simulation parameters
 % R.IntP.intFx = @stepintegrator_delay_Vec;
@@ -65,8 +65,8 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 0.45;
-R.obs.csd.reps = 18;
+R.obs.csd.df = 0.6;
+R.obs.csd.reps = 12;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
