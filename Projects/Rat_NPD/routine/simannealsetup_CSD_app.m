@@ -1,4 +1,4 @@
-function R = simannealsetup_NPD()
+function R = simannealsetup_NPD_app()
 R.d = clock;
 
 R.projectn = 'Rat_NPD';
@@ -37,7 +37,7 @@ R.SimAn.maxdev = 3;
 R.SimAn.jitter = 4;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 32; %40;
+R.SimAn.minRank = 38; %40;
 
 % Set simulation parameters
 % R.IntP.intFx = @stepintegrator_delay_Vec;

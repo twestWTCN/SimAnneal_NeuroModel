@@ -27,13 +27,13 @@ while ii <= searchN
             %         else
             %             pnew = p;
         end % only do outside first run
-         
+        
         %% Simulate New Data
         % Integrate in time master fx function
         %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
-%         xsims = R.IntP.intFx(x,m,pnew,R,u);
+        %         xsims = R.IntP.intFx(x,m,pnew,R,u);
         xsims = R.IntP.intFx(R,x,u,pnew,m);
-% (R,x,u,p,m)
+        % (R,x,u,p,m)
         if isfield(R.obs,'obsFx') % Run Observer function
             xsims = R.obs.obsFx(xsims,m,pnew,R);
         end
@@ -75,31 +75,44 @@ while ii <= searchN
     for i = 1:numel(par_rep)
         parBank = [parBank [full(spm_vec(par_rep{i})); r2loop(i)]];
     end
-    
-    % Find error size (epsilon)
+    % Clip parBank to the best
+    if size(parBank,2)>1024
+        [dum I] = sort(parBank(end,:),'descend');
+        parBank = parBank(:,I(1:1024));
+    end
+    % Find error threshold for temperature (epsilon)
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
-            eps = prctile(parBank(end,end-(rep/2):end),70);
+            eps = prctile(parBank(end,end-(rep/2):end),70); % take top 70 percentile
             eps_tmp = (-3.*Tm(ii))+2;
-            if eps>-0.1 && eps<eps_tmp
+            if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
                 eps = eps_tmp;
             end
             %+(Tm(ii)/5);
             eps = max(eps);
-            parOptBank = parBank(:,parBank(end,:)>eps);
-            while size(parOptBank,2)<R.SimAn.minRank
-                eps = eps-0.5;
-                parOptBank = parBank(:,parBank(end,:)>eps);
-                if eps<-100
-                    parOptBank = [];
-                    break
+            parOptBank = parBank(:,parBank(end,:)>eps); % create bank exceeding threshold
+            if eps<-0.5
+                while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
+                    eps = eps-0.5;
+                    parOptBank = parBank(:,parBank(end,:)>eps);
+                    if eps<-100
+                        parOptBank = [];
+                        break
+                    end
                 end
             end
         end
+        % Checks to stop the parbank (used for paramter sorts) getting to big (memory)
+        if size(parOptBank,2)> 512
+            [dum I] = sort(parOptBank(end,:),'descend');
+            parOptBank = parOptBank(:,I(1:512));
+        end
+        
         assignin('base','parOptBank',parOptBank)
         assignin('base','parBank',parBank)
         disp(size(parOptBank,2))
-        
+        % Now form the copula from kernel density fits to each parameter
+        % row
         if ~isempty(parOptBank)
             j = 0;
             clear copU xf ilist
@@ -108,7 +121,7 @@ while ii <= searchN
                 if sum(abs(diff(x)))>0 && var(x)>1/8
                     j = j +1;
                     ilist(j) = i;
-                    copU(j,:) = ksdensity(x,x,'function','cdf');
+                    copU(j,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
                     xf(j,:) = x;
                 end
             end
