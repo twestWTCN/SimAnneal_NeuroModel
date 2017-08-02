@@ -1,20 +1,7 @@
 function [xint] = spm_fx_compile(R,x,u,p,m)
 % Compiles NMM functions with delays, seperates intrinsic and extrinsic
 % dynamics then summates
- 
-% Compute X inds (removes need to spm_unvec which is slow)
-xinds = zeros(m.m,2);
-for i = 1:m.m
-    if i == 1
-    xinds(i,1) = 1;
-    xinds(i,2) = size(m.x{i},2);
-    else
-        xinds(i,1) = xinds(i-1,2)+1;
-        xinds(i,2) = xinds(i,1) + (size(m.x{i},2)-1);
-    end
-end
-m.xinds = xinds;
-
+xinds = m.xinds;
 % model-specific parameters
 %==========================================================================
 
@@ -63,23 +50,23 @@ afferent(9,:) = [2 2 2 2];               % targets of THAL connections
 
 % scaling of afferent extrinsic connectivity (Hz)
 %--------------------------------------------------------------------------
-E(1,:) = [1 0 1 0]*200;                    % ERP connections      
+E(1,:) = [1 0 1 0]*200;                    % ERP connections
 E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
-E(3,:) = [1.8 1.2 1.8 1.2]*100000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48 
-E(4,:) = [.1111 .6667 1 .1111]*100000;             % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200   
+E(3,:) = [1.8 1.2 1.8 1.2]*100000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
+E(4,:) = [.1111 .6667 1 .1111]*100000;             % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
 
 %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
-E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections 
-E(6,:) = [.5 .5 -.5 -.5]*100000;             % GPE connections 
-E(7,:) = [ 1  1 -.1  -1]*100000;             % STN connections 
-E(8,:) = [.5 .5 -.5 -.5]*100000;               % GPI connections 
-E(9,:) = [.5 .5 -.5 -.5]*100000;               % THAL connections 
+E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
+E(6,:) = [.5 .5 -.5 -.5]*100000;             % GPE connections
+E(7,:) = [ 1  1 -.1  -1]*100000;             % STN connections
+E(8,:) = [.5 .5 -.5 -.5]*100000;               % GPI connections
+E(9,:) = [.5 .5 -.5 -.5]*100000;               % THAL connections
 
-% E(5,:) = [.5 .5 .5 .5]*100000;             % STR connections 
-% E(6,:) = [.5 .5 .5 .5]*100000;             % GPE connections 
-% E(7,:) = [ 1  1 .1  1]*100000;             % STN connections 
-% E(8,:) = [.5 .5 .5 .5]*100000;               % GPI connections 
-% E(9,:) = [.5 .5 .5 .5]*100000;               % THAL connections 
+% E(5,:) = [.5 .5 .5 .5]*100000;             % STR connections
+% E(6,:) = [.5 .5 .5 .5]*100000;             % GPE connections
+% E(7,:) = [ 1  1 .1  1]*100000;             % STN connections
+% E(8,:) = [.5 .5 .5 .5]*100000;               % GPI connections
+% E(9,:) = [.5 .5 .5 .5]*100000;               % THAL connections
 
 
 % get the neural mass models {'ERP','CMC'}
@@ -92,17 +79,17 @@ for i = 1:n
     elseif strcmp(model(i).source,'CMC')
         nmm(i) = 2;
     elseif strcmp(model(i).source,'BGC')
-        nmm(i) = 3; 
-     elseif strcmp(model(i).source,'MMC')
+        nmm(i) = 3;
+    elseif strcmp(model(i).source,'MMC')
         nmm(i) = 4;
     elseif  strcmp(model(i).source,'STR')
         nmm(i) = 5;
     elseif  strcmp(model(i).source,'GPE')
         nmm(i) = 6;
     elseif  strcmp(model(i).source,'STN')
-        nmm(i) = 7;    
+        nmm(i) = 7;
     elseif  strcmp(model(i).source,'GPI')
-        nmm(i) = 8;    
+        nmm(i) = 8;
     elseif  strcmp(model(i).source,'THAL')
         nmm(i) = 9;
     end
@@ -125,24 +112,25 @@ D(1,6) = 6/1000;    % Thal to M1
 
 
 D = ceil(D.*exp(p.D).*(1/R.IntP.dt)); % As expectation of priors and convert units to steps
-D(D>R.IntP.buffer) = R.IntP.buffer-1; % Ensure delay not bigger than buffer
-D(D<((1e-3)/R.IntP.dt)&D>0) = floor((1e-3)/R.IntP.dt); % Minimum 1ms   
+D(D<((1e-3)/R.IntP.dt)&D>0) = floor((1e-3)/R.IntP.dt); % Minimum 1ms
 
+if (R.IntP.buffer-max(max(D)))<=0
+    R.IntP.buffer = max(max(D)) + 2;
+    disp(['Delay is bigger than buffer, increasing buffer to: ' num2str(R.IntP.buffer)])
+end
 Ds = zeros(size(D));Dt = zeros(size(D));
 % Now find indices of inputs
 % Currently no seperation between inh and excitatory
 for i = 1:length(nmm) % target
     for j = 1:length(D(i,:)) % source
         if D(i,j)>0
-        Ds(i,j) = afferent(nmm(j),1); % input sources
-        Ds(i,j) = (m.xinds(j,1)-1)+Ds(i,j);
-        Dt(i,j) = efferent(nmm(i),1); % input sources
-        Dt(i,j) = (m.xinds(i,1)-1)+Dt(i,j);
+            Ds(i,j) = afferent(nmm(j),1); % input sources
+            Ds(i,j) = (m.xinds(j,1)-1)+Ds(i,j);
+            Dt(i,j) = efferent(nmm(i),1); % input sources
+            Dt(i,j) = (m.xinds(i,1)-1)+Dt(i,j);
         end
     end
 end
-
-
 
 % synaptic activation function
 %--------------------------------------------------------------------------
@@ -182,41 +170,39 @@ end
 %% TIME INTEGRATION STARTS HERE ===========================================
 f = zeros(xinds(end),1);
 xint(:,1:R.IntP.buffer) = repmat(spm_vec(x),1,R.IntP.buffer);
-TOL = exp(-8);
+TOL = exp(3);
 for tstep = R.IntP.buffer:R.IntP.nt
-% assemble flow
-%==========================================================================
-N     = m;
-for i = 1:n % targets
-    % intrinsic flow
-    %----------------------------------------------------------------------
-    N.x  = m.x{i};
-    ui   = u(tstep,i);
-    Q    = p.int{i};
-    Q.C  = p.C(i,:);
-    xi = xint(m.xinds(i,1):m.xinds(i,2),tstep)';
-    f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
-    % extrinsic flow
-    %----------------------------------------------------------------------
-    for j = 1:n % sources
-        for k = 1:numel(p.A) % connection type
-            if abs(A{k}(i,j)) > TOL
-                %                 ik       = afferent(nmm(i),k);
-                %                 jk       = efferent(nmm(j),k);
-                %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
-                if tstep-D(i,j)<=0
-                    disp('Borked')
+    % assemble flow
+    %==========================================================================
+    N     = m;
+    for i = 1:n % targets
+        % intrinsic flow
+        %----------------------------------------------------------------------
+        N.x  = m.x{i};
+        ui   = u(tstep,i);
+        Q    = p.int{i};
+        Q.C  = p.C(i,:);
+        xi = xint(m.xinds(i,1):m.xinds(i,2),tstep)';
+        f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
+        % extrinsic flow
+        %----------------------------------------------------------------------
+        for j = 1:n % sources
+            for k = 1:numel(p.A) % connection type
+                if abs(A{k}(i,j)) > TOL
+                    %                 ik       = afferent(nmm(i),k);
+                    %                 jk       = efferent(nmm(j),k);
+                    %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
+                        xD = xint(Ds(i,j),tstep-D(i,j));
+                    
+                    f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);
                 end
-                xD = xint(Ds(i,j),tstep-D(i,j));
-                f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);
             end
         end
     end
-end
-xint(:,tstep+1) = xint(:,tstep) + (f.*R.IntP.dt);
-% if tstep >R.IntP.buffer*10
-%     pause
-% end
-% disp(tstep/R.IntP.nt)
-% xint= spm_unvec(x,M.x);
+    xint(:,tstep+1) = xint(:,tstep) + (f.*R.IntP.dt);
+    % if tstep >R.IntP.buffer*10
+    %     pause
+    % end
+    % disp(tstep/R.IntP.nt)
+    % xint= spm_unvec(x,M.x);
 end

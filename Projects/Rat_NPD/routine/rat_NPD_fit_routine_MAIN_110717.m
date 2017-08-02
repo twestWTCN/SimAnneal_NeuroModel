@@ -12,30 +12,27 @@ addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_Neuro
 R = simannealsetup_CSD_app;
 rng(222)
 d = R.d; % clock
-
-
-
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
-load([R.filepathn '\average_rat_lesion.mat'])
-% % % Set data as working version
-
-ftdata = ftdata_lesion;
-data = ftdata.trial{1}; fsamp = ftdata.fsample;
-%Normalise Data
-for i = 1:4
-    xtmp = data(i,:);
-    xtmp = (xtmp-mean(xtmp))/std(xtmp);
-    data(i,:) = xtmp;
-end
-%compute CSD data features
-R.data.fs = ftdata_lesion.fsample;
-
-R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
-[F_data,meannpd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-
-% % [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
+% load([R.filepathn '\average_rat_lesion.mat'])
+% % % % Set data as working version
+% 
+% ftdata = ftdata_lesion;
+% data = ftdata.trial{1}; fsamp = ftdata.fsample;
+% %Normalise Data
+% for i = 1:4
+%     xtmp = data(i,:);
+%     xtmp = (xtmp-mean(xtmp))/std(xtmp);
+%     data(i,:) = xtmp;
+% end
+% %compute CSD data features
+% R.data.fs = ftdata_lesion.fsample;
+% 
+% R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
+% [F_data,meannpd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+% 
+% % % [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+% save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
 % %%
 load([R.rootn 'data\storage\datafeat_npd']);
 R.data.feat_emp = meannpd_data;
@@ -78,17 +75,29 @@ DCM.Ep.A{1}(6,5) = 0; % Excitatory GPe to Thalamus
 DCM.Ep.A{1}(1,6) = 0; % Excitatory Thal to M1
 DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
 
+% p.A{3}(6,5) = -32; p.A{4}(6,5) = -32;
+
 % Keep only some fields
-
 p = DCM.Ep;
+% Connection strengths
 p.C = zeros(size(p.C,1),1);
+p.C_s = repmat(2,size(p.C));
 
+% Leadfield
 p.obs.LF = zeros(1,size(p.C,1));
+p.obs.LF_s = repmat(2,size(p.obs.LF));
+
 p.obs.mixing = zeros(1,size(p.C,1));
+p.obs.mixing_s = repmat(2,size(p.obs.mixing));
+
 m = DCM.M;
 x = m.x;
 A =  p.A; p = rmfield(p,'A');
-p.A{1} = A{1}; p.A{2} = A{3};
+p.A{1} = A{1}; 
+p.A_s{1} = repmat(4,size(A{1})); 
+p.A{2} = A{3};
+p.A_s{2} = repmat(4,size(A{3}));
+
 % setup exogenous noise
 
 % m.uset.p = DCM;
@@ -100,6 +109,14 @@ u = innovate_timeseries(R,m);
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
+p.D_s = repmat(0.6,size(p.D));
+
+% time constants and gains 
+for i = 1:m.m
+    p.int{i}.T_s = repmat(2,size(p.int{i}.T));
+    p.int{i}.G_s = repmat(2,size(p.int{i}.G));
+end
+
 m.n =  size([m.x{:}],2);
 m.fxord = DCM.Sname;
 m.Bmod = DCM.B;
@@ -124,9 +141,7 @@ for i = 1:size(m.x,2)
 end
 m.xinds = xinds;
 
-
 tic
-% p.A{3}(6,5) = -32; p.A{4}(6,5) = -32;
 %  p = xobs.out.P;
 for i = 1:4
     if i>1

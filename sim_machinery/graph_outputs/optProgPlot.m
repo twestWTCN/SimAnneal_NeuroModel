@@ -5,7 +5,8 @@ function [] = optProgPlot(tm,tbr2,p,R)
     subplot(2,1,2)
     a = fieldnames(p);
     for i = 1:numel(a)
-        if numel(eval(['p.' a{i}]))>100
+%         if numel(eval(['p.' a{i}]))>100 &&
+        if strmatch(a{i}(end),'_s')
             p = rmfield(p,a{i});
         end
     end

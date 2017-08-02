@@ -21,11 +21,11 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-5 3];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
-R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.Tm = 0.7; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
 R.SimAn.rep = 56; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
@@ -37,7 +37,7 @@ R.SimAn.maxdev = 3;
 R.SimAn.jitter = 4;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 38; %40;
+R.SimAn.minRank = 42; %40;
 
 % Set simulation parameters
 % R.IntP.intFx = @stepintegrator_delay_Vec;
@@ -65,8 +65,8 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 0.6;
-R.obs.csd.reps = 12;
+R.obs.csd.df = 1;
+R.obs.csd.reps = 18;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
