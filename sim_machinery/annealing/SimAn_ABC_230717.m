@@ -5,6 +5,7 @@ function [R] = SimAn_ABC_230717(ic,u,p,m,R)
 if isempty(m)
     m.m = 1;
 end
+pOrg = p;
 parBank = []; parOptBank = []; eps = -1;  iflag = 0; par = cell(1,R.SimAn.rep); psave = []; itry = 0;
 %% Notes
 % This version collapses parameter resamples into a single function
@@ -76,36 +77,39 @@ while ii <= searchN
         parBank = [parBank [full(spm_vec(par_rep{i})); r2loop(i)]];
     end
     % Clip parBank to the best
+    [dum I] = sort(parBank(end,:),'ascend');
     if size(parBank,2)>2048
-        [dum I] = sort(parBank(end,:),'descend');
-        parBank = parBank(:,I(1:1024));
+        parBank = parBank(:,I(1:2048));
+    else
+        parBank = parBank(:,I);
     end
     % Find error threshold for temperature (epsilon)
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
-            eps = prctile(parBank(end,end-(rep-1):end),85); % take top 70 percentile
-            eps_tmp = (-1.4.*Tm(ii))+1;
-            if eps>-0.5 && eps<eps_tmp % steps the annealing into gear
-                eps = eps_tmp;
-            end
-            %+(Tm(ii)/5);
-            eps = max(eps);
-            parOptBank = parBank(:,parBank(end,:)>eps); % create bank exceeding threshold
-            if eps<-0.5
+%             eps = prctile(parBank(end,end-(rep-1):end),75); % take top 70 percentile
+%             disp(['90% EPS: ' num2str(eps)])
+            eps= (-1.*Tm(ii))+1;disp(['Anneal EPS: ' num2str(eps)])
+%             if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
+%                 eps = eps_tmp;
+%                 disp(['Anneal EPS: ' num2str(eps)])
+%             end
+            parOptBank = parBank(:,parBank(end,:)>eps);
+            if eps<0.2
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
-                    eps = eps-0.5;
+                    eps = eps-0.005;
                     parOptBank = parBank(:,parBank(end,:)>eps);
                     if eps<-100
                         parOptBank = [];
                         break
                     end
                 end
+                disp(['Whileloop EPS: ' num2str(eps)])
             end
         end
         % Checks to stop the parbank (used for paramter sorts) getting to big (memory)
         if size(parOptBank,2)> 1024
             [dum I] = sort(parOptBank(end,:),'descend');
-            parOptBank = parOptBank(:,I(1:512));
+            parOptBank = parOptBank(:,I(1:1024));
         end
         
         assignin('base','parOptBank',parOptBank)
@@ -139,7 +143,7 @@ while ii <= searchN
             
             figure(3)
             clf
-            plotDistChange_KS(Rho,nu,xf,psave{1},R)
+            plotDistChange_KS(Rho,nu,xf,pOrg,R,stdev)
             % If redraw then increase epsilon
             Tm(ii+1) = Tm(ii)*alpha;
         else % If not enough samples - redraw from old distribution
@@ -179,14 +183,14 @@ while ii <= searchN
     if ii<2
         fx({R.data.feat_emp},{feat_sim_rep{I}},R.data.feat_xscale,R,1)
     else
-        fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:4)}},R.data.feat_xscale,R,I)
+        fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:6)}},R.data.feat_xscale,R,I)
     end
     drawnow; shg
     
     % Plot parameters and R2 track
     figure(2)
     clf
-    optProgPlot(Tm(1:ii),tbr2(1:ii),psave{ii},R)
+    optProgPlot(Tm(1:ii),tbr2(1:ii),pOrg,R)
     drawnow;shg
     %
     if istrue(R.plot.save)

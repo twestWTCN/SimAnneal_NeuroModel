@@ -1,4 +1,4 @@
-function plotDistChange_KS(Rho,nu,xf,psave,R)
+function plotDistChange_KS(Rho,nu,xf,psave,R,stdev)
 % Univariate plots
 subplot(1,2,1)
 for i = 1:2
@@ -8,13 +8,14 @@ for i = 1:2
         
         %{'.params','.noisecov'}
 %         M = psave(nind).params; M(M==0) = []; 
-        M = psave(nind).A{1}; M(M==0) = []; 
-        Ma = M(M>-30);
-       
+        M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
+        M_s(M==0) = []; %M(M==0) = []; 
+        Ma_s = M_s(M>-30); Ma = M(M>-30);
+
         cmap = linspecer(5);
         X = -5:.1:5;
         for Q = 1:5 %length(Ma)
-            p = normpdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm);
+            p = normpdf(X,Ma(Q),Ma_s(Q).*stdev);
 %             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
             plot(X,p,ls,'color',cmap(Q,:))
             hold on

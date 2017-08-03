@@ -10,7 +10,7 @@
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 R = simannealsetup_CSD_app;
-rng(222)
+rng(2042)
 d = R.d; % clock
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
@@ -94,9 +94,9 @@ m = DCM.M;
 x = m.x;
 A =  p.A; p = rmfield(p,'A');
 p.A{1} = A{1}; 
-p.A_s{1} = repmat(2,size(A{1})); 
+p.A_s{1} = repmat(3,size(A{1})); 
 p.A{2} = A{3};
-p.A_s{2} = repmat(2,size(A{3}));
+p.A_s{2} = repmat(3,size(A{3}));
 
 % setup exogenous noise
 
@@ -109,12 +109,12 @@ u = innovate_timeseries(R,m);
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.2,size(p.D));
+p.D_s = repmat(0.4,size(p.D));
 
 % time constants and gains 
 for i = 1:m.m
-    p.int{i}.T_s = repmat(1,size(p.int{i}.T));
-    p.int{i}.G_s = repmat(1,size(p.int{i}.G));
+    p.int{i}.T_s = repmat(2,size(p.int{i}.T));
+    p.int{i}.G_s = repmat(2,size(p.int{i}.G));
 end
 
 m.n =  size([m.x{:}],2);
