@@ -1,4 +1,4 @@
-function R = simannealsetup_NPD_app()
+function R = simannealsetup_CSD_app()
 R.d = clock;
 
 R.projectn = 'Rat_NPD';
@@ -22,11 +22,11 @@ R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC';
 % Set SimAn Parameters
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-5 3];
+R.SimAn.pOptBound = [-2 2];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.7; % Initial temperature
-R.SimAn.alpha = 0.98; % alpha increment
+R.SimAn.alpha = 0.975; % alpha increment
 R.SimAn.rep = 56; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
@@ -34,7 +34,7 @@ R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
 R.SimAn.maxdev = 3;
-R.SimAn.jitter = 4;
+R.SimAn.jitter = 1;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
 R.SimAn.minRank = 42; %40;
@@ -65,8 +65,8 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 1;
-R.obs.csd.reps = 18;
+R.obs.csd.df = 1.5;
+R.obs.csd.reps = 16;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;

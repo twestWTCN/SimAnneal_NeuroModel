@@ -81,11 +81,11 @@ DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1
 p = DCM.Ep;
 % Connection strengths
 p.C = zeros(size(p.C,1),1);
-p.C_s = repmat(2,size(p.C));
+p.C_s = repmat(1,size(p.C));
 
 % Leadfield
 p.obs.LF = zeros(1,size(p.C,1));
-p.obs.LF_s = repmat(2,size(p.obs.LF));
+p.obs.LF_s = repmat(1,size(p.obs.LF));
 
 p.obs.mixing = zeros(1,size(p.C,1));
 p.obs.mixing_s = repmat(2,size(p.obs.mixing));
@@ -94,9 +94,9 @@ m = DCM.M;
 x = m.x;
 A =  p.A; p = rmfield(p,'A');
 p.A{1} = A{1}; 
-p.A_s{1} = repmat(4,size(A{1})); 
+p.A_s{1} = repmat(2,size(A{1})); 
 p.A{2} = A{3};
-p.A_s{2} = repmat(4,size(A{3}));
+p.A_s{2} = repmat(2,size(A{3}));
 
 % setup exogenous noise
 
@@ -109,12 +109,12 @@ u = innovate_timeseries(R,m);
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.6,size(p.D));
+p.D_s = repmat(0.2,size(p.D));
 
 % time constants and gains 
 for i = 1:m.m
-    p.int{i}.T_s = repmat(2,size(p.int{i}.T));
-    p.int{i}.G_s = repmat(2,size(p.int{i}.G));
+    p.int{i}.T_s = repmat(1,size(p.int{i}.T));
+    p.int{i}.G_s = repmat(1,size(p.int{i}.G));
 end
 
 m.n =  size([m.x{:}],2);

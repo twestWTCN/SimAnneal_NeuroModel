@@ -76,16 +76,16 @@ while ii <= searchN
         parBank = [parBank [full(spm_vec(par_rep{i})); r2loop(i)]];
     end
     % Clip parBank to the best
-    if size(parBank,2)>1024
+    if size(parBank,2)>2048
         [dum I] = sort(parBank(end,:),'descend');
         parBank = parBank(:,I(1:1024));
     end
     % Find error threshold for temperature (epsilon)
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
-            eps = prctile(parBank(end,end-(rep/2):end),70); % take top 70 percentile
-            eps_tmp = (-3.*Tm(ii))+2;
-            if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
+            eps = prctile(parBank(end,end-(rep-1):end),85); % take top 70 percentile
+            eps_tmp = (-1.4.*Tm(ii))+1;
+            if eps>-0.5 && eps<eps_tmp % steps the annealing into gear
                 eps = eps_tmp;
             end
             %+(Tm(ii)/5);
@@ -103,7 +103,7 @@ while ii <= searchN
             end
         end
         % Checks to stop the parbank (used for paramter sorts) getting to big (memory)
-        if size(parOptBank,2)> 512
+        if size(parOptBank,2)> 1024
             [dum I] = sort(parOptBank(end,:),'descend');
             parOptBank = parOptBank(:,I(1:512));
         end
