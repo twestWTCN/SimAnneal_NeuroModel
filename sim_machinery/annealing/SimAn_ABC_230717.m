@@ -77,24 +77,24 @@ while ii <= searchN
         parBank = [parBank [full(spm_vec(par_rep{i})); r2loop(i)]];
     end
     % Clip parBank to the best
-    [dum I] = sort(parBank(end,:),'ascend');
+    [dum V] = sort(parBank(end,:),'ascend');
     if size(parBank,2)>2048
-        parBank = parBank(:,I(1:2048));
+        parBank = parBank(:,V(1:2048));
     else
-        parBank = parBank(:,I);
+        parBank = parBank(:,V);
     end
     % Find error threshold for temperature (epsilon)
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
-%             eps = prctile(parBank(end,end-(rep-1):end),75); % take top 70 percentile
-%             disp(['90% EPS: ' num2str(eps)])
-            eps= (-1.*Tm(ii))+1;disp(['Anneal EPS: ' num2str(eps)])
-%             if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
-%                 eps = eps_tmp;
-%                 disp(['Anneal EPS: ' num2str(eps)])
-%             end
+            eps = prctile(parBank(end,end-(rep-1):end),85); % take top 70 percentile
+            disp(['90% EPS: ' num2str(eps)])
+            eps_temp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps)])
+            if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
+                eps = eps_tmp;
+                disp(['Anneal EPS: ' num2str(eps)])
+            end
             parOptBank = parBank(:,parBank(end,:)>eps);
-            if eps<0.2
+            if size(parOptBank,2)-R.SimAn.minRank > rep/2 | itry >2
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
                     eps = eps-0.005;
                     parOptBank = parBank(:,parBank(end,:)>eps);
@@ -103,13 +103,16 @@ while ii <= searchN
                         break
                     end
                 end
+                itry = 0;
                 disp(['Whileloop EPS: ' num2str(eps)])
+            else
+                        disp('Difference between bank size and minimum rank is within tolerance, resampling')
             end
         end
         % Checks to stop the parbank (used for paramter sorts) getting to big (memory)
         if size(parOptBank,2)> 1024
-            [dum I] = sort(parOptBank(end,:),'descend');
-            parOptBank = parOptBank(:,I(1:1024));
+            [dum V] = sort(parOptBank(end,:),'descend');
+            parOptBank = parOptBank(:,V(1:1024));
         end
         
         assignin('base','parOptBank',parOptBank)

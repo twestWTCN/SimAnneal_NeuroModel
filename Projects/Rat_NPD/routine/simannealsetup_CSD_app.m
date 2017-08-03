@@ -22,11 +22,11 @@ R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC';
 % Set SimAn Parameters
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C'} %,'.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-2 2];
+R.SimAn.pOptBound = [-4 4];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
-R.SimAn.Tm = 1; % Initial temperature
-R.SimAn.alpha = 0.98; % alpha increment
+R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.alpha = 0.99; % alpha increment
 R.SimAn.rep = 56; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
