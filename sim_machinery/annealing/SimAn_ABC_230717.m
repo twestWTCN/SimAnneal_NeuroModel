@@ -86,15 +86,15 @@ while ii <= searchN
     % Find error threshold for temperature (epsilon)
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
-            eps = prctile(parBank(end,end-(rep-1):end),85); % take top 70 percentile
+            eps = prctile(parBank(end,end-(rep-1):end),70); % take top 70 percentile
             disp(['90% EPS: ' num2str(eps)])
-            eps_temp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps)])
+            eps_tmp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps)])
             if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
                 eps = eps_tmp;
                 disp(['Anneal EPS: ' num2str(eps)])
             end
             parOptBank = parBank(:,parBank(end,:)>eps);
-            if size(parOptBank,2)-R.SimAn.minRank > rep/2 | itry >2
+            if size(parOptBank,2)-R.SimAn.minRank > rep/2 || itry >2
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
                     eps = eps-0.005;
                     parOptBank = parBank(:,parBank(end,:)>eps);
@@ -103,7 +103,7 @@ while ii <= searchN
                         break
                     end
                 end
-                itry = 0;
+                itry = 0; flag = 0;
                 disp(['Whileloop EPS: ' num2str(eps)])
             else
                         disp('Difference between bank size and minimum rank is within tolerance, resampling')
@@ -120,7 +120,7 @@ while ii <= searchN
         disp(size(parOptBank,2))
         % Now form the copula from kernel density fits to each parameter
         % row
-        if ~isempty(parOptBank)
+        if size(parOptBank,2)>1
             j = 0;
             clear copU xf ilist
             for i = 1:(size(parOptBank,1)-1)
@@ -211,7 +211,7 @@ while ii <= searchN
     %             saveMkPath([R.rootn '\' R.projectn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],R)
     %             saveMkPath([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],parBank)
     %     end
-    
+    assignin('base','R_out',R)
     if iflag == 1
         ii = ii + 1;
     end

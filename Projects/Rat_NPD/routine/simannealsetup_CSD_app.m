@@ -19,25 +19,25 @@ R.frqz = [8:.2:48];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
-R.out.tag = 'NPD_ABC';
+R.out.tag = 'NPD_ABC_delay_fresh';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C'} %,'.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-4 4];
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptBound = [-3 3];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
-R.SimAn.alpha = 0.99; % alpha increment
-R.SimAn.rep = 56; % Repeats per temperature
+R.SimAn.alpha = 0.975; % alpha increment
+R.SimAn.rep = 86; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
 R.SimAn.maxdev = 3;
-R.SimAn.jitter = 1.5;
+R.SimAn.jitter = 1;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 42; %40;
+R.SimAn.minRank = 64; %40;
 
 % Set simulation parameters
 % R.IntP.intFx = @stepintegrator_delay_Vec;
@@ -46,7 +46,7 @@ R.IntP.intFxArgs = '(R,x,u,m,p)';
 R.IntP.compFx= @compareData_100717;
 R.IntP.compFxArgs = '(R,feat_sim)';
 
-R.IntP.dt = .00085;
+R.IntP.dt = .0005;
 % R.IntP.tend = 10;
 % R.IntP.nt = R.IntP.tend/R.IntP.dt;
 % R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.n_Vet);
@@ -65,8 +65,8 @@ R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 1.5;
-R.obs.csd.reps = 16;
+R.obs.csd.df = 0.45;
+R.obs.csd.reps = 12;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
@@ -103,7 +103,7 @@ R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;
-R.plot.save = 'False';
+R.plot.save = 'True';
 R.plot.distchangeFunc = @plotDistChange_KS;
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;

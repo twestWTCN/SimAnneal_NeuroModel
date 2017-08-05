@@ -1,14 +1,15 @@
 %function [] = modelProbs(x,m,p,varo,R)
 %% Resample parameters
-Rho = varo.Mfit.Rho;
-nu = varo.Mfit.nu;
+Rho = R_out.Mfit.Rho;
+nu = R_out.Mfit.nu;
 N = 1000;
 
-eps = 0.5;
+eps = 0.25;
 parOptBank = parBank(:,parBank(end,:)>eps);
 
 r = copularnd('t',Rho,nu,N);
 pvec = spm_vec(p);
+pvec(149) = 0.1;
 ilist = find(pvec>-32 & pvec~= 0);
 
 clear x1
