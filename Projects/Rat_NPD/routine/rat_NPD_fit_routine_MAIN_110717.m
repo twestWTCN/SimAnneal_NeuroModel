@@ -4,6 +4,7 @@
 % TO DO:
 % Reorganise the parameter shifts - p.C and p.A{2} going HUGE!?!
 % ~ Improve the graphic - report the EPS (perct. and while fit), distribution of NMRSEs, 
+% ~ also sample copula to show multivariate distribution?
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 R = simannealsetup_CSD_app;
@@ -100,7 +101,7 @@ p.A_s{2} = repmat(2,size(A{3}));
 
 % m.uset.p = DCM;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1/16; %.*R.IntP.dt;
+m.uset.p.scale = 5e2; %.*R.IntP.dt;
 
 u = innovate_timeseries(R,m);
 % u = u./R.IntP.dt;

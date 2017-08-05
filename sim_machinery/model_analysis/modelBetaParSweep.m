@@ -1,10 +1,11 @@
 %function [] = modelProbs(x,m,p,varo,R)
 % R = simannealsetup_CSD_app()
-load('C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\parsaves\prelim\sim_ABC_output_010817_d.mat')
+clear ;close all
+load('C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\parsaves\prelim\naive.mat')
 load('C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\parsaves\prelim\modsetup_Rmu.mat')
 
 
-R.IntP.dt = .0004;
+R.IntP.dt = .0005;
 R.obs.csd.df = 0.45;
 R.obs.csd.reps = 12;
 
@@ -19,10 +20,14 @@ dfact = fsamp/(2*2^(R.obs.SimOrd));
 disp(sprintf('The target simulation df is %.2f Hz',R.obs.csd.df));
 disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 
+% R.IntP.Utype = 'DCM_Str_Innov';
+m.uset.p = p;
+m.uset.p.covar = eye(m.m);
+m.uset.p.scale = 1/1e-9; %.*R.IntP.dt;
 u = innovate_timeseries(R,m);
 
-p = j;
-
+% p = j;
+x = m.x;
 
 for jj = 1:1
 %     ppm.increment();
@@ -30,10 +35,10 @@ for jj = 1:1
     % Integrate in time master fx function
     %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
     xsims = R.IntP.intFx(R,x,u,p,m);
-    
     if isfield(R.obs,'obsFx') % Run Observer function
         xsims = R.obs.obsFx(xsims,m,p,R);
     end
+figure; plot(xsims(1:6,:)'); shg
     if isfield(R.obs,'transFx') % Run Data Transform
         %% Construct CSD and compare to data
         %             fx = R.obs.transFx;

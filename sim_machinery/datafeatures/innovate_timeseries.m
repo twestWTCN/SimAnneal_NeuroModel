@@ -14,8 +14,7 @@ end
 
 switch R.IntP.Utype
     case 'DCM_Str_Innov'
-        DCM = m.uset.p;
-        [Gu,Gs,Gn,f] = spm_csd_mtf_gu(DCM.Ep,fw);
+        [Gu,Gs,Gn,f] = spm_csd_mtf_gu(m.uset.p,fw);
         
         for i = 1:size(Gu,2)
             F =  [fw; 1]; % Freqencies

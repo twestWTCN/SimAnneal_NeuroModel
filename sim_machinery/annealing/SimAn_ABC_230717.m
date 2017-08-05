@@ -51,6 +51,7 @@ while ii <= searchN
         R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
         r2rep{jj} = r2mean;
         par_rep{jj} = pnew;
+        xsims_rep{jj} = xsims;
         feat_sim_rep{jj} = feat_sim;
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % Iterates per temperature
@@ -195,7 +196,11 @@ while ii <= searchN
     clf
     optProgPlot(Tm(1:ii),tbr2(1:ii),pOrg,R)
     drawnow;shg
-    %
+    
+    figure(4)
+    plot(xsims_rep{I}')
+    drawnow;shg
+    
     if istrue(R.plot.save)
         saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\feattrack\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
         saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\r2track\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);

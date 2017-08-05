@@ -68,8 +68,6 @@ T     = T/1000;
 for i = 1:size(P.T,2)
     T(:,i) = T(:,i).*exp(P.T(:,i));
 end
-
-
 % intrinsic/extrinsic connections to be optimised
 %--------------------------------------------------------------------------
 j     = 1;

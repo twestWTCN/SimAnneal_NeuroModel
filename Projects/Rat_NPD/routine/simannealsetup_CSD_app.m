@@ -27,7 +27,7 @@ R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
 R.SimAn.alpha = 0.975; % alpha increment
-R.SimAn.rep = 86; % Repeats per temperature
+R.SimAn.rep = 24; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
@@ -103,7 +103,7 @@ R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;
-R.plot.save = 'True';
+R.plot.save = 'False';
 R.plot.distchangeFunc = @plotDistChange_KS;
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;
