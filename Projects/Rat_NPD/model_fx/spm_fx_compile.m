@@ -1,4 +1,4 @@
-function [xint] = spm_fx_compile(R,x,u,p,m)
+function [xstore] = spm_fx_compile(R,x,u,p,m)
 % Compiles NMM functions with delays, seperates intrinsic and extrinsic
 % dynamics then summates
 xinds = m.xinds;
@@ -168,8 +168,8 @@ for i = 1:n
 end
 
 %% TIME INTEGRATION STARTS HERE ===========================================
-f = zeros(xinds(end),1);
-xint(:,1:R.IntP.buffer) = repmat(spm_vec(x),1,R.IntP.buffer);
+f = zeros(xinds(end),1); dt = R.IntP.dt;
+xstore= full(repmat(spm_vec(x),1,R.IntP.buffer)); xint = ones(m.n,1);
 TOL = exp(3);
 for tstep = R.IntP.buffer:R.IntP.nt
     % assemble flow
@@ -182,7 +182,7 @@ for tstep = R.IntP.buffer:R.IntP.nt
         ui   = u(tstep,i);
         Q    = p.int{i};
         Q.C  = p.C(i,:);
-        xi = xint(m.xinds(i,1):m.xinds(i,2),tstep)';
+        xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
         f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
         % extrinsic flow
         %----------------------------------------------------------------------
@@ -192,14 +192,15 @@ for tstep = R.IntP.buffer:R.IntP.nt
                     %                 ik       = afferent(nmm(i),k);
                     %                 jk       = efferent(nmm(j),k);
                     %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
-                        xD = xint(Ds(i,j),tstep-D(i,j));
+                        xD = xstore(Ds(i,j),tstep-D(i,j));
                     
                     f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);
                 end
             end
         end
     end
-    xint(:,tstep+1) = xint(:,tstep) + (f.*R.IntP.dt);
+    xint = xint + (f.*dt);
+    xstore = [xstore xint];
     % if tstep >R.IntP.buffer*10
     %     pause
     % end
