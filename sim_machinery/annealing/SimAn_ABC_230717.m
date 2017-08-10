@@ -95,7 +95,7 @@ while ii <= searchN
                 disp(['Anneal EPS: ' num2str(eps)])
             end
             parOptBank = parBank(:,parBank(end,:)>eps);
-            if size(parOptBank,2)-R.SimAn.minRank < rep/3 || itry >2
+            if size(parOptBank,2)-R.SimAn.minRank < rep/2 || itry >2
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
                     eps = eps-0.005;
                     parOptBank = parBank(:,parBank(end,:)>eps);
@@ -198,7 +198,10 @@ while ii <= searchN
     drawnow;shg
     
     figure(4)
-    plot(xsims_rep{I}')
+    tvec_obs = R.IntP.tvec;
+    tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
+    R.IntP.tvec_obs = tvec_obs;
+    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}')
     drawnow;shg
     
     if istrue(R.plot.save)

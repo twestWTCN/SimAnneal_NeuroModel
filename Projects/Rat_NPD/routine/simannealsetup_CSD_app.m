@@ -59,14 +59,14 @@ R.obs.obsFxArgs = '(xsims,m,pnew,R)';
 R.obs.transFx = @constructCSDMat; %% @constructNPDMat;
 R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
 
-R.obs.brn =2; % 2; % burn in time
+R.obs.brn =1; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 0.8;
-R.obs.csd.reps = 18;
+R.obs.csd.df = 0.45;
+R.obs.csd.reps = 26;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
@@ -103,7 +103,7 @@ R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;
-R.plot.save = 'True';
+R.plot.save = 'False';
 R.plot.distchangeFunc = @plotDistChange_KS;
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;

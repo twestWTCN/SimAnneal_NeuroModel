@@ -1,4 +1,4 @@
-function [xstore] = spm_fx_compile(R,x,u,p,m)
+function [xstore,tvec] = spm_fx_compile(R,x,u,p,m)
 % Compiles NMM functions with delays, seperates intrinsic and extrinsic
 % dynamics then summates
 xinds = m.xinds;
@@ -201,9 +201,11 @@ for tstep = R.IntP.buffer:R.IntP.nt
     end
     xint = xint + (f.*dt);
     xstore = [xstore xint];
-    % if tstep >R.IntP.buffer*10
-    %     pause
-    % end
+%     if tstep >R.IntP.buffer*10
+%         pause
+%     end
     % disp(tstep/R.IntP.nt)
     % xint= spm_unvec(x,M.x);
 end
+
+% tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
