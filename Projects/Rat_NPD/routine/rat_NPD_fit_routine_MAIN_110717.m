@@ -101,7 +101,7 @@ p.A_s{2} = repmat(2,size(A{3}));
 
 % m.uset.p = DCM;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 5e2; %.*R.IntP.dt;
+m.uset.p.scale = 3e2; %.*R.IntP.dt;
 
 u = innovate_timeseries(R,m);
 % u = u./R.IntP.dt;

@@ -27,7 +27,7 @@ R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
 R.SimAn.alpha = 0.975; % alpha increment
-R.SimAn.rep = 24; % Repeats per temperature
+R.SimAn.rep = 86; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
@@ -37,7 +37,7 @@ R.SimAn.maxdev = 3;
 R.SimAn.jitter = 1;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-R.SimAn.minRank = 64; %40;
+R.SimAn.minRank = 56; %40;
 
 % Set simulation parameters
 % R.IntP.intFx = @stepintegrator_delay_Vec;
@@ -59,14 +59,14 @@ R.obs.obsFxArgs = '(xsims,m,pnew,R)';
 R.obs.transFx = @constructCSDMat; %% @constructNPDMat;
 R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
 
-R.obs.brn =1; % 2; % burn in time
+R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
-R.obs.csd.df = 0.45;
-R.obs.csd.reps = 12;
+R.obs.csd.df = 0.8;
+R.obs.csd.reps = 18;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
@@ -103,7 +103,7 @@ R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;
-R.plot.save = 'False';
+R.plot.save = 'True';
 R.plot.distchangeFunc = @plotDistChange_KS;
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;

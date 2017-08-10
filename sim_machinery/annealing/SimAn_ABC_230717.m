@@ -95,7 +95,7 @@ while ii <= searchN
                 disp(['Anneal EPS: ' num2str(eps)])
             end
             parOptBank = parBank(:,parBank(end,:)>eps);
-            if size(parOptBank,2)-R.SimAn.minRank > rep/2 || itry >2
+            if size(parOptBank,2)-R.SimAn.minRank < rep/3 || itry >2
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
                     eps = eps-0.005;
                     parOptBank = parBank(:,parBank(end,:)>eps);
@@ -164,7 +164,7 @@ while ii <= searchN
         break
     end
     
-    if ii>1 || iflag == 1
+    if (ii>1 || iflag == 1) && (size(xf,1)==size(Rho,2)) 
         r = copularnd('t',Rho,nu,rep);
         clear x1
         for Q = 1:size(xf,1)
