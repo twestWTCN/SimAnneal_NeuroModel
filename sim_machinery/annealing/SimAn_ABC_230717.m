@@ -15,6 +15,10 @@ repset =  R.SimAn.rep(1);
 Tm(1) =  R.SimAn.Tm;
 alpha = R.SimAn.alpha;
 ii = 1;
+
+% Compute parameter indices
+pInd = parOptInds_110817(R,p,m.m);
+
 while ii <= searchN
     stdev = (R.SimAn.jitter*Tm(ii)); % Set maximum width of distribution from which to mutate
     rep = repset;
@@ -88,8 +92,8 @@ while ii <= searchN
     if itry<5
         if size(parBank,2)>R.SimAn.minRank
             eps = prctile(parBank(end,end-(rep-1):end),70); % take top 70 percentile
-            disp(['90% EPS: ' num2str(eps)])
-            eps_tmp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps)])
+            disp(['90% EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps),2))])
+            eps_tmp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps_tmp),2))])
             if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
                 eps = eps_tmp;
                 disp(['Anneal EPS: ' num2str(eps)])
@@ -147,7 +151,7 @@ while ii <= searchN
             
             figure(3)
             clf
-            plotDistChange_KS(Rho,nu,xf,pOrg,R,stdev)
+            plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R,stdev)
             % If redraw then increase epsilon
             Tm(ii+1) = Tm(ii)*alpha;
         else % If not enough samples - redraw from old distribution
@@ -171,10 +175,10 @@ while ii <= searchN
             x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
         end
         clear base
-        base = spm_vec(p);
+        base = repmat(spm_vec(p),1,rep);
         for i = 1:rep
-            base(ilist) = x1(:,i);
-            par{i} = spm_unvec(base,p);
+            base(ilist,i) = x1(:,i);
+            par{i} = spm_unvec(base(:,i),p);
         end
     end
     
@@ -194,7 +198,13 @@ while ii <= searchN
     % Plot parameters and R2 track
     figure(2)
     clf
-    optProgPlot(Tm(1:ii),tbr2(1:ii),pOrg,R)
+    banksave{ii} = parBank(:,parBank(end,:)>eps);
+    if exist('par')
+        pmean = spm_unvec(mean(base,2),pOrg);
+    else
+        pmean = p;
+    end
+    optProgPlot(Tm(1:ii),tbr2(1:ii),pmean,banksave,eps,pInd,R)
     drawnow;shg
     
     figure(4)

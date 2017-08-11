@@ -1,22 +1,23 @@
-function plotDistChange_KS(Rho,nu,xf,psave,R,stdev)
+function plotDistChange_KS(Rho,nu,xf,psave,pInd,R,stdev)
 % Univariate plots
-subplot(1,2,1)
+indFlat = spm_vec(pInd);
+subplot(2,2,1)
 for i = 1:2
     if i == 1
         ls = '--';
         nind = 1;
         
         %{'.params','.noisecov'}
-%         M = psave(nind).params; M(M==0) = []; 
+        %         M = psave(nind).params; M(M==0) = [];
         M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
-        M_s(M==0) = []; %M(M==0) = []; 
+        M_s(M==0) = []; %M(M==0) = [];
         Ma_s = M_s(M>-30); Ma = M(M>-30);
-
+        
         cmap = linspecer(5);
         X = -5:.1:5;
         for Q = 1:5 %length(Ma)
             p = normpdf(X,Ma(Q),Ma_s(Q).*stdev);
-%             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
+            %             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
             plot(X,p,ls,'color',cmap(Q,:))
             hold on
         end
@@ -31,27 +32,59 @@ for i = 1:2
         end
     end
 end
-    xlabel('\mu')
-    ylabel('p(\mu)')
-    ylim([0 1]);
-    xlim(R.SimAn.pOptBound)
-    
-    subplot(1,2,2)
-    imagesc(Rho)
-    set(gca,'YDir','normal')
-    title('P Rho')
-    set(gca,'XTick',1:size(Rho,1))
-    set(gca,'YTick',1:size(Rho,1))
-    set(gcf,'Position',[2.5 617 884 383])
-    % Multivariate plots
-    %
-    %         u1 = r(:,1);
-    %         v1 = r(:,5);
-    %
-    %
-    %         x1 = ksdensity(xf(1,:),u1,'function','icdf');
-    %         y1 = ksdensity(xf(5,:),v1,'function','icdf');
-    %
-    %         figure;
-    %         scatterhist(x1,y1)
-    %         set(get(gca,'children'),'marker','.')
+xlabel('\mu')
+ylabel('p(\mu)')
+ylim([0 1]);
+xlim(R.SimAn.pOptBound)
+title('Apporximate Posterior Distributions')
+
+subplot(2,2,2)
+imagesc(Rho)
+set(gca,'YDir','normal')
+title('Copula Covariance')
+set(gca,'XTick',1:size(Rho,1))
+set(gca,'YTick',1:size(Rho,1))
+set(gcf,'Position',[2.5 617 884 383])
+% Multivariate plots
+
+r = copularnd('t',Rho,nu,1000);
+subplot(2,2,3)
+title('2D Sample Drawn from Copula')
+
+i = pInd.int{1}.T(1);
+j = pInd.int{1}.G(1);
+i = find(indFlat==i);
+j = find(indFlat==j);
+u1 = r(:,i);
+v1 = r(:,j);
+x1 = ksdensity(xf(i,:),u1,'function','icdf');
+y1 = ksdensity(xf(j,:),v1,'function','icdf');
+
+scatter(x1,y1);
+
+xlabel('M1 Time Constant'); ylabel('M1 Synaptic Gain')
+set(get(gca,'children'),'marker','.')
+
+subplot(2,2,4)
+title(' 3D Sample Drawn from Copula')
+
+i = pInd.A{1}(2);
+j = pInd.int{1}.G(1);
+k = pInd.C(1);
+
+i = find(indFlat==i);
+j = find(indFlat==j);
+k = find(indFlat==k);
+
+u1 = r(:,i);
+v1 = r(:,j);
+w1 = r(:,k);
+x1 = ksdensity(xf(i,:),u1,'function','icdf');
+y1 = ksdensity(xf(j,:),v1,'function','icdf');
+z1 = ksdensity(xf(k,:),w1,'function','icdf');
+
+scatter3(x1,y1,z1)
+xlabel('M1->STR A'); ylabel('STR Gain'); zlabel('M1->STR D');
+set(get(gca,'children'),'marker','.')
+
+set(gcf,'Position',[2.5000  272.0000  903.0000  728.0000])

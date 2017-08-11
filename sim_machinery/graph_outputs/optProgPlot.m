@@ -1,17 +1,18 @@
-function [] = optProgPlot(tm,tbr2,p,R)
+function [] = optProgPlot(Tm,tbr2,p,r2bank,eps,pInd,R)
+
     subplot(2,1,1)
-    plot(-tm,tbr2)
-    ylim([-1 1])
-    subplot(2,1,2)
-    a = fieldnames(p);
-    for i = 1:numel(a)
-%         if numel(eval(['p.' a{i}]))>100 &&
-        if strmatch(a{i}(end),'_s')
-            p = rmfield(p,a{i});
-        end
+    plot(-Tm,tbr2)
+    xlim([-R.SimAn.Tm-0.02 -0.25])
+    hold on
+    for i = 1:size(Tm,2)
+    bplot(r2bank{1}(end,:),-Tm(i),'width',0.01);
     end
+    ylim([-1 1])
+    
+    subplot(2,1,2)
+
     par = full(spm_vec(p));
-    par(par<-20) = 0;
+    par = par(spm_vec(pInd));
     bar(par)
 %     ylim([1.2*min(par) 1.2*max(par)]);
     xlim([0 length(par)])
