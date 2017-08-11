@@ -5,7 +5,7 @@ function [] = optProgPlot(Tm,tbr2,p,r2bank,eps,pInd,R)
     xlim([-R.SimAn.Tm-0.02 -0.25])
     hold on
     for i = 1:size(Tm,2)
-    bplot(r2bank{1}(end,:),-Tm(i),'width',0.01);
+    bplot(r2bank{i}(end,:),-Tm(i),'width',0.01);
     end
     ylim([-1 1])
     

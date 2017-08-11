@@ -21,7 +21,7 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC_delay_fresh';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{1}.S','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-3 3];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
@@ -34,7 +34,7 @@ R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
 R.SimAn.maxdev = 3;
-R.SimAn.jitter = 1;
+R.SimAn.jitter = 1.5;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
 R.SimAn.minRank = 56; %40;
@@ -66,7 +66,7 @@ R.obs.csd.abovezero = 'True'; % Bring above zero
 
 % desired freq res:
 R.obs.csd.df = 0.45;
-R.obs.csd.reps = 26;
+R.obs.csd.reps = 28;
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;

@@ -101,7 +101,7 @@ p.A_s{2} = repmat(2,size(A{3}));
 
 % m.uset.p = DCM;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1e2; %.*R.IntP.dt;
+m.uset.p.scale = 1; %.*R.IntP.dt;
 
 u = innovate_timeseries(R,m);
 u = u./R.IntP.dt;
@@ -114,6 +114,7 @@ p.D_s = repmat(0.5,size(p.D));
 for i = 1:m.m
     p.int{i}.T_s = repmat(1.5,size(p.int{i}.T));
     p.int{i}.G_s = repmat(1.5,size(p.int{i}.G));
+    p.int{i}.S_s = repmat(1.5,size(p.int{i}.G));
 end
 
 m.n =  size([m.x{:}],2);

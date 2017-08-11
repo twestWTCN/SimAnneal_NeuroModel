@@ -211,7 +211,11 @@ while ii <= searchN
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
-    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}')
+        subplot(2,1,1)
+    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}'); 
+            subplot(2,1,2)
+    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}'); xlim([5 8])
+
     drawnow;shg
     
     if istrue(R.plot.save)
