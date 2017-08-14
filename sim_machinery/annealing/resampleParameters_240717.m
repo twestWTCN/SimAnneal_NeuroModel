@@ -4,7 +4,12 @@ xMax = R.SimAn.pOptBound(2);
 plist = R.SimAn.pOptList;
 pnew = pold;
 for i = 1:length(plist)
-    for src = 1:length(MN)
+    if ~isempty(strfind(plist{i},'src'))
+        L = MN;
+    else
+        L = 1;
+    end
+    for src = 1:L
         if strmatch(plist{i},'.A')  % Case for matrices where we loop through
             for Ai = 1:2
                 X_old = eval(['pold' plist{i} '{Ai}']);
@@ -17,7 +22,7 @@ for i = 1:length(plist)
                 X = reshape(Xa,size(X_old));
                 X(X_old==-32) = -32;
                 eval(['pnew' plist{i} '{Ai} = X;']);
-%                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
+                %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
             end
             
         else

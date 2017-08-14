@@ -59,8 +59,9 @@ u1 = r(:,i);
 v1 = r(:,j);
 x1 = ksdensity(xf(i,:),u1,'function','icdf');
 y1 = ksdensity(xf(j,:),v1,'function','icdf');
-
 scatter(x1,y1);
+xlim(R.SimAn.pOptBound)
+ylim(R.SimAn.pOptBound)
 
 xlabel('M1 Time Constant'); ylabel('M1 Synaptic Gain')
 set(get(gca,'children'),'marker','.')
@@ -70,7 +71,7 @@ title(' 3D Sample Drawn from Copula')
 
 i = pInd.A{1}(2);
 j = pInd.int{1}.G(1);
-k = pInd.C(1);
+k = pInd.A{2}(2);
 
 i = find(indFlat==i);
 j = find(indFlat==j);
@@ -84,6 +85,10 @@ y1 = ksdensity(xf(j,:),v1,'function','icdf');
 z1 = ksdensity(xf(k,:),w1,'function','icdf');
 
 scatter3(x1,y1,z1)
+xlim(R.SimAn.pOptBound)
+ylim(R.SimAn.pOptBound)
+zlim(R.SimAn.pOptBound)
+
 xlabel('M1->STR A'); ylabel('STR Gain'); zlabel('M1->STR D');
 set(get(gca,'children'),'marker','.')
 

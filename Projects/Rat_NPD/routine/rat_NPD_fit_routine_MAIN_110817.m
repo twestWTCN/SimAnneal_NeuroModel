@@ -10,7 +10,7 @@ R = simannealsetup_CSD_app;
 rng(2042)
 d = R.d; % clock
 %% Prepare the data
-% prepareratdata_group(R.rootn,R.projectn);
+% % prepareratdata_group(R.rootn,R.projectn);
 load([R.filepathn '\average_rat_lesion.mat'])
 % % % Set data as working version
 
@@ -48,6 +48,7 @@ csdplotter_220517({meannpd_data},[],F_data,R)
 
 % load priors!
 load([R.rootn 'priors\onerat_bgm_DCM_multipass_split_finished.mat'])
+% load([R.rootn 'priors\alt_prior.mat'])
 % load('C:\Users\twest\Documents\Work\PhD\LitvakProject\Bernadette_DCM\outputs\splitup_BGM\onerat_bgm_DCM_multipass_280617','DCM')
 clear u
 % Initialise with random priors
@@ -70,7 +71,7 @@ DCM = DCM(2);
 DCM.Ep.A{1}(6,5) = 0; % Excitatory GPe to Thalamus
 %DCM.Ep.A{2}(6,5) = 0;
 DCM.Ep.A{1}(1,6) = 0; % Excitatory Thal to M1
-DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
+% DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
 DCM.Ep.A{1}(DCM.Ep.A{1}==0) = rand(size(DCM.Ep.A{1}(DCM.Ep.A{1}==0)));
 DCM.Ep.A{3}(DCM.Ep.A{3}==0) = rand(size(DCM.Ep.A{3}(DCM.Ep.A{3}==0)));
 % DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
@@ -84,11 +85,11 @@ p.C = zeros(size(p.C,1),1);
 p.C_s = repmat(1,size(p.C));
 
 % Leadfield
-p.obs.LF = zeros(1,size(p.obs.LF,1));
-p.obs.LF_s = repmat(1,size(p.obs.LF));
+p.obs.LF = zeros(size(R.obs.LF,1));
+p.obs.LF_s = repmat(0.5,size(p.obs.LF));
 
-p.obs.mixing = zeros(1,size(p.obs.mixing,1));
-p.obs.mixing_s = repmat(1,size(p.obs.mixing));
+p.obs.mixing = zeros(size(R.obs.mixing,1));
+p.obs.mixing_s = repmat(0.1,size(p.obs.mixing));
 
 m = DCM.M;
 x = m.x;
@@ -99,11 +100,9 @@ p.A{2} = A{3};
 p.A_s{2} = repmat(2,size(A{3}));
 
 % setup exogenous noise
-
-% m.uset.p = DCM;
+% m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1; %.*R.IntP.dt;
-
+m.uset.p.scale = 2; %.*R.IntP.dt;
 u = innovate_timeseries(R,m);
 u = u./R.IntP.dt;
 
@@ -150,7 +149,7 @@ for i = 1:4
 %     if i>1
 %         p = xobs1.out.P;
 %     end
-    [xobs1] = SimAn_ABC_230717(x,u,p,m,R);
+    [xobs1] = SimAn_ABC_110817(x,u,p,m,R);
 end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 mkdir(folname)

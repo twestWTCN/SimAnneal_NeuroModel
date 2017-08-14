@@ -19,6 +19,7 @@ for i = 1:length(R.obs.gainmeth)
                 xsims(i,:) = (xsims(i,:) - mean(xsims(i,:)))./std(xsims(i,:));
             end
         case 'mixing'
+            %% REPLACE WITH DISTANCE MATRIX
                 mixdeg = R.obs.mixing.*exp(p.obs.mixing);
                 sigmix = repmat(1-mixdeg,m.m,1).*eye(m.m);                
                 sigmix = sigmix + (repmat(mixdeg/(m.m-1),m.m,1).*~eye(m.m));

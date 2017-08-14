@@ -18,7 +18,7 @@ ii = 1;
 
 % Compute parameter indices
 pInd = parOptInds_110817(R,p,m.m);
-
+pIndMap = spm_vec(pInd);
 while ii <= searchN
     stdev = (R.SimAn.jitter*Tm(ii)); % Set maximum width of distribution from which to mutate
     rep = repset;
@@ -93,7 +93,7 @@ while ii <= searchN
         if size(parBank,2)>R.SimAn.minRank
             eps = prctile(parBank(end,end-(rep-1):end),70); % take top 70 percentile
             disp(['90% EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps),2))])
-            eps_tmp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps_tmp),2))])
+            eps_tmp = (-3.*Tm(ii))+2;disp(['Anneal EPS: ' num2str(eps_tmp) ', length ' num2str(size(parBank(:,parBank(end,:)>eps_tmp),2))])
             if eps>-0.1 && eps<eps_tmp % steps the annealing into gear
                 eps = eps_tmp;
                 disp(['Anneal EPS: ' num2str(eps)])
@@ -111,7 +111,7 @@ while ii <= searchN
                 itry = 0; flag = 0;
                 disp(['Whileloop EPS: ' num2str(eps)])
             else
-                        disp('Difference between bank size and minimum rank is within tolerance, resampling')
+                disp('Difference between bank size and minimum rank is within tolerance, resampling')
             end
         end
         % Checks to stop the parbank (used for paramter sorts) getting to big (memory)
@@ -128,14 +128,11 @@ while ii <= searchN
         if size(parOptBank,2)>1
             j = 0;
             clear copU xf ilist
-            for i = 1:(size(parOptBank,1)-1)
-                x = parOptBank(i,:);
-                if sum(abs(diff(x)))>0 && var(x)>1/8
-                    j = j +1;
-                    ilist(j) = i;
-                    copU(j,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
-                    xf(j,:) = x;
-                end
+            for i = 1:size(pIndMap,2)
+                x = parOptBank(pIndMap(i),:);
+                copU(j,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
+                xf(j,:) = x;
+                
             end
         end
         if size(parOptBank,2)> R.SimAn.minRank-1 % Ensure rank is larger than parameters
@@ -168,7 +165,7 @@ while ii <= searchN
         break
     end
     
-    if (ii>1 || iflag == 1) && (size(xf,1)==size(Rho,2)) 
+    if (ii>1 || iflag == 1) && (size(xf,1)==size(Rho,2))
         r = copularnd('t',Rho,nu,rep);
         clear x1
         for Q = 1:size(xf,1)
@@ -211,11 +208,11 @@ while ii <= searchN
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
-        subplot(2,1,1)
-    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}'); 
-            subplot(2,1,2)
-    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}'); xlim([5 8])
-
+    subplot(2,1,1)
+    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}');
+    subplot(2,1,2)
+    plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{I}'); xlim([5 6])
+    
     drawnow;shg
     
     if istrue(R.plot.save)

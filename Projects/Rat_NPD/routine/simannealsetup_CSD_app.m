@@ -15,14 +15,14 @@ addpath(genpath(R.rootm))
 R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'CSD'; %%'NPD'
 
-R.frqz = [8:.2:48];
+R.frqz = [6:.2:35];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC_delay_fresh';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{1}.S','.A','.C','.D'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
-R.SimAn.pOptBound = [-3 3];
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.A','.C','.D','.obs.mixing'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
@@ -33,8 +33,8 @@ R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
 R.SimAn.gradtol = [0.075 0.05];
 R.SimAn.saveout = 'xobs1';
-R.SimAn.maxdev = 3;
-R.SimAn.jitter = 1.5;
+R.SimAn.maxdev = 5;
+R.SimAn.jitter = 0.85;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
 R.SimAn.minRank = 56; %40;
@@ -96,9 +96,9 @@ R.obs.states = [7 9 11 13];
 LF = [20 2 2 2 2 2]; % Fit visually
 
 R.obs.LF = LF;
-R.obs.mixing = 0.1;
+R.obs.mixing = 0.008;
 
-R.obs.gainmeth = {'leadfield','unitvar'};  %'mixing'
+R.obs.gainmeth = {'mixing','unitvar'};  %'mixing'
 R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
