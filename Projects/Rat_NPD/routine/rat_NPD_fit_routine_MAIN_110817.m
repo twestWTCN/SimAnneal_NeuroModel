@@ -99,6 +99,7 @@ p.A_s{1} = repmat(2,size(A{1}));
 p.A{2} = A{3};
 p.A_s{2} = repmat(2,size(A{3}));
 
+p.S_s = 0.5;
 % setup exogenous noise
 % m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
@@ -114,7 +115,7 @@ p.D_s = repmat(0.5,size(p.D));
 for i = 1:m.m
     p.int{i}.T_s = repmat(1.5,size(p.int{i}.T));
     p.int{i}.G_s = repmat(1.5,size(p.int{i}.G));
-    p.int{i}.S_s = repmat(1.5,size(p.int{i}.G));
+    p.int{i}.S_s = repmat(0.5,size(p.int{i}.G));
 end
 
 m.n =  size([m.x{:}],2);
@@ -158,7 +159,7 @@ gif_maker_siman(R)
 % rerun but modulating delays and signal composition
 R.SimAn.opPar = {'mix' 'D' 'LF' 'A'};
 R.objfx.feattype = 'complex';
-R.objfx.specspec = 'cross'; 
+R.objfx.specspec = 'auto'; 
 R.IntP.intFunc = @stepintegrator_delay;
 R.SimAn.saveout = 'xobs2';
 R.out.tag = 'crossst';

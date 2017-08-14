@@ -21,7 +21,7 @@ R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 R.out.tag = 'NPD_ABC_delay_fresh';
 % Set SimAn Parameters
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.A','.C','.D','.obs.mixing'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.S','.A','.C','.D','.obs.mixing'}; %,'.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
@@ -100,7 +100,7 @@ R.obs.mixing = 0.008;
 
 R.obs.gainmeth = {'mixing','unitvar'};  %'mixing'
 R.objfx.feattype = 'complex'; %%'ForRev'; %
-R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
+R.objfx.specspec = 'auto'; %%'auto'; % which part of spectra to fit
 
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;
 R.plot.save = 'False';
