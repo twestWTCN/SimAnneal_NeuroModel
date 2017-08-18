@@ -300,8 +300,12 @@ while ii <= searchN
             saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\r2track\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
             saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\dist_track\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
             %     close all
-            saveMkPath([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],R)
-            saveMkPath([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],parBank)
+            pathstr = [R.rootn '\outputs\' R.out.tag]
+            if ~exist(pathstr, 'dir')
+                mkdir(pathstr);
+            end
+            save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],R)
+            save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],parBank)
             disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
         end
     end

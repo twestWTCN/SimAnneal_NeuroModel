@@ -17,8 +17,9 @@ d = '2017818';
 % modelProbs(m.x,m,p,R,d)
 
 % %% Plot Fit with Confidence intervals
-% PlotFeatureConfInt(R,d)
-
+figure(1)
+PlotFeatureConfInt(R,d)
+saveallfiguresFIL_n([R.rootn '\analysis\' R.out.tag '\featConfInts'],'-jpg',1,'-r200',1);
 
 optP = getOptParMean(m,p,R,d);
 
@@ -31,5 +32,6 @@ parsweep = modelBetaParSweep(m,optP,parsweep,R);
 pathstr = [R.rootn 'analysis\parsweeps\'];
 mkdir(pathstr);
 save([pathstr '\A_STNGPe_AGPeSTN_parsweep'],'parsweep');
-
-
+figure(2)
+parSweepPlot(R,parsweep)
+saveallfiguresFIL_n([R.rootn '\analysis\' R.out.tag '\parSweepSTNGPe.jpg'],'-jpg',1,'-r200',2);

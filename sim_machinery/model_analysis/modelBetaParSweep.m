@@ -20,7 +20,7 @@ end
 betaPowBank = zeros(m.m,N,N);
 frqPowBank = cell(N,N);
 for q = 1:N
-    for r = 1:N
+    parfor r = 1:N
         frqlist = 12:2:24;
         pnew = psweep{q,r};
         pnew.A{1}(3,4)
@@ -43,7 +43,7 @@ for q = 1:N
         end
         betaPow = sum(frqPow(:,frqlist>=14 & frqlist<22),2);
         
-%         frqPowBank{q,r} = frqPow
+        frqPowBank{q,r} = frqPow
         betaPowBank(:,q,r) = betaPow
         disp([q r])
     end

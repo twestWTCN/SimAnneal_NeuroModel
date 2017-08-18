@@ -47,7 +47,7 @@ R.obs.lowpass.cutoff = 80;
 R.obs.lowpass.order = 80;
 
 %% INTEGRATION
-R.IntP.intFx = @spm_fx_compile_170817;
+R.IntP.intFx = @spm_fx_compile_180817;
 R.IntP.intFxArgs = '(R,x,u,m,p)';
 R.IntP.compFx= @compareData_100717;
 R.IntP.compFxArgs = '(R,feat_sim)';

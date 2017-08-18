@@ -16,25 +16,25 @@ d = R.d; % clock
 
 %% Prepare the data
 % prepareratdata_group(R.rootn,R.projectn);
-%     load([R.filepathn '\average_rat_lesion.mat'])
-%     % Set data as working version
-%     ftdata = ftdata_lesion;
-%     data = ftdata.trial{1}; fsamp = ftdata.fsample;
-%     %Normalise Data
-%     for i = 1:4
-%         xtmp = data(i,:);
-%         xtmp = (xtmp-mean(xtmp))/std(xtmp);
-%         data(i,:) = xtmp;
-%     end
-%     %compute CSD data features
-%     R.data.fs = ftdata_lesion.fsample;
-%     R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
-%     if strcmp('CSD',R.data.datatype)
-%         [F_data,meannpd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-%     elseif strcmp('NPD',R.data.datatype)
-%         [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
-%     end
-%     save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
+    load([R.filepathn '\average_rat_lesion.mat'])
+    % Set data as working version
+    ftdata = ftdata_lesion;
+    data = ftdata.trial{1}; fsamp = ftdata.fsample;
+    %Normalise Data
+    for i = 1:4
+        xtmp = data(i,:);
+        xtmp = (xtmp-mean(xtmp))/std(xtmp);
+        data(i,:) = xtmp;
+    end
+    %compute CSD data features
+    R.data.fs = ftdata_lesion.fsample;
+    R.obs.DataOrd = floor(log2(R.data.fs/(2*R.obs.csd.df))); % order of NPD for simulated data
+    if strcmp('CSD',R.data.datatype)
+        [F_data,meannpd_data] = constructCSDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+    elseif strcmp('NPD',R.data.datatype)
+        [F_data,meannpd_data] = constructNPDMat(data,R.chloc_name,ftdata.label',fsamp,R.obs.DataOrd,R);
+    end
+    save([R.filepathn '\datafeat_npd'],'meannpd_data','F_data')
 % %%
 load([R.rootn 'data\storage\datafeat_npd']);
 
@@ -156,13 +156,14 @@ end
 %%%%%%%%%
 % load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\priors\sim_ABC_output_170817_a.mat')
 % p = a;
-load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\cross_fit_workspace.mat')
-R = R_out;
+% load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\cross_fit_workspace.mat')
+% R = R_out;
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 R.SimAn.jitter = 1;
+m.uset.p.scale = 0.1;
 R.out.tag = 'CSD_ABC_neatmodel_iterate';
 
-for i = 2:4
+for i = 1:4
     R.out.tag = [R.out.tag num2str(i)];
     if i>1
         p = R_out.Mfit.Pfit;
