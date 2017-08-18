@@ -2,7 +2,7 @@ function R = simannealsetup_170817()
 R.d = clock;
 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'NPD_ABC_delay_fresh';
+R.out.tag = 'CSD_neatmodel';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
@@ -40,7 +40,7 @@ R.obs.csd.reps = 24;
 R.obs.states = [7 9 11 13];
 % LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
 % LF = [1 1 1 1 1 1]; % Fit visually and for normalised data
-LF = [0.7 0.6 0.6 0.6 0.5 0.5]; % Fit visually and for normalised data
+LF = [1 1 0.9 0.6 0.5 0.5]; % Fit visually and for normalised data
 R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
@@ -84,11 +84,11 @@ R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
-R.SimAn.alpha = 0.975; % alpha increment
+R.SimAn.alpha = 0.97; % alpha increment
 R.SimAn.rep = 86; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
-R.SimAn.jitter = 0.8;
+R.SimAn.jitter = 1;
 R.SimAn.minRank = 56; %40;
 
 %% PLOTTING

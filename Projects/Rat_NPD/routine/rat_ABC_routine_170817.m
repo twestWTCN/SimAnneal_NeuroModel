@@ -121,14 +121,14 @@ p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = zeros(size(R.obs.LF));
-p.obs.LF_s = repmat(0.8,size(p.obs.LF));
+p.obs.LF_s = repmat(1.5,size(p.obs.LF));
 
 p.obs.mixing = [-0.2916 -0.0455]; %zeros(size(R.obs.mixing));
-p.obs.mixing_s = repmat(0.4,size(p.obs.mixing));
+p.obs.mixing_s = repmat(0.6,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.5,size(p.D));
+p.D_s = repmat(1,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = 0;
@@ -145,26 +145,28 @@ for i = 1:m.m
         p.int{i}.S_s = repmat(1,size(p.int{i}.S));
     else
         p.int{i}.T = zeros(1,m.Tint(i));
-        p.int{i}.T_s = repmat(0.2,1,m.Tint(i));
+        p.int{i}.T_s = repmat(0.5,1,m.Tint(i));
         p.int{i}.G = zeros(1,m.Gint(i));
-        p.int{i}.G_s = repmat(0.2,1,m.Gint(i));
+        p.int{i}.G_s = repmat(0.5,1,m.Gint(i));
          p.int{i}.S = zeros(1);
-        p.int{i}.S_s = repmat(0.2,1,1);
+        p.int{i}.S_s = repmat(0.5,1,1);
     end
 end
 
 %%%%%%%%%
 % load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\priors\sim_ABC_output_170817_a.mat')
 % p = a;
+load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\cross_fit_workspace.mat')
+R = R_out;
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
-R.SimAn.jitter = 0.8;
-R.out.tag = 'NPD_ABC_autoB4cross';
+R.SimAn.jitter = 1;
+R.out.tag = 'CSD_ABC_neatmodel_iterate';
 
-for i = 1:4
+for i = 2:4
     R.out.tag = [R.out.tag num2str(i)];
-%     if i>1
-%         p = xobs1.out.P;
-%     end
+    if i>1
+        p = R_out.Mfit.Pfit;
+    end
     [xobs1] = SimAn_ABC_110817(m.x,u,p,m,R);
 end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];

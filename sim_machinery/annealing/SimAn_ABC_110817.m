@@ -46,8 +46,25 @@ pIndMap = spm_vec(pInd); % in flat form
 R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
 % set initial batch of parameters from gaussian priors
 stdev = R.SimAn.jitter*Tm(1); % set the global precision
-for jj = 1:repset
-    par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
+if isfield(R,'mfit')
+    disp('Drawing from copula...')
+    r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,rep);
+    clear x1
+    for Q = 1:size(xf,1)
+        x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
+    end
+    % setup pars from base
+    clear base
+    base = repmat(spm_vec(p),1,rep);
+    for i = 1:rep
+        base(pIndMap,i) = x1(:,i);
+        par{i} = spm_unvec(base(:,i),p);
+    end
+    iflag = 1;
+else
+    for jj = 1:repset
+        par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
+    end
 end
 itry = 0;
 eps_p = -100;
@@ -145,7 +162,7 @@ while ii <= searchN
         % copula formation
         if size(parOptBank,2)> R.SimAn.minRank-1
             itry = 0; % set itry to 0 as criterion is met
-        elseif itry >=3
+        elseif itry >=2 && ((R.SimAn.minRank-size(parOptBank,2))< 0.25*R.SimAn.minRank)
             disp(['To many attempts using old copula/dist, using pseudopars EPS instead: ' num2str(eps)])
             aN = R.SimAn.minRank-size(parOptBank,2);
             mu = mean(parBank(:,end-R.SimAn.minRank:end),2);
@@ -156,14 +173,17 @@ while ii <= searchN
             catch
                 disp('covar matrix is non-symmetric postive definite')
             end
-            %             while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
-            %                 eps = eps-0.005;
-            %                 parOptBank = parBank(:,parBank(end,:)>eps);
-            %                 if eps<-100
-            %                     parOptBank = [];
-            %                     break
-            %                 end
-            %             end
+            itry = 0;
+            elseif itry >=3
+                while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
+                    eps = eps-0.005;
+                    parOptBank = parBank(:,parBank(end,:)>eps);
+                    if eps<-100
+                        parOptBank = [];
+                        break
+                    end
+                end
+               disp(['To many attempts using old copula/dist, using closest Whille EPS instead: ' num2str(eps)])
             itry = 0;
         else
             itry = itry + 1;
@@ -185,7 +205,6 @@ while ii <= searchN
         %% This is where the multivariate posterior parameter estimate is computed using copulas
         if size(parOptBank,2)> R.SimAn.minRank-1 % Ensure rank is larger than parameters
             disp('Forming new copula...')
-            iflag = 1; % flag to draw from distribution (should only go up once- following first copula)
             clear copU xf ilist
             % First form kernel density estimates for each optimized
             % parameter
@@ -199,13 +218,13 @@ while ii <= searchN
             R.Mfit.Rho = Rho;
             R.Mfit.nu = nu;
             R.Mfit.tbr2 = parOptBank(end,1); % get best fit
-            
+            R.Mfit.Pfit = spm_unvec(mean(parOptBank,2),p);
             %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
             figure(3)
             clf
             plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R,stdev)
             %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
-            
+            itry = 0;
             % If redraw then increase epsilon
             iflag = 1;
         else  % If not enough samples - redraw using means from the best fitting model
@@ -217,7 +236,7 @@ while ii <= searchN
     end
     
     %% Now draw parameter sets for the next set of replicates
-    if iflag == 1 && itry < 4
+    if iflag == 1 && itry < 3 
         disp('Drawing from copula...')
         r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,rep);
         clear x1
@@ -297,7 +316,7 @@ while ii <= searchN
     assignin('base','R_out',R)
    
 Tm(ii+1) = Tm(ii)*alpha;
-    if iflag == 1
+    if itry == 0
         ii = ii + 1;
     end
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
