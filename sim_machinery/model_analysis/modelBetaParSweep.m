@@ -1,57 +1,57 @@
-%function [] = modelProbs(x,m,p,varo,R)
-% R = simannealsetup_CSD_app()
-clear ;close all
-load('C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\parsaves\prelim\naive.mat')
-load('C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\parsaves\prelim\modsetup_Rmu.mat')
+function parsweep = modelBetaParSweep(m,p,parsweep,R)
+R.obs.gainmeth = R.obs.gainmeth(1:2);
+% R.obs.gainmeth = {'unitvar','leadfield','submixing'};
+bwid = 1.5;
 
-
-R.IntP.dt = .0005;
-R.obs.csd.df = 0.45;
-R.obs.csd.reps = 12;
-
-N = R.obs.csd.reps; % Number of epochs of desired frequency res
-fsamp = 1/R.IntP.dt;
-R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
-R.IntP.tend = (N*(2^(R.obs.SimOrd)))/fsamp;
-R.IntP.nt = round(R.IntP.tend/R.IntP.dt);
-R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
-
-dfact = fsamp/(2*2^(R.obs.SimOrd));
-disp(sprintf('The target simulation df is %.2f Hz',R.obs.csd.df));
-disp(sprintf('The actual simulation df is %.2f Hz',dfact));
-
-% R.IntP.Utype = 'DCM_Str_Innov';
-m.uset.p = p;
-m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1/1e-9; %.*R.IntP.dt;
 u = innovate_timeseries(R,m);
+u = u./R.IntP.dt;
 
-% p = j;
-x = m.x;
-
-for jj = 1:1
-%     ppm.increment();
-    %% Simulate New Data
-    % Integrate in time master fx function
-    %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
-    xsims = R.IntP.intFx(R,x,u,p,m);
-    if isfield(R.obs,'obsFx') % Run Observer function
-        xsims = R.obs.obsFx(xsims,m,p,R);
+N = 12;
+Qlist = linspace(-2,2,N);
+Rlist = linspace(-2,2,N);
+for q = 1:N
+    for r = 1:N
+        pa = p;
+        eval(['pa' parsweep.Q ' = Qlist(q);'])
+        eval(['pa' parsweep.R ' = Rlist(r);'])
+        psweep{q,r} = pa;
     end
-figure; plot(xsims(1:6,:)'); shg
-    if isfield(R.obs,'transFx') % Run Data Transform
-        %% Construct CSD and compare to data
-        %             fx = R.obs.transFx;
-        %             [~,feat_sim] = fx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,10,R);
-        [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,7,R);
-    else
-        feat_sim = xsims; % else take raw time series
+end
+betaPowBank = zeros(m.m,N,N);
+frqPowBank = cell(N,N);
+for q = 1:N
+    for r = 1:N
+        frqlist = 12:2:24;
+        pnew = psweep{q,r};
+        pnew.A{1}(3,4)
+        % Integrate
+        xsims = R.IntP.intFx(R,m.x,u,pnew,m);
+        % Run Observer function
+        if isfield(R.obs,'obsFx')
+            xsims = R.obs.obsFx(xsims,m,pnew,R);
+        end
+        
+        % Plot
+        % figure
+        % plotRawTimeSeries(R,xsims)
+        % set(gcf,'Position',[680  281  824  696])
+        frqPow = zeros(m.m,length(frqlist));
+        for i = 1:m.m
+            for j = 1:length(frqlist)
+                frqPow(i,j) = bandpower(xsims(i,:),1/R.IntP.dt,[frqlist(j)-bwid frqlist(j)+bwid]);
+            end
+        end
+        betaPow = sum(frqPow(:,frqlist>=14 & frqlist<22),2);
+        
+%         frqPowBank{q,r} = frqPow
+        betaPowBank(:,q,r) = betaPow
+        disp([q r])
     end
-    % Now using NRMSE
-    r2mean  = R.IntP.compFx(R,feat_sim);
-    R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
-%     r2rep{jj} = r2mean;
-%     par_rep{jj} = pnew;
-    disp(jj); % 
 end
 
+parsweep.Rlist = Rlist;
+parsweep.Qlist = Qlist;
+parsweep.R = '.A{1}(3,4)';
+parsweep.Q = '.A{2}(4,3)';
+parsweep.frqPowBank = frqPowBank;
+parsweep.betaPowBank = betaPowBank;

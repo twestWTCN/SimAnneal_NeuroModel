@@ -1,58 +1,76 @@
-%function [] = modelProbs(x,m,p,varo,R)
+function [permMod] = modelProbs(x,m,p,R,d)
+if nargin<5
+    d = sprintf('%d',[R.d(1:3)]);
+end
+load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
+parOptBank = varo;
+% figure
+% hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])
+eps = R.analysis.modEvi.eps;
+N = R.analysis.modEvi.N;
+% parOptBank = parOptBank(:,parOptBank(end,:)>eps);
 %% Resample parameters
-Rho = R_out.Mfit.Rho;
-nu = R_out.Mfit.nu;
-N = 1000;
+% Compute indices of optimised parameter
+pInd = parOptInds_110817(R,p,m.m); % in structure form
+pIndMap = spm_vec(pInd); % in flat form
+R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
+xf = zeros(size(pIndMap,1),size(parOptBank,2));
+for i = 1:size(pIndMap,1)
+    x = parOptBank(pIndMap(i),:); % choose row of parameter values
+    xf(i,:) = x;
+end
 
-eps = 0.25;
-parOptBank = parBank(:,parBank(end,:)>eps);
-
-r = copularnd('t',Rho,nu,N);
-pvec = spm_vec(p);
-pvec(149) = 0.1;
-ilist = find(pvec>-32 & pvec~= 0);
-
+disp('Drawing from copula...')
+r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,N);
 clear x1
-for Q = 1:size(ilist,1)
-    x1(Q,:) = ksdensity(parOptBank(ilist(Q),:),r(:,Q),'function','icdf');
+for Q = 1:size(xf,1)
+    x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
 end
+% setup pars from base
 clear base
-base = spm_vec(p);
-for jj = 1:N
-    base(ilist) = x1(:,i);
-    par{jj} = spm_unvec(base,p);
+base = repmat(spm_vec(p),1,N);
+for i = 1:N
+    base(pIndMap,i) = x1(:,i);
 end
+spm_unvec(mean(base,2),p)
+
 if isempty(gcp)
     parpool
 end
-% ppm = ParforProgMon('Model Probability Calculation',N);
+
+ppm = ParforProgMon('Model Probability Calculation',N);
 
 parfor jj = 1:N
 %     ppm.increment();
     pnew = par{jj};
     %% Simulate New Data
-    % Integrate in time master fx function
-    %         xsims = eval([R.IntP.intFx R.IntP.intFxArgs]);
-    xsims = R.IntP.intFx(x,m,pnew,R);
-    
-    if isfield(R.obs,'obsFx') % Run Observer function
+        u = innovate_timeseries(R,m);
+        u = u./R.IntP.dt;
+    xsims = R.IntP.intFx(R,m.x,u,pnew,m);
+    % Run Observer function
+    if isfield(R.obs,'obsFx')
         xsims = R.obs.obsFx(xsims,m,pnew,R);
     end
-    if isfield(R.obs,'transFx') % Run Data Transform
-        %% Construct CSD and compare to data
-        %             fx = R.obs.transFx;
-        %             [~,feat_sim] = fx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,10,R);
-        [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,7,R);
+    % Run Data Transform
+    if isfield(R.obs,'transFx')
+        [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
     else
         feat_sim = xsims; % else take raw time series
     end
-    % Now using NRMSE
+    % Compare Pseudodata with Real
     r2mean  = R.IntP.compFx(R,feat_sim);
-    R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
+
+%     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
     r2rep{jj} = r2mean;
     par_rep{jj} = pnew;
+    feat_rep{jj} = feat_sim;
     disp(jj); % 
+    ppm.increment(); 
 end
+permMod.r2rep = r2rep;
+permMod.par_rep = par_rep;
+permMod.feat_rep = feat_rep;
+save([R.rootn 'outputs\' R.out.tag '\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 figure
 r2bank = [r2rep{:}];
