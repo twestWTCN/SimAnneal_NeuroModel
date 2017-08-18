@@ -13,15 +13,29 @@ switch R.data.datatype
                             ffx = (squeeze(imag(NPDemp(i,j,:))));
                             r(1) = goodnessOfFit(yfx,ffx,'NRMSE');
                             
-                            yfx = squeeze(real(NPDsim(i,j,:)));
-                            ffx = squeeze(real(NPDemp(i,j,:)));
+                            yfx = (squeeze(real(NPDsim(i,j,:))));
+                            ffx = (squeeze(real(NPDemp(i,j,:))));
                             r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
-                            
                             r2loop(i,j) = mean(r);
                             
                         else
-                            yfx = squeeze(real(NPDsim(i,j,:)));
-                            ffx = squeeze(real(NPDemp(i,j,:)));
+                            yfx = squeeze(abs(NPDsim(i,j,:)));
+                            ffx = squeeze(abs(NPDemp(i,j,:)));
+                            r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
+                            
+                            r2loop(i,j) = r(2);
+                        end
+                    case 'imaginary'
+                        if i~=j
+                            yfx = (squeeze(imag(NPDsim(i,j,:))));
+                            ffx = (squeeze(imag(NPDemp(i,j,:))));
+                            r(1) = goodnessOfFit(yfx,ffx,'NRMSE');
+                            
+                            r2loop(i,j) = r(1); %mean(r);
+                            
+                        else
+                            yfx = squeeze(abs(NPDsim(i,j,:)));
+                            ffx = squeeze(abs(NPDemp(i,j,:)));
                             r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
                             
                             r2loop(i,j) = r(2);

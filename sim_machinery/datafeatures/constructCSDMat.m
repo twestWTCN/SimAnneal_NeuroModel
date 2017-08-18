@@ -20,11 +20,11 @@ for chI = 1:size(chloc_name,2)
                 else
                     Pxy =  Pxy(F>4);
                 end
-                if R.obs.csd.ztranscsd
+                if istrue(R.obs.csd.ztranscsd)
                     Pxy = (Pxy-mean(Pxy))/std(Pxy);
                 end
 %                 if chI == chJ
-                    if R.obs.csd.abovezero
+                    if istrue(R.obs.csd.abovezero)
                         if min(Pxy)<0
                             Pxy = Pxy-min(Pxy);
                         else

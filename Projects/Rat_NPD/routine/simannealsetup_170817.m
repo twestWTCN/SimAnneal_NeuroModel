@@ -1,4 +1,4 @@
-function R = simannealsetup_CSD_app()
+function R = simannealsetup_170817()
 R.d = clock;
 
 R.projectn = 'Rat_NPD';
@@ -26,6 +26,8 @@ R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
 R.obs.obsFxArgs = '(xsims,m,pnew,R)';
+R.obs.gainmeth = {'unitvar','leadfield','submixing'}; %,'lowpass'};  %unitvar'mixing'
+
 R.obs.transFx = @constructCSDMat; %% @constructNPDMat;
 R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
 R.obs.brn =1; % 2; % burn in time
@@ -34,21 +36,15 @@ R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 0.45;
-R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
 R.obs.csd.reps = 24;
 R.obs.states = [7 9 11 13];
 % LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
 % LF = [1 1 1 1 1 1]; % Fit visually and for normalised data
-LF = [0.5 0.5 0.6 0.5 0.5 0.5]; % Fit visually and for normalised data
+LF = [0.7 0.6 0.6 0.6 0.5 0.5]; % Fit visually and for normalised data
 R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
 R.obs.lowpass.order = 80;
-fsamp = 1/R.IntP.dt;
-nyq = fsamp/2;
-Wn = R.obs.lowpass.order/nyq;
-R.obs.lowpass.fwts = fir1(R.obs.lowpass.order,Wn);
-R.obs.gainmeth = {'unitvar','leadfield','submixing'}; %,'lowpass'};  %unitvar'mixing'
 
 %% INTEGRATION
 R.IntP.intFx = @spm_fx_compile_170817;
@@ -62,6 +58,7 @@ R.IntP.buffer = ceil(0.050*(1/R.IntP.dt)); % buffer for delays
 
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
+R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
 R.IntP.tend = (N*(2^(R.obs.SimOrd)))/fsamp;
 R.IntP.nt = R.IntP.tend/R.IntP.dt;
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
@@ -70,12 +67,19 @@ dfact = fsamp/(2*2^(R.obs.SimOrd));
 disp(sprintf('The target simulation df is %.2f Hz',R.obs.csd.df));
 disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 
+% (precompute filter)
+fsamp = 1/R.IntP.dt;
+nyq = fsamp/2;
+Wn = R.obs.lowpass.order/nyq;
+R.obs.lowpass.fwts = fir1(R.obs.lowpass.order,Wn);
+
+
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'complex'; %%'ForRev'; %
 R.objfx.specspec = 'auto'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.S','.A','.D','.C','.obs.mixing'}; %,'.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.S','.A','.D','.C','.obs.mixing','.obs.LF'}; %,'.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;

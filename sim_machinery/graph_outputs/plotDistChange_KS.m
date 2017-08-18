@@ -14,7 +14,7 @@ for i = 1:2
         Ma_s = M_s(M>-30); Ma = M(M>-30);
         
         cmap = linspecer(5);
-        X = -5:.1:5;
+        X = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
         for Q = 1:5 %length(Ma)
             p = normpdf(X,Ma(Q),Ma_s(Q).*stdev);
             %             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
@@ -35,7 +35,7 @@ end
 xlabel('\mu')
 ylabel('p(\mu)')
 ylim([0 1]);
-xlim(R.SimAn.pOptBound)
+xlim(R.SimAn.pOptBound.*0.5)
 title('Apporximate Posterior Distributions')
 
 subplot(2,2,2)
@@ -60,8 +60,8 @@ v1 = r(:,j);
 x1 = ksdensity(xf(i,:),u1,'function','icdf');
 y1 = ksdensity(xf(j,:),v1,'function','icdf');
 scatter(x1,y1);
-xlim(R.SimAn.pOptBound)
-ylim(R.SimAn.pOptBound)
+xlim(R.SimAn.pOptBound.*0.5)
+ylim(R.SimAn.pOptBound.*0.5)
 
 xlabel('M1 Time Constant'); ylabel('M1 Synaptic Gain')
 set(get(gca,'children'),'marker','.')
@@ -71,7 +71,7 @@ title(' 3D Sample Drawn from Copula')
 
 i = pInd.A{1}(2);
 j = pInd.int{1}.G(1);
-k = pInd.A{2}(2);
+k = pInd.D(2);
 
 i = find(indFlat==i);
 j = find(indFlat==j);
@@ -85,9 +85,9 @@ y1 = ksdensity(xf(j,:),v1,'function','icdf');
 z1 = ksdensity(xf(k,:),w1,'function','icdf');
 
 scatter3(x1,y1,z1)
-xlim(R.SimAn.pOptBound)
-ylim(R.SimAn.pOptBound)
-zlim(R.SimAn.pOptBound)
+xlim(R.SimAn.pOptBound.*0.5)
+ylim(R.SimAn.pOptBound.*0.5)
+zlim(R.SimAn.pOptBound.*0.5)
 
 xlabel('M1->STR A'); ylabel('STR Gain'); zlabel('M1->STR D');
 set(get(gca,'children'),'marker','.')

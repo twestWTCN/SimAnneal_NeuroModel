@@ -1,10 +1,9 @@
-function [xstore,tvec] = spm_fx_compile(R,x,u,p,m)
+function [xstore,tvec] = spm_fx_compile_170817(R,x,u,p,m)
 % Compiles NMM functions with delays, seperates intrinsic and extrinsic
 % dynamics then summates
 xinds = m.xinds;
 % model-specific parameters
 %==========================================================================
-
 % model or node-specific state equations of motions
 %--------------------------------------------------------------------------
 fx{1} = @spm_fx_erp;                                    % ERP model
@@ -53,7 +52,7 @@ afferent(9,:) = [2 2 2 2];               % targets of THAL connections
 E(1,:) = [1 0 1 0]*200;                    % ERP connections
 E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
 E(3,:) = [1.8 1.2 1.8 1.2]*10000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
-E(4,:) = [.1111 .6667 1 .1111]*(1000000);             % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
+E(4,:) = [.1111 .6667 1 .1111]*(1000);             % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
 
 %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
 % E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
@@ -62,11 +61,11 @@ E(4,:) = [.1111 .6667 1 .1111]*(1000000);             % MMC connections (to mmc)
 % E(8,:) = [.5 .5 -.5 -.5]*100000;               % GPI connections
 % E(9,:) = [.5 .5 -.5 -.5]*100000;               % THAL connections
 
-E(5,:) = [.2 .2 -.2 -.2]*1000000;             % STR connections
-E(6,:) = [.2 .2 -.2 -.2]*1000000;             % GPE connections
-E(7,:) = [.1 .1 -.1 -.2]*1000000;             % STN connections
-E(8,:) = [.2 .2 -.2 -.2]*1000000;               % GPI connections
-E(9,:) = [.2 .2 -.2 -.2]*1000000;               % THAL connections
+E(5,:) = [.2 .2 -.2 -.2]*1000;             % STR connections
+E(6,:) = [.2 .2 -.2 -.2]*1000;             % GPE connections
+E(7,:) = [.1 .1 -.1 -.2]*1000;             % STN connections
+E(8,:) = [.2 .2 -.2 -.2]*1000;               % GPI connections
+E(9,:) = [.2 .2 -.2 -.2]*1000;               % THAL connections
 
 % get the neural mass models {'ERP','CMC'}
 %--------------------------------------------------------------------------
@@ -100,15 +99,14 @@ end
 D = zeros(m.m);
 D(p.D>-30) = 4/1000; % set all delay priors to 4ms.
 
-D(4,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)
 D(2,1) = 2.5/1000;  % M1 to STN (Nakanishi et al. 1987)
-D(3,2) = 2/1000;    % STN to GPe (Kita and Kitai 1991)
-D(2,3) = 4/1000;    % GPe to STN (Fujimoto and Kita 1993)
+D(4,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)
+D(3,4) = 2/1000;    % STN to GPe (Kita and Kitai 1991)
 D(5,4) = 5/1000;    % STR to GP (Kita and Kitai 1991)
-
-D(6,5) = 4/1000;    % GPe to Thal
 D(1,6) = 10/1000;    % Thal to M1
 
+D(4,3) = 4/1000;    % GPe to STN (Fujimoto and Kita 1993)
+D(6,5) = 4/1000;    % GPi to Thal
 
 D = ceil(D.*exp(p.D).*(1/R.IntP.dt)); % As expectation of priors and convert units to steps
 D(D<((1e-3)/R.IntP.dt)&D>0) = floor((1e-3)/R.IntP.dt); % Minimum 1ms
@@ -125,7 +123,7 @@ for i = 1:length(nmm) % target
         if D(i,j)>0
             Ds(i,j) = afferent(nmm(j),1); % input sources
             Ds(i,j) = (m.xinds(j,1)-1)+Ds(i,j);
-            Dt(i,j) = efferent(nmm(i),1); % input sources
+            Dt(i,j) = efferent(nmm(i),1); % input targets
             Dt(i,j) = (m.xinds(i,1)-1)+Dt(i,j);
         end
     end
@@ -175,14 +173,7 @@ for tstep = R.IntP.buffer:R.IntP.nt
     %==========================================================================
     N     = m;
     for i = 1:n % targets
-        % intrinsic flow
-        %----------------------------------------------------------------------
-        N.x  = m.x{i};
-        ui   = u(tstep,i);
-        Q    = p.int{i};
-        Q.C  = p.C(i,:);
-        xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
-        f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
+        fA = 0;
         % extrinsic flow
         %----------------------------------------------------------------------
         for j = 1:n % sources
@@ -192,14 +183,19 @@ for tstep = R.IntP.buffer:R.IntP.nt
                     %                 jk       = efferent(nmm(j),k);
                     %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
                     xD = xstore(Ds(i,j),tstep-D(i,j));
-                    f(Dt(i,j)) = f(Dt(i,j)) + A{k}(i,j)*S(xD,Rz,B);
+%                     fA(Dt(i,j)) = A{k}(i,j)*S(xD,Rz,B);
+                    fA = [fA  A{k}(i,j)*S(xD,Rz,B)];
                 end
             end
         end
-        
-        
-        
-        
+        % intrinsic flow
+        %----------------------------------------------------------------------
+        N.x  = m.x{i};
+        ui   = u(tstep,i) + sum(fA);
+        Q    = p.int{i};
+        Q.C  = p.C(i,:);
+        xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
+        f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
     end
     xint = xint + (f.*dt);
     xstore = [xstore xint];

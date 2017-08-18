@@ -7,10 +7,12 @@
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
 R = simannealsetup_CSD_app;
-rng(2042)
+R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
+
+rng(2043)
 d = R.d; % clock
 %% Prepare the data
-% prepareratdata_group(R.rootn,R.projectn);
+% % prepareratdata_group(R.rootn,R.projectn);
 load([R.filepathn '\average_rat_lesion.mat'])
 % % % Set data as working version
 
@@ -19,7 +21,7 @@ data = ftdata.trial{1}; fsamp = ftdata.fsample;
 %Normalise Data
 for i = 1:4
     xtmp = data(i,:);
-    xtmp = (xtmp-mean(xtmp))/std(xtmp);
+    xtmp = (xtmp-mean(xtmp));%/std(xtmp);
     data(i,:) = xtmp;
 end
 %compute CSD data features
@@ -47,9 +49,12 @@ csdplotter_220517({meannpd_data},[],F_data,R)
 % 6 THAL
 
 % load priors!
-load([R.rootn 'priors\onerat_bgm_DCM_multipass_split_finished.mat'])
-% load('C:\Users\twest\Documents\Work\PhD\LitvakProject\Bernadette_DCM\outputs\splitup_BGM\onerat_bgm_DCM_multipass_280617','DCM')
+% load([R.rootn 'priors\onerat_bgm_DCM_multipass_split.mat'])
+% load([R.rootn 'priors\alt_prior.mat'])
+load('C:\Users\twest\Documents\Work\PhD\LitvakProject\Bernadette_DCM\outputs\splitup_BGM\onerat_bgm_DCM_multipass_280617','DCM')
 clear u
+
+
 % Initialise with random priors
 % [x,p,m] = setup_new_priors(P,M); % Assign Priors to correct structure
 
@@ -60,7 +65,7 @@ DCM(2).Ep.int{2}.G=DCM(1).Ep.int{2}.G+DCM(1).Ep.int{2}.B;
 
 %for extrinsic connections
 DCM(2).Ep.A{1}=DCM(1).Ep.A{1}+DCM(1).Ep.B{1};
-DCM(2).Ep.A{2}=DCM(1).Ep.A{2}+DCM(1).Ep.B{1}; % if only 1 modulatory forward connection (that’s what I use = same modulatory effect thalamus on middle and superficial cortical layers)
+DCM(2).Ep.A{2}=DCM(1).Ep.A{2}+DCM(1). Ep.B{1}; % if only 1 modulatory forward connection (that’s what I use = same modulatory effect thalamus on middle and superficial cortical layers)
 % DCM.Ep.A{2}=DCM.Ep.A{2}+DCM.Ep.Bf{2}; % if model contains 2 modulatory forward connections (if there is a second cell in DCM.Ep.Bf)
 DCM(2).Ep.A{3}=DCM(1).Ep.A{3}+DCM(1).Ep.B{2};
 DCM(2).Ep.A{4}=DCM(1).Ep.A{4}+DCM(1).Ep.B{2}; % if model contains 2 modulatory backward connections (that’s what I use = separate hyperdirect and (in)direct pathway modulations)
@@ -70,7 +75,7 @@ DCM = DCM(2);
 DCM.Ep.A{1}(6,5) = 0; % Excitatory GPe to Thalamus
 %DCM.Ep.A{2}(6,5) = 0;
 DCM.Ep.A{1}(1,6) = 0; % Excitatory Thal to M1
-DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
+% DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
 DCM.Ep.A{1}(DCM.Ep.A{1}==0) = rand(size(DCM.Ep.A{1}(DCM.Ep.A{1}==0)));
 DCM.Ep.A{3}(DCM.Ep.A{3}==0) = rand(size(DCM.Ep.A{3}(DCM.Ep.A{3}==0)));
 % DCM.Ep.A{3}(1,6) = 0; % Inhibitory Thal to M1 
@@ -79,45 +84,49 @@ DCM.Ep.A{3}(DCM.Ep.A{3}==0) = rand(size(DCM.Ep.A{3}(DCM.Ep.A{3}==0)));
 
 % Keep only some fields
 p = DCM.Ep;
+
+%% Load prior fit
+load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\priors\sim_ABC_output_150817_c.mat')
+p = a;
+
 % Connection strengths
-p.C = zeros(size(p.C,1),1);
-p.C_s = repmat(1,size(p.C));
+p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
-p.obs.LF = zeros(1,size(R.obs.LF,1));
-p.obs.LF_s = repmat(1,size(p.obs.LF));
+p.obs.LF_s = repmat(0.5,size(p.obs.LF));
 
-p.obs.mixing = zeros(1,size(R.obs.mixing,1));
-p.obs.mixing_s = repmat(1,size(p.obs.mixing));
+p.obs.mixing_s = repmat(0.5,size(p.obs.mixing));
 
 m = DCM.M;
 x = m.x;
-A =  p.A; p = rmfield(p,'A');
-p.A{1} = A{1}; 
-p.A_s{1} = repmat(2,size(A{1})); 
-p.A{2} = A{3};
-p.A_s{2} = repmat(2,size(A{3}));
+p.A_s{1} = repmat(2,size(p.A{1})); 
+p.A_s{2} = repmat(2,size(p.A{2}));
 
+p.S_s = 0.5;
 % setup exogenous noise
-
-% m.uset.p = DCM;
+% m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1; %.*R.IntP.dt;
-
+m.uset.p.scale = 1; %.*R.InstP.dt;
 u = innovate_timeseries(R,m);
 u = u./R.IntP.dt;
 
 % Delays
-p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
 p.D_s = repmat(0.5,size(p.D));
 
 % time constants and gains 
 for i = 1:m.m
-    p.int{i}.T_s = repmat(1.5,size(p.int{i}.T));
-    p.int{i}.G_s = repmat(1.5,size(p.int{i}.G));
-    p.int{i}.S_s = repmat(1.5,size(p.int{i}.G));
+    if i<5
+        p.int{i}.T_s = repmat(0.8,size(p.int{i}.T));
+        p.int{i}.G_s = repmat(0.8,size(p.int{i}.G));
+        p.int{i}.S_s = repmat(0.8,size(p.int{i}.S));
+    else
+        p.int{i}.T_s = repmat(0.2,size(p.int{i}.T));
+        p.int{i}.G_s = repmat(0.2,size(p.int{i}.G));
+        p.int{i}.S_s = repmat(0.2,size(p.int{i}.S));
+    end
 end
-
+% Correction for STN
+% p.int{4}.G = 0.5;
 m.n =  size([m.x{:}],2);
 m.fxord = DCM.Sname;
 m.Bmod = DCM.B;
@@ -141,8 +150,6 @@ for i = 1:size(m.x,2)
     end
 end
 m.xinds = xinds;
-% load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\priors\sim_ABC_output_010817_d.mat')
-% p = j;
 tic
 %  p = xobs.out.P;
 for i = 1:4
@@ -150,57 +157,9 @@ for i = 1:4
 %     if i>1
 %         p = xobs1.out.P;
 %     end
-    [xobs1] = SimAn_ABC_230717(x,u,p,m,R);
+    [xobs1] = SimAn_ABC_110817(x,u,p,m,R);
 end
 folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 mkdir(folname)
 save([folname '\xobs1'],'xobs1');
 gif_maker_siman(R)
-% rerun but modulating delays and signal composition
-R.SimAn.opPar = {'mix' 'D' 'LF' 'A'};
-R.objfx.feattype = 'complex';
-R.objfx.specspec = 'cross'; 
-R.IntP.intFunc = @stepintegrator_delay;
-R.SimAn.saveout = 'xobs2';
-R.out.tag = 'crossst';
-
-[xobs1] = SimAn_290617(x,u,p,m,R);
-save([folname '\xobs2'],'xobs2');
-gif_maker_siman(R)
-toc
-xsim = stepintegrator(R,x,u,m,xobs2.out.P);
-
-
-[xsimob,R] = observe_data(xsim,m,xobs2.out.P,R);
-[F_sim,meancsd_sim] = constructCSDMat(xsimob,R.chloc_name,R.chloc_name,1/R.IntP.dt,9,R);
-figure
-csdplotter_220517({meannpd_data},{meancsd_sim},R.frqz,R)
-figure
-plot(repmat(R.IntP.tvec_obs,size(xsimob,1),1)',xsimob')
-legend(R.chsim_name)
-
-figure
-stngpe_ob = xsimob(2:3,:);
-plot(repmat(R.IntP.tvec_obs,size(stngpe_ob,1),1)',stngpe_ob')
-legend(R.chsim_name{2:3})
-
-% % Integrate in time master fx function
- xstore = zeros(6,nt);
-% for t = 1:nt5
-%     [x xobs] = simAn_master_fx_bgc(x,u,p,m,dt,t);
-%     xstore(:,t) = xobs';
-%     t
-% end
-% 
-% %% Process Simulated Data
-% dobs = [1 4 3 2]; % simulated data matching observed
-% % Normalise
-% for i = 1:length(dobs)
-%     xtmp = xstore(dobs(i),:);
-%     xtmp = (xtmp-mean(xtmp))/std(xtmp);
-%     xsims(i,:) = xtmp;
-% end
-% %% Construct CSD
-% [F_sim,meancsd_sim] = constructCSDMat(xsims,R.chloc_name,ftdata.label',1/dt,10,R.frqz);
-% % Plot CSD
-% csdplotter([],meancsd_sim,F_sim,R)
