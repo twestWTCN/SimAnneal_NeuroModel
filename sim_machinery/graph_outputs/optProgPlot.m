@@ -16,6 +16,6 @@ function [] = optProgPlot(Tm,tbr2,p,r2bank,eps,pInd,R)
     bar(par)
 %     ylim([1.2*min(par) 1.2*max(par)]);
     xlim([0 length(par)])
-    ylim([R.SimAn.pOptBound])
+    ylim([R.SimAn.pOptBound.*0.5])
     xlabel('parameter')
     ylabel('Posterior')
