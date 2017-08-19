@@ -84,24 +84,39 @@ while ii <= searchN
         %% Simulate New Data
         % Integrate in time master fx function
         xsims = R.IntP.intFx(R,x,u,pnew,m);
+        
         % Run Observer function
-        if isfield(R.obs,'obsFx')
-            xsims = R.obs.obsFx(xsims,m,pnew,R);
+        glorg = pnew.obs.LF;
+        % Subloop is local optimization of the observer gain
+        % Parfor requires parameter initialisation
+        gainlist = linspace(-3,3,12);
+        feat_sim = cell(1,length(gainlist));
+        xsims_gl = cell(1,length(gainlist));
+        r2mean = zeros(1,length(gainlist));
+        for gl = 1:length(gainlist)
+            pnew.obs.LF = glorg + gainlist(gl);
+            if isfield(R.obs,'obsFx')
+                xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
+            end
+            % Run Data Transform
+            if isfield(R.obs,'transFx')
+                [~,feat_sim{gl}] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
+            else
+                feat_sim{gl} = xsims_gl{gl}; % else take raw time series
+            end
+            % Compare Pseudodata with Real
+            r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
         end
-        % Run Data Transform
-        if isfield(R.obs,'transFx')
-            [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
-        else
-            feat_sim = xsims; % else take raw time series
-        end
-        % Compare Pseudodata with Real
-        r2mean  = R.IntP.compFx(R,feat_sim);
+        % F
+        [r2 ir2] = max(r2mean);
+        pnew.obs.LF = glorg + gainlist(ir2);
+        toc
         % plot if desired
-        %         R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
-        r2rep{jj} = r2mean;
+%         R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1)
+        r2rep{jj} = r2;
         par_rep{jj} = pnew;
-        xsims_rep{jj} = xsims;
-        feat_sim_rep{jj} = feat_sim;
+        xsims_rep{jj} = xsims_gl{ir2};
+        feat_sim_rep{jj} = feat_sim{ir2};
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % End of batch replicates
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,7 +153,7 @@ while ii <= searchN
         eps = prctile(parBank(end,end-L:end),90); % percentile eps
         eps_tmp = (-3.*Tm(ii))+2; % temperature based epsilon (arbitrary function)
         if  eps-eps_p < 0.005
-            eps = eps + 0.008;
+            eps = eps + 0.02;
             disp('EPS was getting stuck, forcing increase')
         end
         
@@ -176,7 +191,7 @@ while ii <= searchN
             itry = 0;
             elseif itry >=3
                 while size(parOptBank,2)<R.SimAn.minRank % ignore the epsilon if not enough rank
-                    eps = eps-0.005;
+                    eps = eps-0.001;
                     parOptBank = parBank(:,parBank(end,:)>eps);
                     if eps<-100
                         parOptBank = [];
@@ -304,8 +319,8 @@ while ii <= searchN
             if ~exist(pathstr, 'dir')
                 mkdir(pathstr);
             end
-            save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],R)
-            save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],parBank)
+            save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'R')
+            save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'parBank')
             disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
         end
     end

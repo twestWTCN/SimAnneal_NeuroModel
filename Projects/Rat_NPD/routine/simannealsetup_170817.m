@@ -36,7 +36,7 @@ R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 0.45;
-R.obs.csd.reps = 24;
+R.obs.csd.reps = 18;
 R.obs.states = [7 9 11 13];
 % LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
 % LF = [1 1 1 1 1 1]; % Fit visually and for normalised data

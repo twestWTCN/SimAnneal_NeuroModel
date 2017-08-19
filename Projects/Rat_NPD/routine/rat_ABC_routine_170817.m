@@ -100,7 +100,7 @@ A(3,4) = 0; % STN to GPe
 A(5,4) = 0; % STN to GPi
 A(1,6) = 0; % THAL to M1
 p.A{1} = A;
-A_s = repmat(2,size(A));
+A_s = repmat(1,size(A));
 p.A_s{1} = A_s;
 
 % Inhbitory connections
@@ -112,7 +112,7 @@ A(5,3) = 0; % GPe to GPi
 A(2,3) = 0; % GPe to STR
 A(6,5) = 0; % GPi to THAL
 p.A{2} = A;
-A_s = repmat(2,size(A));
+A_s = repmat(1,size(A));
 p.A_s{2} = A_s;
 
 % Connection strengths
@@ -121,7 +121,7 @@ p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = zeros(size(R.obs.LF));
-p.obs.LF_s = repmat(1.5,size(p.obs.LF));
+p.obs.LF_s = repmat(0.5,size(p.obs.LF));
 
 p.obs.mixing = [-0.2916 -0.0455]; %zeros(size(R.obs.mixing));
 p.obs.mixing_s = repmat(0.6,size(p.obs.mixing));
@@ -160,7 +160,7 @@ end
 % R = R_out;
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 R.SimAn.jitter = 1;
-m.uset.p.scale = 0.1;
+m.uset.p.scale = 0.01;
 R.out.tag = 'CSD_ABC_neatmodel_iterate';
 
 for i = 1:4
