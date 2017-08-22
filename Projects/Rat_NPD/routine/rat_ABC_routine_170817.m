@@ -95,8 +95,8 @@ u = u./R.IntP.dt;
 % Excitatory connections
 A = repmat(-32,m.m,m.m);
 A(2,1) = 0; % M1 to STR
-A(4,1) = 0; % M1 to STN
-A(3,4) = 0; % STN to GPe
+A(4,1) = 0.5; % M1 to STN
+A(3,4) = 0.5; % STN to GPe
 A(5,4) = 0; % STN to GPi
 A(1,6) = 0; % THAL to M1
 p.A{1} = A;
@@ -105,9 +105,9 @@ p.A_s{1} = A_s;
 
 % Inhbitory connections
 A = repmat(-32,m.m,m.m);
-A(3,2) = 0; % STR to GPe
+A(3,2) = 0.5; % STR to GPe
 A(5,2) = 0; % STR to GPi
-A(4,3) = 0; % GPe to STN
+A(4,3) = 0.5; % GPe to STN
 A(5,3) = 0; % GPe to GPi
 A(2,3) = 0; % GPe to STR
 A(6,5) = 0; % GPi to THAL
@@ -128,7 +128,7 @@ p.obs.mixing_s = repmat(0.6,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(1,size(p.D));
+p.D_s = repmat(0.8,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = 0;
@@ -138,11 +138,11 @@ p.S_s = 1;
 for i = 1:m.m
     if i<5
         p.int{i}.T = zeros(1,m.Tint(i));
-        p.int{i}.T_s = repmat(1,size(p.int{i}.T));
+        p.int{i}.T_s = repmat(0.5,size(p.int{i}.T));
         p.int{i}.G = zeros(1,m.Gint(i));
-        p.int{i}.G_s = repmat(1,size(p.int{i}.G));
+        p.int{i}.G_s = repmat(0.5,size(p.int{i}.G));
         p.int{i}.S = zeros(1);
-        p.int{i}.S_s = repmat(1,size(p.int{i}.S));
+        p.int{i}.S_s = repmat(0.5,size(p.int{i}.S));
     else
         p.int{i}.T = zeros(1,m.Tint(i));
         p.int{i}.T_s = repmat(0.5,1,m.Tint(i));
@@ -160,7 +160,7 @@ end
 % R = R_out;
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 R.SimAn.jitter = 1;
-m.uset.p.scale = 0.01;
+m.uset.p.scale = 0.05;
 R.out.tag = 'CSD_ABC_neatmodel_iterate';
 
 for i = 1:4

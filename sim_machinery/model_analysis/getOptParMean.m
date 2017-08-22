@@ -1,6 +1,7 @@
 function optP = getOptParMean(m,p,R,d)
 %% Resample parameters
-load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
+load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\CSD_ABC_neatmodel_iterate2\parBank_CSD_ABC_neatmodel_iterate2_2017818.mat')
+% load([R.rootn 'outputs\' R.out.tag '2\parBank_' R.out.tag '2_' d '.mat'])
 parOptBank = varo;
 % figure
 % hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])

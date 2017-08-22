@@ -23,16 +23,19 @@ for L = 1:length(CSD_sim)
         for j = 1:M
             k = k+1;
             subplot(N,M,k)
-            plot(F,squeeze(real(CSD_sim_n(i,j,:))),'r--','linewidth',lwid); hold on
-            plot(F,squeeze(real(CSD_data_n(i,j,:))),'r','linewidth',2)
+            hold on
+            if i==j
+                plot(F,squeeze(abs(CSD_sim_n(i,j,:))),'k--','linewidth',lwid)
+                plot(F,squeeze(abs(CSD_data_n(i,j,:))),'k','linewidth',2)
+            else
+                plot(F,squeeze(real(CSD_sim_n(i,j,:))),'r--','linewidth',lwid); hold on
+                plot(F,squeeze(real(CSD_data_n(i,j,:))),'r','linewidth',2)
+                
+                plot(F,squeeze(imag(CSD_sim_n(i,j,:))),'b--','linewidth',lwid)
+                plot(F,squeeze(imag(CSD_data_n(i,j,:))),'b','linewidth',2)
+            end
             
-            plot(F,squeeze(imag(CSD_sim_n(i,j,:))),'b--','linewidth',lwid)
-            plot(F,squeeze(imag(CSD_data_n(i,j,:))),'b','linewidth',2)
-            
-            plot(F,squeeze(abs(CSD_sim_n(i,j,:))),'k--','linewidth',lwid)
-            plot(F,squeeze(abs(CSD_data_n(i,j,:))),'k','linewidth',2)
-            
-            xlim([min(R.frqz) max(R.frqz)])
+            xlim([min(R.frqz) 45]) %max(R.frqz)])
             %         ylim([-0.03 0.03])
         end
     end

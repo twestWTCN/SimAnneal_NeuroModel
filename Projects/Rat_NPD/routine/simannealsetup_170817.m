@@ -1,6 +1,5 @@
 function R = simannealsetup_170817()
-R.d = clock;
-
+% 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'CSD_neatmodel';
 
@@ -18,7 +17,7 @@ addpath(genpath(R.rootm))
 %% DATA SPECIFICATION
 R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'CSD'; %%'NPD'
-R.frqz = [6:.2:45];
+R.frqz = [6:.2:85];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MTX','STN','GPe','STR'};
 R.chsim_name = {'MTX','STN','GPe','STR','GPi','THAL'};
@@ -36,11 +35,11 @@ R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 0.45;
-R.obs.csd.reps = 18;
+R.obs.csd.reps = 12;
 R.obs.states = [7 9 11 13];
 % LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
 % LF = [1 1 1 1 1 1]; % Fit visually and for normalised data
-LF = [1 1 0.9 0.6 0.5 0.5]; % Fit visually and for normalised data
+  LF = [0.8 0.5 0.5 0.5 0.5 0.5]; % Fit visually and for normalised data
 R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
@@ -85,11 +84,10 @@ R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
 R.SimAn.alpha = 0.97; % alpha increment
-R.SimAn.rep = 86; % Repeats per temperature
+R.SimAn.rep = 128; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
 R.SimAn.jitter = 1;
-R.SimAn.minRank = 56; %40;
 
 %% PLOTTING
 R.plot.outFeatFx = @csdplotter_220517; %%@npdplotter_110717;

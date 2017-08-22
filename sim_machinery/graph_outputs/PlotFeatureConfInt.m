@@ -3,7 +3,7 @@ if nargin<2
     d = sprintf('%d',[R.d(1:3)]);
 end
 
-load([R.rootn 'outputs\' R.out.tag '\permMod_' R.out.tag '_' d '.mat'],'permMod')
+load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 CSD_data_n = permMod.feat_rep{1};
 N = size(CSD_data_n,1); M = size(CSD_data_n,2);
@@ -44,9 +44,9 @@ for i = 1:N
         hout = outlinebounds(hl, hp);
         set(hout(1:3),'LineWidth',1,'LineStyle','--'); set(hout(2),'LineWidth',1); set(hout(3),'LineWidth',1);
         if i == j
-            ylim([0 0.04])
+            ylim([0 0.06])
         else
-            ylim([-6e-3 25e-3])
+            ylim([-6e-3 35e-3])
         end
         xlim([min(R.frqz) max(R.frqz)])
         xlabel('Freq (Hz'); ylabel('Amplitude')

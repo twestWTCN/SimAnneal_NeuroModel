@@ -63,7 +63,7 @@ E(4,:) = [.1111 .6667 1 .1111]*(1000);             % MMC connections (to mmc) wi
 
 E(5,:) = [.2 .2 -.2 -.2]*1000;             % STR connections
 E(6,:) = [.2 .2 -.2 -.2]*1000;             % GPE connections
-E(7,:) = [.1 .1 -.1 -.2]*1000;             % STN connections
+E(7,:) = [.2 .2 -.2 -.2]*1000;             % STN connections
 E(8,:) = [.2 .2 -.2 -.2]*1000;               % GPI connections
 E(9,:) = [.2 .2 -.2 -.2]*1000;               % THAL connections
 

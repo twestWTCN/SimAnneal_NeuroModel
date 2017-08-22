@@ -33,8 +33,8 @@ for L = 1:length(NPD_sim)
                 plot(F,squeeze(NPD_sim_n(i,j,3,:)),'b--','linewidth',lwid)
                 plot(F,squeeze(NPD_data_n(i,j,3,:)),'b','linewidth',2)
                 
-                plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid)
-                plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
+%                 plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid)
+%                 plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
             end
             xlim([min(R.frqz) max(R.frqz)])
             %         ylim([-0.03 0.03])

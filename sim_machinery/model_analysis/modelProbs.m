@@ -2,8 +2,8 @@ function [permMod] = modelProbs(x,m,p,R,d)
 if nargin<5
     d = sprintf('%d',[R.d(1:3)]);
 end
-load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
-parOptBank = varo;
+% load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
+ parOptBank = R.parOptBank;
 % figure
 % hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])
 eps = R.analysis.modEvi.eps;
@@ -31,8 +31,8 @@ clear base
 base = repmat(spm_vec(p),1,N);
 for i = 1:N
     base(pIndMap,i) = x1(:,i);
+    par{i} = spm_unvec(mean(base,2),p)
 end
-spm_unvec(mean(base,2),p)
 
 if isempty(gcp)
     parpool
@@ -70,17 +70,18 @@ end
 permMod.r2rep = r2rep;
 permMod.par_rep = par_rep;
 permMod.feat_rep = feat_rep;
-save([R.rootn 'outputs\' R.out.tag '\permMod_' R.out.tag '_' d '.mat'],'permMod')
+save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
+load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 figure
 r2bank = [r2rep{:}];
-[h r] = hist(r2bank,25); %D is your data and 140 is number of bins.
+[h r] = hist(r2bank,50); %D is your data and 140 is number of bins.
 h = h/sum(h); % normalize to unit length. Sum of h now will be 1.
 bar(h, 'DisplayName', 'Model NRMSE'); 
 xD = r(2:2:end);
 xL = 2:2:length(r); % list of indices
 set(gca,'XTick',xL)
-set(gca,'XTickLabel',strread(num2str(xD,2),'%s'))
+set(gca,'XTickLabel',strread(num2str(xD,2),'%s1'))
 
 legend('show');
 ylabel('P(D-D*)'); xlabel('D-D*');
@@ -101,4 +102,4 @@ annotation(gcf,'textbox',...
     'FitBoxToText','off',...
     'LineStyle','none');
 
-saveallfiguresFIL_n([R.rootn '\outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r100',1);
+saveallfiguresFIL_n([R.rootn '\outputs\' R.out.tag '2\modelEvidence.jpg'],'-jpg',1,'-r100',1);
