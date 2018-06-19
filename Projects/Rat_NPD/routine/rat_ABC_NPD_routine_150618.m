@@ -7,10 +7,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 clear ; close all
-addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
+% addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
+
+addpath(genpath('C:\Users\Tim\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
+addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\bplot')
+addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\MEG_STN_Project')
+addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\export_fig')
+
+
 rng(231231)
 
 %% Set Parameters of the Routine
@@ -64,7 +71,7 @@ R.data.feat_xscale = R.frqz;
 if strcmp('CSD',R.data.datatype)
     csdplotter_220517({meannpd_data},[],F_data,R)
 elseif strcmp('NPD',R.data.datatype)
-    npdplotter_110717({meannpd_data},[],R.frqz,R)
+    npdplotter_110717({meannpd_data},[],R.frqz,R,[],[])
 end
 
 %% Prepare Model
@@ -98,7 +105,7 @@ m.xinds = xinds;
 % setup exogenous noise
 % m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 0.1; %.*R.InstP.dt;
+m.uset.p.scale = 1e-3; %.*R.InstP.dt;
 u = innovate_timeseries(R,m);
 u = sqrt(R.IntP.dt).*u;
 
@@ -151,7 +158,7 @@ p.D_s = repmat(0.8,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = 0;
-p.S_s = 1;
+p.S_s = 0.2;
 
 % time constants and gains
 for i = 1:m.m

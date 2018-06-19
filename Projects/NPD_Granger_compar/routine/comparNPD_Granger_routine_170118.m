@@ -129,18 +129,21 @@ drawnow;shg
 % normnoise(1,:) = sin(2*pi*25.*tvec_obs)+ (rand(1,length(xsims_gl))/2);
 % normnoise(2,:) = sin(2*pi*25.*tvec_obs + pi/2)+ (rand(1,length(xsims_gl))/2);
 cfg             = [];
-cfg.ntrials     = 1;
+cfg.ntrials     = 10;
 cfg.triallength = tvec_obs(end);
 cfg.fsample     = 1/R.IntP.dt;
 cfg.nsignal     = 2;
 cfg.method      = 'ar';
 cfg.params(:,:,1) = [
-    1   1;
+    1   0;
     0   1];
 
 cfg.params(:,:,2) = [
     -0.5  0 ;
     0   -0.8 ] ;
+cfg.params(:,:,3) = [
+    0  0 ;
+    -1  0] ;
 cfg.noisecov      = [
     0.001    0   ;
     0    0.001 ] ;

@@ -36,7 +36,6 @@ for i = 1:length(plist)
             X = reshape(Xa,size(X_old));
             X(X_old==-32) = -32;
             eval(['pnew' plist{i} ' = X;']);
-            eval(['pnew' plist{i} ' = X;']);
         end
     end
 end

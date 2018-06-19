@@ -27,7 +27,7 @@ R.obs.obsFx = @observe_data;
 R.obs.obsFxArgs = '(xsims,m,pnew,R)';
 R.obs.gainmeth = {'unitvar','leadfield','submixing'}; %,'lowpass'};  %unitvar'mixing'
 
-R.obs.transFx = @constructNPDMat; %% @constructNPDMat;
+R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
 R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
 R.obs.brn =1; % 2; % burn in time
 R.obs.norm = 'False';
@@ -84,7 +84,7 @@ R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
-R.SimAn.rep = 256; % Repeats per temperature
+R.SimAn.rep = 32; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
 R.SimAn.jitter = 2;

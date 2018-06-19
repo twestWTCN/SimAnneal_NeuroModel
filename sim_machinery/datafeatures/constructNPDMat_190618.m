@@ -16,8 +16,7 @@ for chI = 1:size(chloc_name,2)
                 chindsR = chinds{chJ};
                 if chI == chJ
                     [Pxy,F] = pwelch(data(chindsP(p),:),hanning(2^N),[],2^(N),fsamp);
-<<<<<<< HEAD
-                    [nPxy,F] = pwelch(normnoise(1,:),hanning(2^N),[],2^(N),fsamp);
+%                     [nPxy,F] = pwelch(normnoise(1,:),hanning(2^N),[],2^(N),fsamp);
 %                      Pxy = (Pxy-mean(Pxy))./std(Pxy);
 %                     Pxy = Pxy - min(Pxy);
 %                     if nargin>5
@@ -25,9 +24,8 @@ for chI = 1:size(chloc_name,2)
 %                     else
 %                         Pxy =  Pxy(F>4);
 %                     end
-                    Pxy = Pxy./max(nPxy);
+%                     Pxy = Pxy./max(nPxy);
                     Pxy = Pxy; %.*welchwin(length(Pxy))';
-=======
                     Pxy = -abs(log10(Pxy));
                     Pxy(F>48 & F<52) = [];
                     F(F>48 & F<52) = [];
@@ -43,28 +41,24 @@ for chI = 1:size(chloc_name,2)
                     Pxy = (Pxy-mean(Pxy))./std(Pxy);
                     Pxy = Pxy - min(Pxy);
                     Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
->>>>>>> 069d05f1db2ce7673c2c62bbc1b754259bbe21a9
                     xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
                 else
                     [f13,~,~]=sp2a2_R2(data(chindsP(p),:)',data(chindsR(r),:)',fsamp,N-1);
-                    [nf13,~,~]=sp2a2_R2(normnoise(1,:)',normnoise(2,:)',fsamp,N-1);
+%                     [nf13,~,~]=sp2a2_R2(normnoise(1,:)',normnoise(2,:)',fsamp,N-1);
                     F = f13(:,1);
                     zl = [10 11 12];
                     for z = 1:3
                         %                     [Pxy,F] = cpsd(data(chindsP(p),:),data(chindsR(r),:),hanning(N),[],N,fsamp);
                         Pxy = f13(:,zl(z));
-                        nPxy = nf13(:,12);
+%                         nPxy = nf13(:,12);
                         if nargin>5
                             Pxy = interp1(F,Pxy,F_scale);
                         else
                             Pxy =  Pxy(F>4);
                         end
-<<<<<<< HEAD
-                        Pxy = Pxy./max(nPxy);
+%                         Pxy = Pxy./max(nPxy);
                         Pxy = Pxy; %.*welchwin(length(Pxy))';
-=======
                         Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
->>>>>>> 069d05f1db2ce7673c2c62bbc1b754259bbe21a9
                         xcsd(p,r,z,:) = Pxy;
                     end
                 end
