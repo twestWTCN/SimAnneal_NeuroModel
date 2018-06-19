@@ -1,4 +1,4 @@
-function [] = optProgPlot(Tm,tbr2,p,r2bank,eps,pInd,R)
+function [] = optProgPlot(Tm,tbr2,p,r2bank,eps_rec,pInd,R)
 
     subplot(2,1,1)
     plot(-Tm,tbr2)
@@ -7,6 +7,9 @@ function [] = optProgPlot(Tm,tbr2,p,r2bank,eps,pInd,R)
     for i = 1:size(Tm,2)
     bplot(r2bank{i}(end,:),-Tm(i),'width',0.01);
     end
+        hold on
+    plot(Tm,eps_rec)
+        scatter(Tm,eps_rec,'rx')
     ylim([-1 1])
     
     subplot(2,1,2)

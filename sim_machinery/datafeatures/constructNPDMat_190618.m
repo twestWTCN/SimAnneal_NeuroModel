@@ -32,6 +32,7 @@ for chI = 1:size(chloc_name,2)
                     Pxy(F==0) = [];
                     F(F==0) = [];
                     [xCalc yCalc b Rsq] = linregress(log10(F),Pxy);
+                    Pxy
                     Pxy = Pxy-yCalc;
                     if nargin>5
                         Pxy = interp1(F,Pxy,F_scale);

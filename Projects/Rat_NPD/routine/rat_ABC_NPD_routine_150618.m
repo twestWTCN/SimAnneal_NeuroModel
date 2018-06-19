@@ -4,18 +4,19 @@
 % the real part of the CSD for the group average OFF spectra
 % TO DO:
 % 1) Take all sims that are above criteria and include!
+% 2) Set Tm and anneal to be optimal
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 clear ; close all
-% addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
+addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 
-addpath(genpath('C:\Users\Tim\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\bplot')
-addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\MEG_STN_Project')
-addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\export_fig')
+% addpath(genpath('C:\Users\Tim\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
+% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\bplot')
+% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\MEG_STN_Project')
+% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\export_fig')
 
 
 rng(231231)
@@ -105,7 +106,7 @@ m.xinds = xinds;
 % setup exogenous noise
 % m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1e-3; %.*R.InstP.dt;
+m.uset.p.scale = 1e1; %.*R.InstP.dt;
 u = innovate_timeseries(R,m);
 u = sqrt(R.IntP.dt).*u;
 
@@ -154,7 +155,7 @@ p.obs.mixing_s = repmat(0.2,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.8,size(p.D));
+p.D_s = repmat(0.1,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = 0;

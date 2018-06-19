@@ -85,36 +85,43 @@ while ii <= searchN
         %% Simulate New Data
         % Integrate in time master fx function
         xsims = R.IntP.intFx(R,x,u,pnew,m);
-        if sum(isnan(xsims)) == 0
-            % Run Observer function
-            glorg = pnew.obs.LF;
-            % Subloop is local optimization of the observer gain
-            % Parfor requires parameter initialisation
-            gainlist = 0; %linspace(-0.5,1,8);
-            feat_sim = cell(1,length(gainlist));
-            xsims_gl = cell(1,length(gainlist));
-            r2mean = zeros(1,length(gainlist));
-            for gl = 1:length(gainlist)
-                pnew.obs.LF = glorg + gainlist(gl);
-                if isfield(R.obs,'obsFx')
-                    xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
+        if sum(isnan(xsims(:))) == 0
+            try
+                % Run Observer function
+                glorg = pnew.obs.LF;
+                % Subloop is local optimization of the observer gain
+                % Parfor requires parameter initialisation
+                gainlist = 0; %linspace(-0.5,1,8);
+                feat_sim = cell(1,length(gainlist));
+                xsims_gl = cell(1,length(gainlist));
+                r2mean = zeros(1,length(gainlist));
+                for gl = 1:length(gainlist)
+                    pnew.obs.LF = glorg + gainlist(gl);
+                    if isfield(R.obs,'obsFx')
+                        xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
+                    end
+                    % Run Data Transform
+                    if isfield(R.obs,'transFx')
+                        [~,feat_sim{gl}] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
+                    else
+                        feat_sim{gl} = xsims_gl{gl}; % else take raw time series
+                    end
+                    % Compare Pseudodata with Real
+                    r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
                 end
-                % Run Data Transform
-                if isfield(R.obs,'transFx')
-                    [~,feat_sim{gl}] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
-                else
-                    feat_sim{gl} = xsims_gl{gl}; % else take raw time series
-                end
-                % Compare Pseudodata with Real
-                r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
+                % F
+                [r2 ir2] = max(r2mean);
+                pnew.obs.LF = glorg + gainlist(ir2);
+                %         disp(pnew.obs.LF)
+                %         toc
+                % plot if desired
+                %                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+            catch
+                r2 = -inf;
+                ir2 =1;
+                xsims_gl{1} = NaN;
+                feat_sim{1} = NaN;
             end
-            % F
-            [r2 ir2] = max(r2mean);
-            pnew.obs.LF = glorg + gainlist(ir2);
-            %         disp(pnew.obs.LF)
-            %         toc
-            % plot if desired
-            %                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
         else
             r2 = -inf;
             ir2 =1;
@@ -150,7 +157,7 @@ while ii <= searchN
     Ilist(isnan(r2loop(Ilist))) = []; % reconstruct Ilist without NaNs
     
     % Clip parBank to the best (keeps size manageable
-    [dum V] = sort(parBank(end,:),'ascend');
+    [dum V] = sort(parBank(end,:),'descend');
     if size(parBank,2)>2^13
         parBank = parBank(:,V(1:2^13));
     else
@@ -160,7 +167,8 @@ while ii <= searchN
     % Find error threshold for temperature (epsilon)
     if size(parBank,1)>R.SimAn.minRank
         %L = round(size(parBank,2)*0.4);
-        eps = prctile(parBank(end,:),95); % percentile eps
+        eps = prctile(parBank(end,:),70); % percentile eps
+        eps_rec(ii) = eps;
         %         try
         %             L = rep;
         %             eps = prctile(parBank(end,end-L:end),75); % percentile eps
@@ -311,7 +319,7 @@ while ii <= searchN
         figure(1)
         clf
         fx = R.plot.outFeatFx;
-        fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:np)}},R.data.feat_xscale,R,1)
+        fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:np)}},R.data.feat_xscale,R,1,[])
         drawnow; shg
         
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%

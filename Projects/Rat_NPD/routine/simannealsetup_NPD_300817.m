@@ -13,7 +13,6 @@ end
 addpath(genpath(R.rootn))
 addpath(genpath(R.rootm))
 
-
 %% DATA SPECIFICATION
 R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
@@ -82,12 +81,12 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.S','.A','.D','.C
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
-R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.Tm = 1.1; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
-R.SimAn.rep = 32; % Repeats per temperature
+R.SimAn.rep = 132; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
-R.SimAn.jitter = 2;
+R.SimAn.jitter = 3;
 
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517

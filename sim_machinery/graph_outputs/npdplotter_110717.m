@@ -29,15 +29,15 @@ for L = 1:length(NPD_sim)
             if i == j
                 plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid); hold on
                 plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
-                                xlabel('Hz'); ylabel('Power'); title(sprintf('Ch %1.f Pxx',i))
+                                xlabel('Hz'); ylabel('Power'); %title(sprintf('Ch %1.f Pxx',i))
             else
                 a(1) = plot(F,squeeze(NPD_sim_n(i,j,2,:)),'r--','linewidth',lwid); hold on
                 plot(F,squeeze(NPD_data_n(i,j,2,:)),'r','linewidth',2)
                 
-                a(2) = plot(F,squeeze(NPD_sim_n(i,j,3,:)),'b--','linewidth',lwid)
+                a(2) = plot(F,squeeze(NPD_sim_n(i,j,3,:)),'b--','linewidth',lwid);
                 plot(F,squeeze(NPD_data_n(i,j,3,:)),'b','linewidth',2)
-                xlabel('Hz'); ylabel(labelna); title(sprintf('Ch %1.f -> Ch %1.f NPD',i,j));
-                legend(a,{'Forward','Reverse'})
+                xlabel('Hz'); ylabel(labelna); %title(sprintf('Ch %1.f -> Ch %1.f NPD',i,j));
+%                 legend(a,{'Forward','Reverse'})
 %                 plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid)
 %                 plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
             end
