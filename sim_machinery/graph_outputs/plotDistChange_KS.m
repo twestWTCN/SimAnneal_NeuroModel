@@ -35,8 +35,8 @@ end
 xlabel('\mu')
 ylabel('p(\mu)')
 ylim([0 1]);
-xlim(R.SimAn.pOptBound.*0.5)
-title('Apporximate Posterior Distributions')
+xlim(R.SimAn.pOptBound.*0.2)
+title('Approximate Posterior Distribution')
 
 subplot(2,2,2)
 imagesc(Rho)
@@ -60,8 +60,8 @@ v1 = r(:,j);
 x1 = ksdensity(xf(i,:),u1,'function','icdf');
 y1 = ksdensity(xf(j,:),v1,'function','icdf');
 scatter(x1,y1);
-xlim(R.SimAn.pOptBound.*0.5)
-ylim(R.SimAn.pOptBound.*0.5)
+xlim(R.SimAn.pOptBound.*0.2)
+ylim(R.SimAn.pOptBound.*0.2)
 
 xlabel('M1 Time Constant'); ylabel('M1 Synaptic Gain')
 set(get(gca,'children'),'marker','.')
@@ -85,9 +85,9 @@ y1 = ksdensity(xf(j,:),v1,'function','icdf');
 z1 = ksdensity(xf(k,:),w1,'function','icdf');
 
 scatter3(x1,y1,z1)
-xlim(R.SimAn.pOptBound.*0.5)
-ylim(R.SimAn.pOptBound.*0.5)
-zlim(R.SimAn.pOptBound.*0.5)
+xlim(R.SimAn.pOptBound.*0.2)
+ylim(R.SimAn.pOptBound.*0.2)
+zlim(R.SimAn.pOptBound.*0.2)
 
 xlabel('M1->STR A'); ylabel('STR Gain'); zlabel('M1->STR D');
 set(get(gca,'children'),'marker','.')

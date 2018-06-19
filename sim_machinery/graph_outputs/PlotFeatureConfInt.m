@@ -1,4 +1,4 @@
-function PlotFeatureConfInt(R,d)
+function PlotFeatureConfInt_CSD(R,d)
 if nargin<2
     d = sprintf('%d',[R.d(1:3)]);
 end
@@ -29,7 +29,9 @@ CSD_mean(:,:,:,3) = mean(abs(CSD_bank),4);
 CSD_std(:,:,:,1,3)  = prctile(abs(CSD_bank),25,4);
 CSD_std(:,:,:,2,3)  = prctile(abs(CSD_bank),75,4);
 
-F = repmat(R.frqz',1,3);
+% F = repmat(R.frqz',1,3);
+F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));
+F = repmat(F',1,3);
 cmap = linspecer(2);
 cmap = [0 0 0; cmap];
  k = 0;
@@ -46,7 +48,7 @@ for i = 1:N
         if i == j
             ylim([0 0.06])
         else
-            ylim([-6e-3 35e-3])
+%             ylim([-6e-3 35e-3])
         end
         xlim([min(R.frqz) max(R.frqz)])
         xlabel('Freq (Hz'); ylabel('Amplitude')

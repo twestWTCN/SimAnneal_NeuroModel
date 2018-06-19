@@ -8,7 +8,7 @@
 
 clear ; close all
 addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-rng(8453)
+rng(53223)
 
 %% Set Parameters of the Routine
 R = simannealsetup_NPD_210817;
@@ -161,7 +161,6 @@ end
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 R.SimAn.jitter = 0.5;
 m.uset.p.scale = 0.05;
-R.out.tag = 'NPD_ABC_autob4cross';
 
 for i = 1:4
     R.out.tag = [R.out.tag num2str(i)];
