@@ -16,14 +16,21 @@ for chI = 1:size(chloc_name,2)
                 chindsR = chinds{chJ};
                 if chI == chJ
                     [Pxy,F] = pwelch(data(chindsP(p),:),hanning(2^N),[],2^(N),fsamp);
-%                      Pxy = (Pxy-mean(Pxy))./std(Pxy);
-%                     Pxy = Pxy - min(Pxy);
+                    Pxy = -abs(log10(Pxy));
+                    Pxy(F>48 & F<52) = [];
+                    F(F>48 & F<52) = [];
+                    Pxy(F==0) = [];
+                    F(F==0) = [];
+                    [xCalc yCalc b Rsq] = linregress(log10(F),Pxy);
+                    Pxy = Pxy-yCalc;
                     if nargin>5
                         Pxy = interp1(F,Pxy,F_scale);
                     else
                         Pxy =  Pxy(F>4);
                     end
-                    Pxy = Pxy.*welchwin(length(Pxy))';
+                    Pxy = (Pxy-mean(Pxy))./std(Pxy);
+                    Pxy = Pxy - min(Pxy);
+                    Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                     xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
                 else
                     [f13,~,~]=sp2a2_R2(data(chindsP(p),:)',data(chindsR(r),:)',fsamp,N-1);
@@ -37,7 +44,7 @@ for chI = 1:size(chloc_name,2)
                         else
                             Pxy =  Pxy(F>4);
                         end
-                        Pxy = Pxy.*welchwin(length(Pxy))';
+                        Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                         xcsd(p,r,z,:) = Pxy;
                     end
                 end

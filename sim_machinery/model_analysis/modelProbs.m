@@ -13,6 +13,8 @@ N = R.analysis.modEvi.N;
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
+% pIndMap (71 x 1)
+% xf (71 x size(parOptBank,2) )
 R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
 xf = zeros(size(pIndMap,1),size(parOptBank,2));
 for i = 1:size(pIndMap,1)
@@ -31,7 +33,7 @@ clear base
 base = repmat(spm_vec(p),1,N);
 for i = 1:N
     base(pIndMap,i) = x1(:,i);
-    par{i} = spm_unvec(mean(base,2),p)
+    par{i} = spm_unvec(mean(base,2),p);
 end
 
 if isempty(gcp)
@@ -64,24 +66,25 @@ parfor jj = 1:N
     r2rep{jj} = r2mean;
     par_rep{jj} = pnew;
     feat_rep{jj} = feat_sim;
-    disp(jj); % 
+%     disp(jj); % 
     ppm.increment(); 
 end
 permMod.r2rep = r2rep;
 permMod.par_rep = par_rep;
 permMod.feat_rep = feat_rep;
+mkdir([R.rootn 'outputs\' R.out.tag '2\'])
 save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 figure
-r2bank = [r2rep{:}];
+r2bank = [permMod.r2rep{:}];
 [h r] = hist(r2bank,50); %D is your data and 140 is number of bins.
 h = h/sum(h); % normalize to unit length. Sum of h now will be 1.
 bar(h, 'DisplayName', 'Model NRMSE'); 
 xD = r(2:2:end);
 xL = 2:2:length(r); % list of indices
 set(gca,'XTick',xL)
-set(gca,'XTickLabel',strread(num2str(xD,2),'%s1'))
+set(gca,'XTickLabel',strsplit(num2str(xD,2),' '))
 
 legend('show');
 ylabel('P(D-D*)'); xlabel('D-D*');
@@ -94,12 +97,12 @@ epsm = xL(xD==xD(idx)); %closest value
 
 plot([epsm epsm],Yval,'B--','linewidth',3)
 
-Pmod = numel(r2bank(r2bank>eps))/N;
+Pmod = numel(r2bank(r2bank>eps))/R.analysis.modEvi.N;
 annotation(gcf,'textbox',...
     [0.28 0.81 0.19 0.09],...
     'String',{sprintf('eps = %.2f',eps),sprintf('P(m|D) = %.2f',Pmod)},...
     'HorizontalAlignment','right',...
     'FitBoxToText','off',...
     'LineStyle','none');
-
-saveallfiguresFIL_n([R.rootn '\outputs\' R.out.tag '2\modelEvidence.jpg'],'-jpg',1,'-r100',1);
+set(gcf,'Position',[680 437 1070 541])
+saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r200',1);

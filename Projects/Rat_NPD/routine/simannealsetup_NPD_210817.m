@@ -1,7 +1,7 @@
 function R = simannealsetup_NPD_210817()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'NPD_model';
+R.out.tag = 'NPD_Final_NPDPaper';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];

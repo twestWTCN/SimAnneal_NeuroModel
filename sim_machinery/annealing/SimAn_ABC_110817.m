@@ -32,7 +32,6 @@ pOrg = p; % Record prior parameters.
 
 % Initialise variables
 parBank = []; parOptBank = []; eps = -1;  iflag = 0; par = cell(1,R.SimAn.rep); psave = []; itry = 0;
-
 % Set Fixed Annealing Parameters
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
@@ -43,10 +42,11 @@ ii = 1;
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
-R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
+R.SimAn.minRank = ceil(size(pIndMap,1)*2);
 % set initial batch of parameters from gaussian priors
 stdev = R.SimAn.jitter*Tm(1); % set the global precision
 if isfield(R,'Mfit')
+    xf = R.Mfit.xf;
     rep = repset;
     disp('Drawing from copula...')
     r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,rep);
@@ -85,7 +85,7 @@ while ii <= searchN
         %% Simulate New Data
         % Integrate in time master fx function
         xsims = R.IntP.intFx(R,x,u,pnew,m);
-        
+        if sum(isnan(xsims)) == 0
         % Run Observer function
         glorg = pnew.obs.LF;
         % Subloop is local optimization of the observer gain
@@ -115,6 +115,13 @@ while ii <= searchN
         %         toc
         % plot if desired
         %         R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1)
+        else
+            r2 = -inf;
+            ir2 =1;
+            xsims_gl{1} = NaN;
+            feat_sim{1} = NaN;
+        end
+            
         r2rep{jj} = r2;
         par_rep{jj} = pnew;
         xsims_rep{jj} = xsims_gl{ir2};
@@ -144,8 +151,8 @@ while ii <= searchN
     
     % Clip parBank to the best (keeps size manageable
     [dum V] = sort(parBank(end,:),'ascend');
-    if size(parBank,2)>4096
-        parBank = parBank(:,V(1:4096));
+    if size(parBank,2)>2^13
+        parBank = parBank(:,V(1:2^13));
     else
         parBank = parBank(:,V);
     end
@@ -153,7 +160,7 @@ while ii <= searchN
     % Find error threshold for temperature (epsilon)
     if size(parBank,1)>R.SimAn.minRank
         %L = round(size(parBank,2)*0.4);
-         eps = prctile(parI(end,:),90); % percentile eps
+         eps = prctile(parBank(end,:),95); % percentile eps
 %         try
 %             L = rep;
 %             eps = prctile(parBank(end,end-L:end),75); % percentile eps
@@ -163,7 +170,7 @@ while ii <= searchN
 %         end
         eps_tmp = (-3.*Tm(ii))+2; % temperature based epsilon (arbitrary function)
         if  eps-eps_p < 0.005
-            eps = eps + 0.02;
+            eps = eps + 0.01;
             disp('EPS was getting stuck, forcing increase')
         end
         
@@ -218,14 +225,14 @@ while ii <= searchN
         end
         
         % Crops the optbank to stop it getting to big (memory)
-        if size(parOptBank,2)> 1024
+        if size(parOptBank,2)> 2^13
             [dum V] = sort(parOptBank(end,:),'descend');
-            parOptBank = parOptBank(:,V(1:1024));
+            parOptBank = parOptBank(:,V(1:2^13));
         end
         
         % assign to base workspace in case stop early
-        assignin('base','parOptBank',parOptBank)
-        assignin('base','parBank',parBank)
+%         assignin('base','parOptBank',parOptBank)
+%         assignin('base','parBank',parBank)
         
         disp(['The number of parsets within epsilon is ' num2str(size(parOptBank,2))])
         
@@ -235,6 +242,7 @@ while ii <= searchN
             clear copU xf ilist
             % First form kernel density estimates for each optimized
             % parameter
+            clear copU
             for i = 1:size(pIndMap,1)
                 x = parOptBank(pIndMap(i),:); % choose row of parameter values
                 copU(i,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
@@ -243,6 +251,7 @@ while ii <= searchN
             [Rho,nu] = copulafit('t',copU','Method','ApproximateML'); % Fit copula
             % Save outputs that specify the copula
             R.Mfit.Rho = Rho;
+            R.Mfit.xf = xf;
             R.Mfit.nu = nu;
             R.Mfit.tbr2 = parOptBank(end,1); % get best fit
             R.Mfit.Pfit = spm_unvec(mean(parOptBank,2),p);
@@ -333,16 +342,21 @@ while ii <= searchN
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
         if istrue(R.plot.save)
-            saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\feattrack\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
-            saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\r2track\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
-            saveallfiguresFIL_n([R.rootn 'outputs\csd_gif\dist_track\' sprintf('%d',[R.d(1:3)]) '\' R.out.tag '\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\csd_gif\feattrack\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\r2track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\dist_track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
             %     close all
-            pathstr = [R.rootn '\outputs\' R.out.tag]
+            pathstr = [R.rootn '\outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\OptSaves\'];
             if ~exist(pathstr, 'dir')
                 mkdir(pathstr);
             end
-            save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'R')
-            save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'parBank')
+            try
+            save([pathstr 'modelfit_' R.out.tag '_' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '.mat'],'R','parBank','p','m','Mfit_hist')
+            catch
+            save([pathstr 'modelfit_' R.out.tag '_' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '.mat'],'R','parBank','p','m')
+            end
+            %             save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'R')
+%             save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'parBank')
             disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
         end
     end
@@ -354,7 +368,7 @@ while ii <= searchN
     %             saveMkPath([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],parBank)
     %     end
     % Or to workspace
-    assignin('base','R_out',R)
+%     assignin('base','R_out',R)
     Tm(ii+1) = Tm(ii)*alpha;
     if iflag == 1
         ii = ii + 1;
