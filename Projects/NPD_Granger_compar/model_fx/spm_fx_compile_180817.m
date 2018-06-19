@@ -97,7 +97,7 @@ end
 
 % Compute value of delays from lognormal mean
 D = zeros(m.m);
-D(p.D>-30) = 4/1000; % set all delay priors to 4ms.
+D(p.D>-30) = 15/1000; % set all delay priors to 4ms.
 
 D(2,1) = 2.5/1000;  % M1 to STN (Nakanishi et al. 1987)
 D(4,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)

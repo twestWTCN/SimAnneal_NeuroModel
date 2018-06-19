@@ -1,4 +1,4 @@
-function [] = npdplotter_110717(NPD_data,NPD_sim,F,R,bestn,labelna)
+function [] = comparplotter_180117(NPD_data,NPD_sim,F,R,bestn,labelna,leglist)
 if isempty(NPD_data)
     NPD_data = {zeros(size(NPD_sim{1}))};
 end
@@ -12,14 +12,11 @@ if isempty(labelna)
     labelna = 'NPD';
 end
 NPD_data_n = NPD_data{1};
+cmap = linspecer(length(NPD_sim));
 for L = 1:length(NPD_sim)
     NPD_sim_n = NPD_sim{L};
     
-    if L == bestn
-        lwid = 2;
-    else
-        lwid = 0.5;
-    end
+lwid = 1;
     k = 0;
     N = size(NPD_data_n,1); M = size(NPD_data_n,2);
     for i = 1:N
@@ -27,22 +24,24 @@ for L = 1:length(NPD_sim)
             k = k+1;
             subplot(N,M,k)
             if i == j
-                plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid); hold on
-                plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
+                plot(F{L},squeeze(NPD_sim_n(i,j,1,:)),'linewidth',lwid,'Color',cmap(L,:)); hold on
                                 xlabel('Hz'); ylabel('Power'); title(sprintf('Ch %1.f Pxx',i))
+%                                                     ylim([0 0.3])
+
             else
-                a(1) = plot(F,squeeze(NPD_sim_n(i,j,2,:)),'r--','linewidth',lwid); hold on
-                plot(F,squeeze(NPD_data_n(i,j,2,:)),'r','linewidth',2)
+                a(L) = plot(F{L},squeeze(NPD_sim_n(i,j,2,:)),'linewidth',lwid,'Color',cmap(L,:)); hold on
                 
-                a(2) = plot(F,squeeze(NPD_sim_n(i,j,3,:)),'b--','linewidth',lwid)
-                plot(F,squeeze(NPD_data_n(i,j,3,:)),'b','linewidth',2)
-                xlabel('Hz'); ylabel(labelna); title(sprintf('Ch %1.f -> Ch %1.f NPD',i,j));
-                legend(a,{'Forward','Reverse'})
+%                 a(2) = plot(F{L},squeeze(NPD_sim_n(i,j,3,:)),'b--','linewidth',lwid)
+                xlabel('Hz'); ylabel(labelna); title(sprintf('Ch %1.f -> Ch %1.f',i,j));
+                if L==length(NPD_sim)
+                legend(leglist)
+                                    ylim([0 1.1])
+
+                end
 %                 plot(F,squeeze(NPD_sim_n(i,j,1,:)),'k--','linewidth',lwid)
 %                 plot(F,squeeze(NPD_data_n(i,j,1,:)),'k','linewidth',2)
             end
-            xlim([min(R.frqz) max(R.frqz)])
-            %         ylim([-0.03 0.03])
+            xlim([0 max(R.frqz)])
         end
     end
 end

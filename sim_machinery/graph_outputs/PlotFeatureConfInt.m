@@ -39,7 +39,7 @@ for i = 1:N
         subplot(N,M,k)
         Y = squeeze(CSD_mean(:,i,j,:));
         B = squeeze(CSD_std(:,i,j,:,:));
-        [hl, hp] =boundedline(F,Y,B,'cmap',cmap,'alpha','transparency',0.45);
+        [hl, hp] = boundedline(F,Y,B,'cmap',cmap,'alpha','transparency',0.45);
         hl(1).LineWidth = 2; hl(2).LineWidth = 1; hl(3).LineWidth = 1;
         hout = outlinebounds(hl, hp);
         set(hout(1:3),'LineWidth',1,'LineStyle','--'); set(hout(2),'LineWidth',1); set(hout(3),'LineWidth',1);

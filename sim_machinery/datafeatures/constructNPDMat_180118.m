@@ -1,4 +1,4 @@
-function [F meannpd] = constructNPDMat(data,chloc_name,chlist,fsamp,N,R,normnoise)
+function [F meannpd] = constructNPDMat_180118(data,chloc_name,chlist,fsamp,N,R,normnoise)
 if isempty(N)
     N = floor(fsamp/R.obs.csd.df);
 end
@@ -16,16 +16,15 @@ for chI = 1:size(chloc_name,2)
                 chindsR = chinds{chJ};
                 if chI == chJ
                     [Pxy,F] = pwelch(data(chindsP(p),:),hanning(2^N),[],2^(N),fsamp);
+                    Pxy = Pxy(2:end);
                     [nPxy,F] = pwelch(normnoise(1,:),hanning(2^N),[],2^(N),fsamp);
 %                      Pxy = (Pxy-mean(Pxy))./std(Pxy);
 %                     Pxy = Pxy - min(Pxy);
-%                     if nargin>5
-%                         Pxy = interp1(F,Pxy,F_scale);
-%                     else
-%                         Pxy =  Pxy(F>4);
-%                     end
+%                     Pxy = Pxy.*welchwin(length(Pxy))';
+                    F = F(2:end);
                     Pxy = Pxy./max(nPxy);
-                    Pxy = Pxy; %.*welchwin(length(Pxy))';
+                    Pxy = interp1(F,Pxy,F_scale);
+                    Pxy = Pxy;
                     xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
                 else
                     [f13,~,~]=sp2a2_R2(data(chindsP(p),:)',data(chindsR(r),:)',fsamp,N-1);
@@ -36,13 +35,9 @@ for chI = 1:size(chloc_name,2)
                         %                     [Pxy,F] = cpsd(data(chindsP(p),:),data(chindsR(r),:),hanning(N),[],N,fsamp);
                         Pxy = f13(:,zl(z));
                         nPxy = nf13(:,12);
-                        if nargin>5
-                            Pxy = interp1(F,Pxy,F_scale);
-                        else
-                            Pxy =  Pxy(F>4);
-                        end
                         Pxy = Pxy./max(nPxy);
-                        Pxy = Pxy; %.*welchwin(length(Pxy))';
+                        Pxy = Pxy'; %.*welchwin(length(Pxy))';
+                    Pxy = interp1(F,Pxy,F_scale);
                         xcsd(p,r,z,:) = Pxy;
                     end
                 end
@@ -52,7 +47,7 @@ for chI = 1:size(chloc_name,2)
         clear xcsd
     end
 end
-F = F_scale;
+F = F_scale
 % % take out symetrical CSD
 % diaginds = [2 1; 3 1; 3 2];
 % for i = 1:3
