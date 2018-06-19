@@ -99,6 +99,8 @@ while ii <= searchN
                     pnew.obs.LF = glorg + gainlist(gl);
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
+                    else
+                        xsims_gl{gl} =xsims;
                     end
                     % Run Data Transform
                     if isfield(R.obs,'transFx')
@@ -167,7 +169,7 @@ while ii <= searchN
     % Find error threshold for temperature (epsilon)
     if size(parBank,1)>R.SimAn.minRank
         %L = round(size(parBank,2)*0.4);
-        eps = prctile(parBank(end,:),70); % percentile eps
+        eps = prctile(r2loop(end,:),85); % percentile eps
         eps_rec(ii) = eps;
         %         try
         %             L = rep;
@@ -331,7 +333,7 @@ while ii <= searchN
         end
         banksave{ii} = parBank(:,parBank(end,:)>eps);
         figure(2);    clf
-        optProgPlot(Tm(1:ii),r2loop(Ilist(1)),pmean,banksave,eps,pInd,R)
+        optProgPlot(Tm(1:ii),r2loop(Ilist(1)),pmean,banksave,eps_rec,pInd,R)
         drawnow;shg
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot example time series
@@ -340,10 +342,10 @@ while ii <= searchN
         tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
         R.IntP.tvec_obs = tvec_obs;
         subplot(2,1,1)
-        plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{Ilist(1)}');
+        plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)},1),1)',xsims_rep{Ilist(1)}');
         xlabel('Time (s)'); ylabel('Amplitude')
         subplot(2,1,2)
-        plot(repmat(R.IntP.tvec_obs,6,1)',xsims_rep{Ilist(1)}'); xlim([5 6])
+        plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)},1),1)',xsims_rep{Ilist(1)}'); xlim([5 6])
         xlabel('Time (s)'); ylabel('Amplitude')
         legend(R.chsim_name)
         drawnow;shg
@@ -377,8 +379,8 @@ while ii <= searchN
     %     end
     % Or to workspace
     %     assignin('base','R_out',R)
-    Tm(ii+1) = Tm(ii)*alpha;
     if iflag == 1
+        Tm(ii+1) = Tm(ii)*alpha;
         ii = ii + 1;
     end
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%

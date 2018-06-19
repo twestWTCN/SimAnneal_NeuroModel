@@ -1,4 +1,4 @@
-function [xint,T] = fx_simulateMVAR(x,m,p,R)
+function [xint,T] = fx_simulateMVAR(R,x,u,p,m)
 % Log Normal Priors
 a = m.fn;
 P = m;

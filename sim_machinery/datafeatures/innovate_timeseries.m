@@ -33,4 +33,7 @@ switch R.IntP.Utype
     case 'white_covar'
         u = (sqrtm(m.uset.p.covar)*randn(m.m,R.IntP.nt)).*m.uset.p.scale;
         u = u';
+    case 'zero'
+        u = zeros(m.m,R.IntP.nt)';
+        
 end

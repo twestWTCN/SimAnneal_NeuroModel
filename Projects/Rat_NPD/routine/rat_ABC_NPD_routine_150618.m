@@ -33,7 +33,7 @@ load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
 nsPowmat = fyA;
 load([R.filepathn '\frq_paper_RatNPD_150618.mat']);
 F_data = fxA(:,1);
-condsel = 2; % ON
+condsel = 1; % ON
 %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
 meannpd_data = [];
 for i = 1:size(NPDmat,1)

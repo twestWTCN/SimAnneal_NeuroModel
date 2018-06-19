@@ -9,10 +9,16 @@ for i = 1:2
         
         %{'.params','.noisecov'}
         %         M = psave(nind).params; M(M==0) = [];
-        M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
-        M_s(M==0) = []; %M(M==0) = [];
-        Ma_s = M_s(M>-30); Ma = M(M>-30);
-        
+        if strcmp(R.projectn,'MVAR')
+            M = psave(nind).params; M_s = psave(nind).params_s;
+            M_s(M(:)==0) = []; M(M==0) = [];
+            Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
+            
+        else
+            M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
+            M_s(M==0) = []; %M(M==0) = [];
+            Ma_s = M_s(M>-30); Ma = M(M>-30);
+        end
         cmap = linspecer(5);
         X = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
         for Q = 1:5 %length(Ma)
@@ -50,9 +56,13 @@ set(gcf,'Position',[2.5 617 884 383])
 r = copularnd('t',Rho,nu,1000);
 subplot(2,2,3)
 title('2D Sample Drawn from Copula')
-
-i = pInd.int{1}.T(1);
-j = pInd.int{1}.G(1);
+if strcmp(R.projectn,'MVAR')
+    i = pInd.params(1);
+    j =pInd.params(2);
+else
+    i = pInd.int{1}.T(1);
+    j = pInd.int{1}.G(1);
+end
 i = find(indFlat==i);
 j = find(indFlat==j);
 u1 = r(:,i);
@@ -68,11 +78,15 @@ set(get(gca,'children'),'marker','.')
 
 subplot(2,2,4)
 title(' 3D Sample Drawn from Copula')
-
-i = pInd.A{1}(2);
-j = pInd.int{1}.G(1);
-k = pInd.D(2);
-
+if strcmp(R.projectn,'MVAR')
+    i = pInd.params(1);
+    j =pInd.params(2);
+    k = pInd.params(3);
+else
+    i = pInd.A{1}(2);
+    j = pInd.int{1}.G(1);
+    k = pInd.D(2);
+end
 i = find(indFlat==i);
 j = find(indFlat==j);
 k = find(indFlat==k);
