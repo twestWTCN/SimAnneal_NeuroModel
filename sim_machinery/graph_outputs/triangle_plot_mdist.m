@@ -1,6 +1,6 @@
 function triangle_plot_mdist(R,p,m,xf)
 % Compute indices of optimised parameter
-pInd = parOptInds_110817(R,p,m.m); % in structure form
+pInd = parOptInds_110817(R,p,m.m,1); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
 
 r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,5000);
@@ -8,17 +8,20 @@ r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,5000);
 labellist = {'M1 -> STR','M1 -> STN','STN -> GPe','STN -> GPi','Thal -> M1'};
 set(gcf,'Position',[667         67        1024         1024])
 %% INDEXING ISNT RIGHT FOR r THIS IS THE OPTIMIZED
-A1 =  reshape(pInd.A{1},6,6);
-plist(1) = A1(2,1); % M1 to STR
-plist(2) = A1(4,1); % M1 to STN
-plist(3) = A1(3,4); % STN to GPe
-plist(4) = A1(5,4); % STN to GPi
-plist(5) = A1(1,6); % THAL to M1
+A1 =  pInd.A{1}; %reshape(pInd.A{1},6,6);
+plist(1) = A1(1); % M1 to STR
+plist(2) = A1(2); % M1 to STN
+plist(3) = A1(3); % STN to GPe
+plist(4) = A1(4); % STN to GPi
+plist(5) = A1(5); % THAL to M1
+plist(6) = A1(6);
+plist(7) = A1(7);
+plist(8) = A1(8);
 
-A2 =  reshape(pInd.A{2},6,6);
-plist(6) = A2(3,2);
-plist(7) = A2(5,2);
-plist(8) = A2(4,3);
+% A2 =  reshape(pInd.A{2},6,6);
+% plist(6) = A2(3,2);
+% plist(7) = A2(5,2);
+% plist(8) = A2(4,3);
 cnt = 0;
 
 for j = 1:5
@@ -38,8 +41,8 @@ for j = 1:5
             subplot(5,5,cnt)
 
             [dum a] = contour(c{1},c{2},n,10);
-            xlim(R.SimAn.pOptBound.*0.2)
-            ylim(R.SimAn.pOptBound.*0.2)
+            xlim(R.SimAn.pOptBound.*0.075)
+            ylim(R.SimAn.pOptBound.*0.075)
             a = gca;
             a.FontSize = 14;
 

@@ -2,6 +2,7 @@ function [F meannpd] = constructNPDMat(data,chloc_name,chlist,fsamp,N,R,normnois
 if isempty(N)
     N = floor(fsamp/R.obs.csd.df);
 end
+data = data(R.obs.obsstates,:);
 % N = R.obs.csd.pow2;
 F_scale = R.frqz;
 % Construct NPD matrix from data - take mean across channel replicates

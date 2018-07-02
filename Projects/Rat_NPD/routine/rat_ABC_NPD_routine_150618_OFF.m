@@ -6,25 +6,14 @@
 % 1) Take all sims that are above criteria and include!
 % 2) Set Tm and anneal to be optimal
 %%%%%%%%%%%%%%%%%%%%%%%%
-
+simAnnealAddPaths()
 clear ; close all
-addpath(genpath('C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-addpath(genpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\boundedline-pkg'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
-
-% addpath(genpath('C:\Users\Tim\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\sim_machinery'))
-% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\bplot')
-% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\MEG_STN_Project')
-% addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\export_fig')
 
 
 rng(7453)
 
 %% Set Parameters of the Routine
-R = simannealsetup_NPD_300817;
+R = simannealsetup_NPD_300817_OFF;
 R.d = clock; % clock
 
 %% Prepare the data
@@ -35,7 +24,7 @@ load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
 nsPowmat = fyA;
 load([R.filepathn '\frq_paper_RatNPD_150618.mat']);
 F_data = fxA(:,1);
-condsel = 1; % ON
+condsel = 2; % OFF
 %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
 meannpd_data = [];
 for i = 1:size(NPDmat,1)
@@ -84,12 +73,15 @@ m.Gint = [14 1 1 1 1 1];
 m.Tint = [4 1 1 1 1 1];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
-m.dipfit.model(1).source = 'MMC';
-m.dipfit.model(2).source = 'STR';
-m.dipfit.model(3).source = 'GPE';
-m.dipfit.model(4).source = 'STN';
-m.dipfit.model(5).source = 'GPI';
-m.dipfit.model(6).source = 'THAL';
+for i = 1:numel(R.chsim_name)
+m.dipfit.model(i).source = R.chsim_name{i};
+end
+
+m.outstates = {[0 0 0 0 0 0 1 0]  [1 0]  [1 0]  [1 0]  [1 0]  [1 0]};
+R.obs.outstates = find([m.outstates{:}]);
+for i=1:numel(R.chloc_name)
+    R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
+end
 
 % Precompute xinds to make things easier with indexing
 % Compute X inds (removes need to spm_unvec which is slow)
@@ -123,36 +115,35 @@ u = sqrt(R.IntP.dt).*u;
 
 % Excitatory connections
 A = repmat(-32,m.m,m.m);
-A(3,1) = 0; % M1 to STR
 A(2,1) = 0; % M1 to STR
 A(4,1) = 0; % M1 to STN
 A(3,4) = 0; % STN to GPe
 A(5,4) = 0; % STN to GPi
-A(5,1) = 0; % STN to STR
+A(2,4) = 0; % STN to STR
 A(1,6) = 0; % THAL to M1
 
+% A(3,2) = 0; % STR to GPe
+% A(5,2) = 0; % STR to GPi
+% A(4,3) = 0; % GPe to STN
+% A(5,3) = 0; % GPe to GPi
+% A(2,3) = 0; % GPe to STR
+% A(6,5) = 0; % GPi to THAL
+
+p.A{1} = A;
+A_s = repmat(1,size(A));
+p.A_s{1} = A_s;
+
+% Inhbitory connections
+A = repmat(-32,m.m,m.m);
 A(3,2) = 0; % STR to GPe
 A(5,2) = 0; % STR to GPi
 A(4,3) = 0; % GPe to STN
 A(5,3) = 0; % GPe to GPi
 A(2,3) = 0; % GPe to STR
 A(6,5) = 0; % GPi to THAL
-
-p.A{1} = A;
-A_s = repmat(0.5,size(A));
-p.A_s{1} = A_s;
-
-% Inhbitory connections
-% A = repmat(-32,m.m,m.m);
-% % A(3,2) = 0; % STR to GPe
-% % A(5,2) = 0; % STR to GPi
-% % A(4,3) = 0; % GPe to STN
-% % A(5,3) = 0; % GPe to GPi
-% % A(2,3) = 0; % GPe to STR
-% % A(6,5) = 0; % GPi to THAL
-% p.A{2} = A;
-% A_s = repmat(1.5,size(A));
-% p.A_s{2} = A_s;
+p.A{2} = A;
+A_s = repmat(1,size(A));
+p.A_s{2} = A_s;
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -166,29 +157,29 @@ p.obs.mixing = [-0.2916 -0.0455]; %zeros(size(R.obs.mixing));
 p.obs.mixing_s = repmat(0.2,size(p.obs.mixing));
 
 % Delays
-p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32)); % | (p.A{2}>-32)) ;
-p.D_s = repmat(0.5,size(p.D));
+p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
+p.D_s = repmat(0.01,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = [0 0];
-p.S_s = [1 1];
+p.S_s = [0.1 0.1];
 
 % time constants and gains
 for i = 1:m.m
     if i<5
         p.int{i}.T = zeros(1,m.Tint(i));
-        p.int{i}.T_s = repmat(1,size(p.int{i}.T));
+        p.int{i}.T_s = repmat(0.2,size(p.int{i}.T));
         p.int{i}.G = zeros(1,m.Gint(i));
-        p.int{i}.G_s = repmat(1,size(p.int{i}.G));
+        p.int{i}.G_s = repmat(0.2,size(p.int{i}.G));
         p.int{i}.S = zeros(1);
-        p.int{i}.S_s = repmat(1,size(p.int{i}.S));
+        p.int{i}.S_s = repmat(0.2,size(p.int{i}.S));
     else
         p.int{i}.T = zeros(1,m.Tint(i));
-        p.int{i}.T_s = repmat(1,1,m.Tint(i));
+        p.int{i}.T_s = repmat(0.2,1,m.Tint(i));
         p.int{i}.G = zeros(1,m.Gint(i));
-        p.int{i}.G_s = repmat(1,1,m.Gint(i));
+        p.int{i}.G_s = repmat(0.2,1,m.Gint(i));
         p.int{i}.S = zeros(1);
-        p.int{i}.S_s = repmat(1,1,1);
+        p.int{i}.S_s = repmat(0.2,1,1);
     end
 end
 
@@ -201,21 +192,27 @@ end
 % p = R_out.Mfit.Pfit;
 % load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\NPD_123.mat')
 % R = xobs1;
-R2 = load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\NPD_1234.mat');
-load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\NPD_1234_parbank.mat');
-xobs1 = R2.R;
-
-R.SimAn.rep = 96; %96; %512; % Repeats per temperature
-R.SimAn.Tm = 0.8;
-R.SimAn.jitter = 2;
-R.objfx.specspec = 'cross_only';
-i = 2;
-for i = 1:4
+% load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\NPD_1234OFF_parbank.mat');
+% parBank = [];
+% R2 = load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\NPD_1234OFF.mat');
+% xobs1 = R2.R;
+R.out.tag = 'NPD_Final_JNPPaper_lesion_fresh';
+R.out.dag = '2018628';
+load([R.rootn '\' R.projectn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
+xobs1 = varo;
+load([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
+parBank = varo;
+R.SimAn.rep =512; %512; %96; %512; % Repeats per temperature
+R.SimAn.Tm = 0.85;
+R.SimAn.jitter = 1;
+R.objfx.specspec = 'cross';
+parBank = [];
+for i = 2:4
     %     R.out.tag = [R.out.tag num2str(i)];
     if i>1
         p = xobs1.Mfit.Pfit;
     end
-    [xobs1] = SimAn_ABC_110817(m.x,u,p,m,R,parBank);
+    [xobs1 parBank] = SimAn_ABC_110817(m.x,u,p,m,R,parBank);
 end
 % folname = ['C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\Rat_CSD\outputs\parfits\' sprintf('%d',[d(1:3)])];
 % mkdir(folname)

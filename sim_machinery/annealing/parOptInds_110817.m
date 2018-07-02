@@ -1,4 +1,7 @@
-function pInd = parOptInds_110817(R,p,MN)
+function pInd = parOptInds_110817(R,p,MN,set)
+if nargin<4
+    set =1;
+end
 plist = R.SimAn.pOptList;
 for i = 1:length(plist)
     if ~isempty(strfind(plist{i},'src'))
@@ -16,7 +19,9 @@ for i = 1:length(plist)
                 pvec = full(spm_vec(p));
                 K = strfind(pvec',xseq);
                 indK = K:K+(size(x,2)-1);
+                if set == 1
                 indK(x==-32) = [];
+                end
                 eval(['pInd' plist{i} '{Ai} = indK;']);
 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
             end
@@ -29,7 +34,9 @@ for i = 1:length(plist)
                 pvec = full(spm_vec(p));
                 K = strfind(pvec',xseq);
                 indK = K:K+(size(xseq,2)-1);
+                if set == 1
                 indK(x==-32) = [];
+                end
                 eval(['pInd' plist{i} ' = indK;']);
         end
     end

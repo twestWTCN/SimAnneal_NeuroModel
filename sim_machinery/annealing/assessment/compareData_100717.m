@@ -105,6 +105,8 @@ switch R.data.datatype
             case 'cross'
                 r2mean = nanmean(r2loop(triu(r2loop)~=0));
                 %         r2mean = sum(r2loop(triu(r2loop)~=0));
+            case 'cross_only'
+                r2mean = nanmean(r2loop(logical(~eye(j).*(triu(r2loop)~=0))));
         end
         %% TIME
     case 'time' % time courses

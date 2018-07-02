@@ -3,12 +3,20 @@ R.obs.gainmeth = R.obs.gainmeth(1:2);
 % R.obs.gainmeth = {'unitvar','leadfield','submixing'};
 bwid = 1.5;
 
-u = innovate_timeseries(R,m);
-u = u./R.IntP.dt;
+R.obs.csd.df = 1;
+R.obs.csd.reps = 96; %32;
 
-N = 12;
-Qlist = linspace(-2,2,N);
-Rlist = linspace(-2,2,N);
+N = R.obs.csd.reps; % Number of epochs of desired frequency res
+fsamp = 1/R.IntP.dt;
+R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
+R.IntP.tend = (N*(2^(R.obs.SimOrd)))/fsamp;
+
+u = innovate_timeseries(R,m);
+u = u.*sqrt(R.IntP.dt);
+
+N = 24;
+Qlist = linspace(-1,4,N);
+Rlist = linspace(-1,4,N);
 for q = 1:N
     for r = 1:N
         pa = p;
@@ -52,6 +60,6 @@ end
 parsweep.Rlist = Rlist;
 parsweep.Qlist = Qlist;
 parsweep.R = '.A{1}(3,4)';
-parsweep.Q = '.A{2}(4,3)';
+parsweep.Q = '.A{1}(4,3)';
 parsweep.frqPowBank = frqPowBank;
 parsweep.betaPowBank = betaPowBank;

@@ -1,4 +1,4 @@
-function R = simannealsetup_NPD_300817()
+function R = simannealsetup_NPD_300817_OFF()
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'NPD_Final_JNPPaper';
@@ -18,8 +18,8 @@ R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
 R.frqz = [6:.2:85];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MTX','GPe','STR','STN'};
-R.chsim_name = {'MTX','GPe','STR','STN','GPi','THAL'};
+R.chloc_name = {'MMC','GPE','STR','STN'};
+R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
 
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
@@ -34,7 +34,7 @@ R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 1;
-R.obs.csd.reps = 128; %32;
+R.obs.csd.reps = 96; %96;
 R.obs.states = [7 9 11 13];
 % LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
 % LF = [1 1 1 1 1 1]; % Fit visually and for normalised data

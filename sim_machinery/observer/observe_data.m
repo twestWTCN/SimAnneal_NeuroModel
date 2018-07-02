@@ -1,6 +1,6 @@
 function [xsims R] = observe_data(xstore,m,p,R)
 
-xsims = xstore([7 9 11 13 15 17],:);
+xsims = xstore(R.obs.outstates,:);
 % Delete burnin
 xsims(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
 tvec_obs = R.IntP.tvec;
@@ -47,8 +47,6 @@ for i = 1:length(R.obs.gainmeth)
             end
     end
 end
-
-
 
 % if R.obs.norm
 %     % Normalise

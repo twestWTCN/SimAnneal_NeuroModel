@@ -1,16 +1,19 @@
-function PlotFeatureConfInt_CSD(R,d)
+function PlotFeatureConfInt(R,d)
 if nargin<2
     d = sprintf('%d',[R.d(1:3)]);
 end
 
-load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
+% load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
+load('permod.mat')
 
 CSD_data_n = permMod.feat_rep{1};
-N = size(CSD_data_n,1); M = size(CSD_data_n,2);
+N = size(CSD_data_n,1); M = size(CSD_data_n,2); O = size(CSD_data_n,3)
 for ii = 1:size(permMod.feat_rep,2)
     for i = 1:N
         for j = 1:M
-            CSD_bank(:,i,j,ii) = permMod.feat_rep{ii}(i,j,:);
+            for k = 1:O
+            CSD_bank(:,i,j,k,ii) = permMod.feat_rep{ii}(i,j,k,:);
+            end
         end
     end
 end

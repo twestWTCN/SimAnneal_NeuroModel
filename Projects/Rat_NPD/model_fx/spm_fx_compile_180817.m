@@ -52,7 +52,7 @@ afferent(9,:) = [2 2 2 2];               % targets of THAL connections
 E(1,:) = [1 0 1 0]*200;                    % ERP connections
 E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
 E(3,:) = [1.8 1.2 1.8 1.2]*10000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
-E(4,:) = [.1111 .6667 1 .1111]*(10);             % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
+E(4,:) = [.1111 .6667 1 .1111]*(250);  %1000           % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
 
 %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
 % E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
@@ -61,11 +61,11 @@ E(4,:) = [.1111 .6667 1 .1111]*(10);             % MMC connections (to mmc) with
 % E(8,:) = [.5 .5 -.5 -.5]*100000;               % GPI connections
 % E(9,:) = [.5 .5 -.5 -.5]*100000;               % THAL connections
 
-E(5,:) = [.2 .2 -.2 -.2]*10;             % STR connections
-E(6,:) = [.2 .2 -.2 -.2]*10;             % GPE connections
-E(7,:) = [.2 .2 -.2 -.2]*10;             % STN connections
-E(8,:) = [.2 .2 -.2 -.2]*10;               % GPI connections
-E(9,:) = [.2 .2 -.2 -.2]*10;               % THAL connections
+E(5,:) = [.2 .2 -.2 -.2]*75;             % STR connections
+E(6,:) = [.2 .2 -.2 -.2]*75;             % GPE connections
+E(7,:) = [.2 .2 -.2 -.2]*75;             % STN connections
+E(8,:) = [.2 .2 -.2 -.2]*75;               % GPI connections
+E(9,:) = [.2 .2 -.2 -.2]*75;  %500              % THAL connections
 
 % get the neural mass models {'ERP','CMC'}
 %--------------------------------------------------------------------------
@@ -134,7 +134,7 @@ end
 %--------------------------------------------------------------------------
 Rz     = 2/3;                      % gain of sigmoid activation function
 B     = 0;                        % bias or background (sigmoid)
-Rz     = (1e-1)*Rz.*exp(p.S);
+Rz     = ((1e-3)*Rz).*exp(p.S(2));
 S     = @(x,Rz,B)1./(1 + exp(-Rz*x(:) + B)) - 1/(1 + exp(B));
 % dSdx  = @(x,R,B)(R*exp(B - R*x(:)))./(exp(B - R*x(:)) + 1).^2;
 % for i = 1:n
@@ -176,7 +176,7 @@ for tstep = R.IntP.buffer:R.IntP.nt
     %==========================================================================
     N     = m;
     for i = 1:n % targets
-        fA = 0;
+        fA = [];
         % extrinsic flow
         %----------------------------------------------------------------------
         for j = 1:n % sources

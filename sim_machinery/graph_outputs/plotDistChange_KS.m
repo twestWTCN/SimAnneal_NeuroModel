@@ -11,13 +11,13 @@ for i = 1:2
         %         M = psave(nind).params; M(M==0) = [];
         if strcmp(R.projectn,'MVAR')
             M = psave(nind).params; M_s = psave(nind).params_s;
-            M_s(M(:)==0) = []; M(M==0) = [];
+            M_s(M(:)==0) = []; M(M(:)==0) = [];
             Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
             
         else
             M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
-            M_s(M==0) = []; %M(M==0) = [];
-            Ma_s = M_s(M>-30); Ma = M(M>-30);
+            %M_s(M(:)==0) = [];% M(M(:)==0) = [];
+            Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
         end
         cmap = linspecer(5);
         X = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
@@ -60,8 +60,10 @@ if strcmp(R.projectn,'MVAR')
     i = pInd.params(1);
     j =pInd.params(2);
 else
-    i = pInd.int{1}.T(1);
-    j = pInd.int{1}.G(1);
+    i = spm_vec(pInd);
+    i = i(10);
+    j = spm_vec(pInd);
+    j = j(5);
 end
 i = find(indFlat==i);
 j = find(indFlat==j);
@@ -83,9 +85,12 @@ if strcmp(R.projectn,'MVAR')
     j =pInd.params(2);
     k = pInd.params(3);
 else
-    i = pInd.A{1}(2);
-    j = pInd.int{1}.G(1);
-    k = pInd.D(2);
+    i = spm_vec(pInd);
+    i = i(10);
+    j = spm_vec(pInd);
+    j = j(5);
+    k = spm_vec(pInd);
+    k = k(2);
 end
 i = find(indFlat==i);
 j = find(indFlat==j);
