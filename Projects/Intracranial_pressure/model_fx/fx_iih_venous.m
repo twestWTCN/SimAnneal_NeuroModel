@@ -2,12 +2,12 @@ function fx_iih_venous
 
 
 P        = [];
-P.T      = [0  1000];
+P.T      = [0 :1 :100];
 P.Cpan   = 0.205;     % ml/mmHg
 P.DCpa1  = 2.87;      % ml/mmHg
 P.DCpa2  = 0.164;     % ml/mmHg
 P.Gaut   = 3;
-P.Ke     = 5.1%0.077;     % /ml
+P.Ke     = 0.077;     % /ml
 P.Kr     = 13.1*1e3;  % mlHg3.s/ml
 P.Kven   = 0.155;     % /ml
 P.a      = 100;       % mmHg
@@ -17,7 +17,7 @@ P.Pv     = 14.1;      % mmHg
 P.Pv1    = -2.5;      % mmHg
 P.Pvs     = 6.0;        % mmHg
 P.Qn     = 12.5;      % ml/s
-P.Ro     = 30*526.3;     % mmHg.s.ml-1
+P.Ro     = 526.3;     % mmHg.s.ml-1
 P.Rf     = 2.38*1e3;  % mmHg.s.ml-1
 P.Rla    = 0.6;       % mmHg.s.ml-1
 P.Rpv    = 0.880;     % mmHg.s.ml-1
@@ -40,7 +40,7 @@ P.Pjr    = 5.85;       % mmHg --- right jugular
 P.Pjl    = 5.85;       % mmHg --- left jugular 
 
 P.Qn     = 12.5;        % ml/s --- total cerebral blood flow
-P.Qtr    = 6%P.Qn/5;      % ml/s --- right venous flow
+P.Qtr    = P.Qn/2;      % ml/s --- right venous flow
 P.Qtl    = P.Qn - P.Qtr;% ml/s --- left ar venous flow
 
 P.Qjr    =  P.Qtr;                                             
@@ -61,16 +61,21 @@ P.kjr2   = 13.0;
 P.kjl3   = 11.0;
 P.kjl2   = 13.0;
 
-P.Gtr   = P.Qtr/(P.Pvs - P.Ptr);                                   % mmHg/ml/s --- right jugular superior tract
-P.Gtl   = P.Qtl/(P.Pvs - P.Ptl);  
+P.Gtr   = P.Qtr/4*(P.Pvs - P.Ptr);                                   % mmHg/ml/s --- right jugular superior tract
+P.Gtl   = P.Qtl/1.2*(P.Pvs - P.Ptl); 
 
-% options = odeset('RelTol', 1e-5,'AbsTol',1e-5);
-[T, f]  = ode45(@(t,F) fx_icv(t,F,P),P.T,[P.xaut, P.icn, P.Pv, P.Pa, P.Pvs, P.Ptr, P.Ptl]);
+
+P.Gjr   = P.kjr3* ((1 + (2/pi)*atan((P.Ptr - 0)/P.A)))^2;
+P.Gjl   = P.kjl3* ((1 + (2/pi)*atan((P.Ptl- 0)/P.A)))^2;
+
+options = odeset('RelTol', 1e-4,'AbsTol',1e-4);
+[T, f]  = ode45(@(t,F) fx_icv(t,F,P),P.T,[P.xaut, P.icn, P.Pv, P.Pa, P.Pvs, P.Ptr, P.Ptl],options);
 figure;plot(T,f);legend({'xaut','ICP','Venous pressure','Pial arterial pressure','Venous sinus pressure','Right transverse sinus pressure','Left transverse sinus pressure'});
 % equations of motion dfdt
 
-function [dfdt] = fx_icv(t,F,P)
 
+function [dfdt] = fx_icv(t,F,P)
+disp(t)
 % F - values of time dependent variables
 
 % dfdt     = [dXautdt, dPicdt, dPvdt, dPadt, dPvsdt, dPtr, dPtl, dPjr, dPjl];
@@ -167,10 +172,8 @@ P.Gvs    = 1/Rvs;
     % mmHg/ml/s --- termnal intracranial veins
 P.Go     = 1/P.Ro;       % mmHg/ml/s --- to CSF outflow
 
-P.Gjr   = P.kjr3* ((1 + (2/pi)*atan((Ptr - 0)/P.A)))^2;
-P.Gjl   = P.kjl3* ((1 + (2/pi)*atan((Ptl- 0)/P.A)))^2;
                                       % mmHg/ml/s --- left jugular superior tract
-
+ 
 
 %% Venous outflow equations of motion dfdt
 
@@ -181,4 +184,9 @@ dPtrdt  = 1/P.Cjr* ((Pvs - Ptr)*P.Gtr  - (Ptr - P.Pjr)*P.Gjr);
 dPtldt  = 1/P.Cjl* ((Pvs - Ptl)*P.Gtl  - (Ptl - P.Pjr)*P.Gjl);
 
 dfdt     = [dXautdt, dPicdt, dPvdt, dPadt, dPvsdt, dPtrdt, dPtldt]';
-
+if any(isnan(dfdt)) 
+   keyboard;
+end
+if any(isinf(dfdt)) 
+clear    keyboard;
+end

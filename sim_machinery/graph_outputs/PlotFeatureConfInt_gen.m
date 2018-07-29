@@ -6,14 +6,16 @@ function PlotFeatureConfInt_gen(R,d)
 load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 CSD_data_n = permMod.feat_rep{1};
-list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],1));
+% list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],1));
+list = find([permMod.r2rep{:}]>-1);
 
-N = size(CSD_data_n,1); M = size(CSD_data_n,2);O = size(CSD_data_n,3);
+C = size(CSD_data_n,1); N = size(CSD_data_n,2); M = size(CSD_data_n,3);O = size(CSD_data_n,4);
+
 for ii = 1:size(list,2)
     for i = 1:N
         for j = 1:M
             for k = 1:O
-                CSD_bank(:,i,j,k,ii) = permMod.feat_rep{list(ii)}(i,j,k,:);
+                CSD_bank(:,i,j,k,ii) = permMod.feat_rep{list(ii)}(C,i,j,k,:);
             end
         end
     end
@@ -45,6 +47,7 @@ end
 F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));
 F = repmat(F',1,3);
 cmap = linspecer(2);
+figure
 cmap = [0 0 0; cmap];
 k = 0;
 for i = 1:N
@@ -72,13 +75,13 @@ for i = 1:N
         set(hout(1:2),'LineWidth',1,'LineStyle','--'); set(hout(2),'LineWidth',1);% set(hout(3),'LineWidth',1);
         hold on
         for L = lr
-         plot(R.data.feat_xscale,squeeze(R.data.feat_emp(i,j,L,:)),'color',cmap(c,:)); hold on
+         plot(R.data.feat_xscale,squeeze(R.data.feat_emp(C,i,j,L,:)),'color',cmap(c,:)); hold on
         end
         if i == j
             ylim([0 8])
             ylabel('Amplitude')
         else
-            ylim([0 0.3])
+            ylim([0 1])
             ylabel(msr)
         end
         xlim([min(R.frqz) max(R.frqz)])
@@ -91,18 +94,18 @@ set(gcf,'Position',[680         112        1112         893])
 %LABEL LOCATIONS
 % Top row
 labPos(:,1,1) = [0.182654676258993 0.938409854423292 0.0548561151079137 0.0313549832026876];
-labPos(:,2,1) = [0.395100719424461 0.936326987681971 0.0548561151079137 0.0313549832026876];
-labPos(:,3,1) = [0.603266187050362 0.93552071668533 0.0548561151079137 0.0313549832026876];
-labPos(:,4,1) = [0.7954964028777 0.935363941769317 0.0548561151079137 0.0313549832026876];
+labPos(:,2,2) = [0.395100719424461 0.936326987681971 0.0548561151079137 0.0313549832026876];
+labPos(:,3,3) = [0.603266187050362 0.93552071668533 0.0548561151079137 0.0313549832026876];
+labPos(:,4,4) = [0.7954964028777 0.935363941769317 0.0548561151079137 0.0313549832026876];
 
 % First Column
-labPos(:,1,2) =[0.0369352517985632 0.830414333706607 0.0548561151079137 0.0313549832026876];
+labPos(:,1,1) =[0.0369352517985632 0.830414333706607 0.0548561151079137 0.0313549832026876];
 labPos(:,2,2) =[0.039633093525182 0.610929451287794 0.0548561151079137 0.0313549832026876];
-labPos(:,3,2) =[0.0425467625899302 0.392721164613662 0.0548561151079137 0.0313549832026876];
-labPos(:,4,2) =[0.0436618705035993 0.178992161254199 0.0548561151079137 0.0313549832026876];
+labPos(:,3,3) =[0.0425467625899302 0.392721164613662 0.0548561151079137 0.0313549832026876];
+labPos(:,4,4) =[0.0436618705035993 0.178992161254199 0.0548561151079137 0.0313549832026876];
 
-for i = 1:4
-    for j = 1:2
+for i = 1:N
+    for j = 1:M
         annotation(gcf,'textbox',...
             labPos(:,i,j)',...
             'String',R.chloc_name{i},...

@@ -1,17 +1,19 @@
-function [xint,T] = fx_simulateICP(x,m,p)
+function [xint,T] = fx_simulateICP(R,x,~,p,m)
 % Log Normal Priors
 a = fieldnames(p);
 P = m;
 for i = 1:numel(a)
+    if ~isequal(a{i}(end),'s')
     y = eval(['m.' a{i}]); ys = eval(['p.' a{i}]);
     Y = y.*exp(ys);
     eval(['P.' a{i} '= Y;'])
+    end
 end
 
 for j = 1%:length(P.KE)
     P.Ke = P.KE(j);
     try
-        [T, f]  = ode15s(@(t,F) odefx(t,F,m.Z,P),P.T,x);
+        [T, f]  = ode15s(@(t,F) odefx(t,F,m.Z,P),m.T,x);
         VolArt  = f(:,2)'.*(P.Pa - f(:,1)');
         Ra      = [];
         xint = f';
@@ -27,6 +29,7 @@ for j = 1%:length(P.KE)
     
     
 end
+xint = {xint};
 
 function [dfdt,Ra] = odefx(t,F,Z,P)
 % initiate equations of motion
@@ -72,7 +75,6 @@ t5 = (F(1)- Z{3})/P.Ro;
 
 dPicdt  = t1*(t2+t3+t4-t5+Z{4});
 dfdt    = [dPicdt;dCadt];
-
 % 
 % function s = Sig(P,x,Ksig,DCa)
 % 

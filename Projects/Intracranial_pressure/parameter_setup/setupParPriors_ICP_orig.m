@@ -18,3 +18,5 @@ P.t     = 0;         % seconds
 P.Qn    = 0;       % ml/s
 P.G     = 0;        % ml x /mmHg x 100% /CBF change
 P.Pc    = 0;
+
+P.obs.LF = NaN;

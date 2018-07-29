@@ -11,24 +11,24 @@ end
 % September 2010 (C)
 for K = 1:3
     if K == 1
-        file_path = [R.rootn '\outputs\csd_gif\dist_track\' d '\' R.out.tag '\'];
+        file_path = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\dist_track\'];
     elseif K == 2
-        file_path = [R.rootn '\outputs\csd_gif\r2track\' d '\' R.out.tag '\'];
+        file_path = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\r2track\'];
     elseif K == 3
-        file_path = [R.rootn '\outputs\csd_gif\feattrack\' d '\' R.out.tag '\'];
+        file_path = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\feattrack\'];
     end
     a = dir([file_path,'\*.jpg']);
     a = {a.name};
     file_name=sort_nat(a);
     
     if K== 1
-        file_path2 = [R.rootn '\outputs\csd_gif\' d '\gifs\'];
+        file_path2 = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\gifs\'];
         file_name2 = [R.out.tag '_dist_track_gif.gif'];
     elseif K == 2
-        file_path2 = [R.rootn '\outputs\csd_gif\' d '\gifs\'];
+        file_path2 = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\gifs\'];
         file_name2 = [R.out.tag '_r2track_gif.gif'];
-elseif K == 3
-        file_path2 = [R.rootn '\outputs\csd_gif\' d '\gifs\'];
+    elseif K == 3
+        file_path2 = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\gifs\'];
         file_name2 = [R.out.tag '_feat_track_gif.gif'];
     end
     mkdir(file_path2)

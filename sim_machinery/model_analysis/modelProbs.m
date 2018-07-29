@@ -11,7 +11,7 @@ N = R.analysis.modEvi.N;
 % parOptBank = parOptBank(:,parOptBank(end,:)>eps);
 %% Resample parameters
 % Compute indices of optimised parameter
-pInd = parOptInds_110817(R,p,m.m,1); % in structure form
+pInd = parOptInds_110817(R,p,m.m,2); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
 % pIndMap (71 x 1)
 % xf (71 x size(parOptBank,2) )
@@ -35,10 +35,10 @@ for i = 1:N
     base(pIndMap,i) = x1(:,i);
     par{i} = spm_unvec(mean(base,2),p);
 end
-
-if isempty(gcp)
-    parpool
-end
+% 
+% if isempty(gcp)
+%     parpool
+% end
 
 ppm = ParforProgMon('Model Probability Calculation',N);
 %%Plot Example
@@ -46,25 +46,25 @@ figure(5)
 pnew = par{1};
 %% Simulate New Data
 u = innovate_timeseries(R,m);
-u = u.*sqrt(R.IntP.dt);
+u{1} = u{1}.*sqrt(R.IntP.dt);
 xsims = R.IntP.intFx(R,m.x,u,pnew,m);
 % Run Observer function
 if isfield(R.obs,'obsFx')
-    xsims = R.obs.obsFx(xsims,m,pnew,R);
+    [xsims R] = R.obs.obsFx(xsims,m,pnew,R);
 end
-xsims = xsims + linspace(m.m,0,m.m)'
- plot(R.IntP.tvec_obs(2:end),xsims(:,2:end))
+xsims{1} = xsims{1} + linspace(m.m,0,m.m)';
+ plot(R.IntP.tvec_obs(1:end),xsims{1}(:,2:end))
  legend(R.chsim_name); xlabel('Time (s)'); ylabel('Amplitude')
  set(gcf,'Position',[705         678        1210         420]); 
  xlim([4 5])
 %%
 
-parfor jj = 1:N
+for jj = 1:N
 %     ppm.increment();
     pnew = par{jj};
     %% Simulate New Data
         u = innovate_timeseries(R,m);
-        u = u.*sqrt(R.IntP.dt);
+        u{1} = u{1}.*sqrt(R.IntP.dt);
     xsims = R.IntP.intFx(R,m.x,u,pnew,m);
     % Run Observer function
     if isfield(R.obs,'obsFx')

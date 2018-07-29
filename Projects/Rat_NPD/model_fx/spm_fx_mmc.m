@@ -83,11 +83,11 @@ end
 
 % input connections
 %--------------------------------------------------------------------------
-C    = exp(P.C);
+% C    = exp(P.C);
  
 % pre-synaptic inputs: s(V)
 %--------------------------------------------------------------------------
-R    = 2/3;                      % slope of sigmoid activation function
+R    = (2/3);     %0.5.*                  % slope of sigmoid activation function
 B    = 0;                        % bias or background (sigmoid)
 R    = R.*exp(P.S);              % gain of activation function
 F    = 1./(1 + exp(-R*x + B));   % firing rate
@@ -107,8 +107,8 @@ S    = F - 1/(1 + exp(B));       % deviation from baseline firing
 %     U = C*u(:)*32;
 %     
 % end
-U = C*u(:)*32;
- 
+% U = C*u(:)*32;
+ U = u;
 % time constants and intrinsic connections
 %==========================================================================
 T    = ones(n,1)*T/1000;
@@ -174,25 +174,25 @@ end
  
 % Middle layer (middle pyramidal cells): Hidden causes
 %--------------------------------------------------------------------------
-u      =   U; %A{1}*S(:,3)+
+u      =   U; %A{1}*S(:,3)+ ;
 u      = - G(:,1).*S(:,1) - G(:,3).*S(:,5) + G(:,8).*S(:,3) + u;
 f(:,2) =  (u - 2*x(:,2) - x(:,1)./T(:,1))./T(:,1);
  
 % Supra-granular layer (superficial pyramidal cells): Hidden causes - error
 %--------------------------------------------------------------------------
-u      =  0; %A{2}*S(:,3);% + 
+u      = 0;% A{2}*S(:,3);% + 
 u      =  - G(:,7).*S(:,3) + G(:,2).*S(:,1) - G(:,12).*S(:,5) + G(:,14).*S(:,7) + u;
 f(:,4) =  (u - 2*x(:,4) - x(:,3)./T(:,2))./T(:,2);
  
 % Supra-granular layer (inhibitory interneurons): Hidden states - error
 %--------------------------------------------------------------------------
-u      =  0; %- A{4}*S(:,7);
+u      = 0;%- A{4}*S(:,7);
 u      =  - G(:,4).*S(:,5) + G(:,5).*S(:,1) + G(:,6).*S(:,7) + G(:,13).*S(:,3) + u;
 f(:,6) =  (u - 2*x(:,6) - x(:,5)./T(:,3))./T(:,3);
  
 % Infra-granular layer (deep pyramidal cells): Hidden states
 %--------------------------------------------------------------------------
-u      =   0; % A{3}*S(:,7);
+u      =  U;% A{3}*S(:,7);
 u      = - G(:,10).*S(:,7) - G(:,9).*S(:,5) + G(:,11).*S(:,3) + u;
 f(:,8) =  (u - 2*x(:,8) - x(:,7)./T(:,4))./T(:,4);
  

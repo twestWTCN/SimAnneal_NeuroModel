@@ -10,7 +10,7 @@ for i = 1:length(plist)
         L = 1;
     end
     for src = 1:L
-        if strmatch(plist{i},'.A')  % Case for matrices where we loop through
+        if isequal(plist{i},'.A') || isequal(plist{i},'.B') % Case for matrices where we loop through
             for Ai = 1:2
                 X_old = eval(['pold' plist{i} '{Ai}']);
                 X_s = eval(['pold' plist{i} '_s{Ai}']);
@@ -20,7 +20,7 @@ for i = 1:length(plist)
                 end
                 Xa(Xa>xMax & Xa>-30) = xMax; Xa(Xa<xMin & Xa>-30) = xMin;
                 X = reshape(Xa,size(X_old));
-                X(X_old==-32) = -32;
+                X(X_old<-30) = -32;
                 eval(['pnew' plist{i} '{Ai} = X;']);
                 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
             end
@@ -34,7 +34,7 @@ for i = 1:length(plist)
             end
             Xa(Xa>xMax & Xa>-30) = xMax; Xa(Xa<xMin & Xa>-30) = xMin;
             X = reshape(Xa,size(X_old));
-            X(X_old==-32) = -32;
+            X(X_old<-30) = -32;
             eval(['pnew' plist{i} ' = X;']);
         end
     end

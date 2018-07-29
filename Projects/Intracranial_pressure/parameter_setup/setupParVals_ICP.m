@@ -9,7 +9,7 @@ b              = repmat(90,1,2500);
 c              = repmat(90,1,10*1e3);
 M.Pa           = [a c b];                                                                                   % mmHg Arterial Pressure
 M.T            = [1:length(a), length(a)+1e-3:1e-3:length(a)+10, length(a)+11:length(a)+10+length(b)];      % small temporal step size for integration
-
+M.T = linspace(M.T(1),M.T(end),length(M.T));
 M.dPadt        = [0 diff(M.Pa)];
 
     

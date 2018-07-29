@@ -14,6 +14,11 @@ for i = 1:2
             M_s(M(:)==0) = []; M(M(:)==0) = [];
             Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
             
+        elseif strcmp(R.projectn,'Intracranial_pressure')
+            M = [psave(nind).Ca psave(nind).Ro psave(nind).Can psave(nind).KE psave(nind).Pc];
+            M_s = [psave(nind).Ca_s psave(nind).Ro_s psave(nind).Can_s psave(nind).KE_s psave(nind).Pc_s];
+            %M_s(M(:)==0) = [];% M(M(:)==0) = [];
+            Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
         else
             M = psave(nind).A{1}; M_s = psave(nind).A_s{1};
             %M_s(M(:)==0) = [];% M(M(:)==0) = [];
@@ -21,7 +26,11 @@ for i = 1:2
         end
         cmap = linspecer(5);
         X = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
-        for Q = 1:5 %length(Ma)
+        QL = length(Ma);
+        if QL>5
+            QL = 5;
+        end
+        for Q = 1:QL
             p = normpdf(X,Ma(Q),Ma_s(Q).*stdev);
             %             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
             plot(X,p,ls,'color',cmap(Q,:))
@@ -61,7 +70,7 @@ if strcmp(R.projectn,'MVAR')
     j =pInd.params(2);
 else
     i = spm_vec(pInd);
-    i = i(10);
+    i = i(4);
     j = spm_vec(pInd);
     j = j(5);
 end
@@ -86,7 +95,7 @@ if strcmp(R.projectn,'MVAR')
     k = pInd.params(3);
 else
     i = spm_vec(pInd);
-    i = i(10);
+    i = i(4);
     j = spm_vec(pInd);
     j = j(5);
     k = spm_vec(pInd);

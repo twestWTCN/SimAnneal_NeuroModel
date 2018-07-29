@@ -1,4 +1,4 @@
-function [R,parBank] = SimAn_ABC_110817(ic,u,p,m,R,parBank)
+function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
 %%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION of NONLINEAR
 %%%% DYNAMICAL MODELS
 % ---- 11/08/17---------------------------
@@ -43,9 +43,9 @@ ii = 1;
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
-R.SimAn.minRank = ceil(size(pIndMap,1)*2);
+R.SimAn.minRank = ceil(size(pIndMap,1)*2.2); %1.8 multiplier
 % set initial batch of parameters from gaussian priors
-stdev = R.SimAn.jitter*Tm(1); % set the global precision
+stdev = 1*R.SimAn.jitter; % set the global precision
 if isfield(R,'Mfit')
     xf = R.Mfit.xf;
     rep = repset;
@@ -69,7 +69,7 @@ else
     end
 end
 itry = 0;
-eps_p = -100;
+eps_p = -5;
 %% Main Annealing Loop
 while ii <= searchN
     rep = repset;
@@ -78,23 +78,26 @@ while ii <= searchN
     % optimization here is prime.
     
     parfor jj = 1:rep % Replicates for each temperature
-        u = innovate_timeseries(R,m);
-        u = u.*sqrt(R.IntP.dt);
+        if ~isempty(R.IntP.Utype)
+            uc = innovate_timeseries(R,m);
+        else
+            uc = [];
+        end
         x = ic;
         %% Resample Parameters
         pnew = par{jj};
         %% Simulate New Data
         % Integrate in time master fx function
         try
-        xsims = R.IntP.intFx(R,x,u,pnew,m);
+            [xsims dum wflag] = R.IntP.intFx(R,x,uc,pnew,m);
         catch
-            disp('Simulation failed')
-            xsims = nan(1,3);
+            disp('Simulation failed!')
+            xsims{1} = nan(1,3);
         end
-        if sum(isnan(xsims(:))) == 0
+        if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
             try
                 % Run Observer function
-                glorg = pnew.obs.LF;
+                %                 glorg = pnew.obs.LF;
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 gainlist = 0; %linspace(-0.5,1,8);
@@ -102,35 +105,42 @@ while ii <= searchN
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
                 for gl = 1:length(gainlist)
-                    pnew.obs.LF = glorg + gainlist(gl);
+                    %                     pnew.obs.LF = glorg + gainlist(gl);
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
                     else
                         xsims_gl{gl} =xsims;
                     end
-                    % Run Data Transform
+                    % Run Data Transform d
                     if isfield(R.obs,'transFx')
-                        [~,feat_sim{gl}] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
+                        [~, feat_sim{gl} wflag] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
                     else
                         feat_sim{gl} = xsims_gl{gl}; % else take raw time series
                     end
                     % Compare Pseudodata with Real
                     r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
                 end
-                % F
+                if wflag == 1
+                    error('TransFX could not compute data transform!')
+                end
                 [r2 ir2] = max(r2mean);
-                pnew.obs.LF = glorg + gainlist(ir2);
+                %                 pnew.obs.LF = glorg + gainlist(ir2);
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
-                %                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+%                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+%                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
+%                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
+                close all
             catch
+                disp('Observation/Cost Function Failure!')
                 r2 = -inf;
                 ir2 =1;
                 xsims_gl{1} = NaN;
                 feat_sim{1} = NaN;
             end
         else
+            disp('Sim Output contains NaNs!')
             r2 = -inf;
             ir2 =1;
             xsims_gl{1} = NaN;
@@ -161,7 +171,7 @@ while ii <= searchN
     % Append succesful replicates to bank of params and fits
     %(parameter table, with fits)
     for i = 1:numel(r2loop)
-        if ~isnan(r2loop(i))
+        if ~isinf(r2loop(i))
             parI(:,i) = [full(spm_vec(par_rep{i})); r2loop(i)]';
             parBank = [parBank parI(:,i) ];
         end
@@ -179,75 +189,61 @@ while ii <= searchN
     end
     
     % Find error threshold for temperature (epsilon)
-    eps = NaN;
+    eps = -5;
     if size(parBank,2)>R.SimAn.minRank
-        %L = round(size(parBank,2)*0.4);
-        %         eps_op(2) = prctile(parBank(end,:),85);
-        %         eps = max(eps_op);
-        %         try
-        %             L = rep;
-        %             eps = prctile(parBank(end,end-L:end),75); % percentile eps
-        %         catch
-        %             L = round(size(parBank,2)*0.4);
-        %             eps = prctile(parBank(end,end-L:end),75); % percentile eps
-        %         end
-        eps_tmp(1) = (-3.*Tm(ii))+2; % temperature based epsilon (arbitrary function)
+        
+        eps = (Tm(ii)^(1/4))-2.5; %.2; % temperature based epsilon (arbitrary function)
+        %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
+        %         epgrad = r2eps-eps_p;
+        %         eps = eps_p + epgrad;
+        
         clear parOptBank
-        parOptBank = parBank(:,parBank(end,:)>eps_tmp(1));
+        parOptBank = parBank(:,parBank(end,:)>eps);
         
         if size(parOptBank,2)< R.SimAn.minRank-1
-            eps_check = [0 0];
-            disp(['Annealing EPS not yielding large enough bank, try percentile EPS'])
-            eps_tmp(2) = prctile(r2loop,85);
-            A{2} = parBank(:,parBank(end,:)>eps_tmp(2));
-            if size(A{2},2)>size(parOptBank,2)
-                eps_check(1) = 1;
+            if itry>R.SimAn.copout(1)
+                delta = 1; eps = eps+1;
+                while abs(eps_p-eps) < 0.001
+                    pip = 100;
+                    A = [1];
+                    while size(A,2)<(R.SimAn.minRank*delta)
+                        pip = pip-0.001;
+                        if pip<0
+                            break
+                        end
+                        eps = prctile(parBank(end,:),pip);
+                        A = parBank(:,parBank(end,:)>eps);
+                    end
+                    parOptBank = A;
+                    clear A
+                    delta = delta-0.005;
+                    if delta<0.25
+                        break
+                    end
+                end
             end
-            eps_tmp(3) = prctile(parBank(end,:),95);
-            A{3} = parBank(:,parBank(end,:)>eps_tmp(3));
-            if size(A{3},2)>size(parOptBank,2)
-                eps_check(2) = 1;
-            end
-            Asel = [size(A{3},2)>size(A{2},2) size(A{3},2)<size(A{2},2)].*eps_check;
-            dispmes = {'Using 85% ii Call Pars','Using 95% Parbank pars'};
-            if any(Asel)
-                parOptBank = A{find(Asel)+1};
-                eps = eps_tmp(find(Asel)+1);
-                disp(dispmes{find(Asel)})
-            end
-            disp(['90% EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps),2))])
+            %             if itry<=R.SimAn.copout(2) || eps-eps_p < 0.005
+            %                 pip = 100;
+            %                 A = [1];
+            %                 while size(A,2)<(R.SimAn.minRank)*0.35
+            %                     pip = pip-0.001;
+            %                     if pip<0
+            %                         break
+            %                     end
+            %                     eps = prctile(parBank(end,:),pip);
+            %                     A = parBank(:,parBank(end,:)>eps);
+            %                 end
+            %                 parOptBank = A;
+            %                 clear A
+            %             end
+            itry = itry + 1;
+            tflag = 0;
         else
+            tflag = 1;
             itry = 0;
-            eps = eps_tmp(1);
             disp(['Using Annealing EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps),2))])
         end
         clear A
-        
-        if  eps-eps_p < 0.005
-            itry = itry + 1;
-            if itry<=R.SimAn.copout(2)
-                pip = 100;
-                A = [1];
-                while size(A,2)<R.SimAn.minRank-1
-                    pip = pip-0.001;
-                    eps = prctile(parBank(end,:),pip);
-                    A = parBank(:,parBank(end,:)>eps);
-                end
-                parOptBank = A;
-                clear A
-            elseif (itry>R.SimAn.copout(2)) 
-                pip = 100;
-                A = [1];
-                while size(A,2)<(R.SimAn.minRank)*0.60
-                    pip = pip-0.001;
-                    eps = prctile(parBank(end,:),pip);
-                    A = parBank(:,parBank(end,:)>eps);
-                end
-                parOptBank = A;
-                clear A
-            end
-        end
-        
         eps_p = eps; % past value of eps (for next loop)
         
         % Form the bank of parameters exceeding acceptance level
@@ -255,7 +251,7 @@ while ii <= searchN
         % data and more than a given number of replicates are attempted
         % then choose epsilon to give bank exceeding rank (bare minimum for
         % copula formation
-        if ((R.SimAn.minRank-size(parOptBank,2))< 0.35*R.SimAn.minRank) && itry>R.SimAn.copout(1)
+        if itry>=R.SimAn.copout(1) && itry < 12
             disp(['Rank is within limits, filling with pseudopars: ' num2str(eps)])
             aN = R.SimAn.minRank-size(parOptBank,2);
             mu = mean(parBank(:,parBank(end,:)>eps),2);
@@ -266,9 +262,9 @@ while ii <= searchN
             catch
                 disp('covar matrix is non-symmetric postive definite')
             end
-            itry =0;
+%             itry =0;
         end
-        
+        %
         % Crops the optbank to stop it getting to big (memory)
         if size(parOptBank,2)> 2^9
             [dum V] = sort(parOptBank(end,:),'descend');
@@ -296,23 +292,24 @@ while ii <= searchN
             try
                 [Rho,nu] = copulafit('t',copU','Method','ApproximateML'); % Fit copula
                 % Save outputs that specify the copula
-                R.Mfit.Rho = Rho;
                 R.Mfit.xf = xf;
                 R.Mfit.nu = nu;
                 R.Mfit.tbr2 = parOptBank(end,1); % get best fit
                 R.Mfit.Pfit = spm_unvec(mean(parOptBank,2),p);
+                R.Mfit.Rho = Rho;
                 Mfit_hist(ii) = R.Mfit;
                 %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
+                
                 figure(3)
                 clf
                 plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R,stdev)
                 %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
-                 iflag = 1;
+                iflag = 1;
                 % If redraw then increase epsilon
             catch
                 disp('The estimate of Rho has become rank-deficient.  You may have too few data, or strong dependencies among variables.')
-                    p = spm_unvec(mean(parOptBank,2),p);
-                    iflag = 0;
+                p = spm_unvec(mean(parOptBank,2),p);
+                iflag = 0;
             end
         else  % If not enough samples - redraw using means from the best fitting model
             %             p = par_rep{Ilist(1)}; % The best par_rep
@@ -346,30 +343,46 @@ while ii <= searchN
             base(pIndMap,i) = x1(:,i);
             par{i} = spm_unvec(base(:,i),p);
         end
-    elseif iflag == 0 && itry > R.SimAn.copout(2)
+    elseif iflag == 0 && size(parOptBank,2)>2 && itry>=R.SimAn.copout(1)
         disp(['No copula available, reverting to normal distribution on best fitting posteriors'])
         mu = mean(parOptBank(1:end-1,:),2);
+        if any(isnan(mu))
+            for jj = 1:repset
+                par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
+            end
+            break
+        end
         pm = spm_unvec(mu,p);
-        sig = cov(parOptBank(1:end-1,:)');
-        sig = (sig + sig.') / 2; % Ensures symmetry constraints
-        stdev = mean(diag(sig));
+        if size(parBank,2)>0.25*R.SimAn.minRank
+            sig = cov(parBank(1:0.25*R.SimAn.minRank,:)');
+            sig = (sig + sig.') / 2; % Ensures symmetry constraints
+            stdev = mean(diag(sig))*2;
+        else
+            stdev= Tm(ii)*R.SimAn.jitter;
+        end
         for jj = 1:repset
             par{jj} = resampleParameters_240717(R,pm,stdev,m.m); % Draw from prior
         end
-        itry = 0;
+    else
+        for jj = 1:repset
+            par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
+        end
     end
     
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
     if size(Ilist,2)>2
         np = round(0.15*size(Ilist,2));
-        %% Plot Data Features Outputs
-        figure(1)
-        clf
-        fx = R.plot.outFeatFx;
-        if size(Ilist,2)<12; xn = size(Ilist,2); else; xn = 12; end
-        fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},R.data.feat_xscale,R,1,[])
-        drawnow; shg
-        
+        if isfield(R.plot,'outFeatFx')
+            %% Plot Data Features Outputs
+            figure(1)
+            clf
+            fx = R.plot.outFeatFx;
+            if size(Ilist,2)<12; xn = size(Ilist,2); else; xn = 12; end
+            try
+                fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},R.data.feat_xscale,R,1,[])
+                drawnow; shg
+            end
+        end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
         if exist('base')
@@ -387,30 +400,39 @@ while ii <= searchN
         tvec_obs = R.IntP.tvec;
         tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
         R.IntP.tvec_obs = tvec_obs;
-        subplot(2,1,1)
-        plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)},1),1)',xsims_rep{Ilist(1)}');
-        xlabel('Time (s)'); ylabel('Amplitude')
-        subplot(2,1,2)
-        plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)},1),1)',xsims_rep{Ilist(1)}'); xlim([5 6])
-        xlabel('Time (s)'); ylabel('Amplitude')
-        legend(R.chsim_name)
-        drawnow;shg
+        ptr(1) = subplot(2,1,1);
+        try
+            plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+            xlabel('Time (s)'); ylabel('Amplitude')
+            if numel(xsims_rep{Ilist(1)})>1
+                ptr(2) = subplot(2,1,2);
+                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
+                linkaxes(ptr,'x'); %xlim([10 20])
+            else
+                ptr(2) = subplot(2,1,2);
+                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+                xlim  ([2000 2500])
+            end
+            xlabel('Time (s)'); ylabel('Amplitude')
+            legend(R.chsim_name)
+            drawnow;shg
+        end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
-        if istrue(R.plot.save)
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\csd_gif\feattrack\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\r2track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\dist_track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
+        if isequal(R.plot.save,'True')
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\feattrack\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\r2track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
+            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\dist_track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
             %     close all
-            pathstr = [R.rootn '\outputs\' R.out.tag '\' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '\OptSaves\'];
+            pathstr = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\OptSaves\'];
             if ~exist(pathstr, 'dir')
                 mkdir(pathstr);
             end
-            try
-                save([pathstr 'modelfit_' R.out.tag '_' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '.mat'],'R','parBank','p','m','Mfit_hist')
-            catch
-                save([pathstr 'modelfit_' R.out.tag '_' sprintf('%d_%.2d_%.2d',[R.d(1:3)]) '.mat'],'R','parBank','p','m')
-            end
+            %             try
+            %                 save([pathstr 'modelfit_' R.out.tag '_' R.out.dag '.mat'],'R','parBank','p','m','Mfit_hist')
+            %             catch
+            %                 save([pathstr 'modelfit_' R.out.tag '_' R.out.dag '.mat'],'R','parBank','p','m')
+            %             end
             %             save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'R')
             %             save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'parBank')
             disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
@@ -419,14 +441,19 @@ while ii <= searchN
     %     disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
     %% Save data
-        if rem(ii,10) == 0
-                saveMkPath([R.rootn '\' R.projectn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],R)
-                saveMkPath([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
-        end
+    if rem(ii,10) == 0
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],R)
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
+    end
     % Or to workspace
     %     assignin('base','R_out',R)
     if iflag == 1
-        Tm(ii+1) = Tm(ii)*alpha;
+        if tflag == 1
+            Tm(ii+1) = Tm(ii)+1;
+        else
+            Tm(ii+1) = Tm(ii);
+        end
         ii = ii + 1;
     end
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%

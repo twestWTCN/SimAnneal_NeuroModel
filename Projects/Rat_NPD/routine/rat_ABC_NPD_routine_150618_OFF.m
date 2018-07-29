@@ -6,7 +6,7 @@
 % 1) Take all sims that are above criteria and include!
 % 2) Set Tm and anneal to be optimal
 %%%%%%%%%%%%%%%%%%%%%%%%
-simAnnealAddPaths()
+% simAnnealAddPaths()
 clear ; close all
 
 
@@ -24,39 +24,42 @@ load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
 nsPowmat = fyA;
 load([R.filepathn '\frq_paper_RatNPD_150618.mat']);
 F_data = fxA(:,1);
-condsel = 2; % OFF
-%     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
-meannpd_data = [];
-for i = 1:size(NPDmat,1)
-    for j = 1:size(NPDmat,2)
-        if i==j
-            Ftmp = F_data;
-            Pxy = abs(log10(mean(vertcat(nsPowmat{i,condsel,:}),1)));
-            Pxy(Ftmp>48 & Ftmp<52) = [];
-            Ftmp(Ftmp>48 & Ftmp<52) = [];
-            [xCalc yCalc b Rsq] = linregress(log10(Ftmp),Pxy');
-            Pxy = Pxy-yCalc';
-            Pxy = interp1(Ftmp,Pxy,R.frqz);
-            Pxy = (Pxy-mean(Pxy))./std(Pxy);
-            Pxy = Pxy - min(Pxy);
-            Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
-            meannpd_data(i,j,1,:) = Pxy;
-        else
-            for k = 1:size(NPDmat,3)
+    meannpd_data = [];
+
+for condsel =1:2
+    %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
+    for i = 1:size(NPDmat,1)
+        for j = 1:size(NPDmat,2)
+            if i==j
                 Ftmp = F_data;
-                Cxy = mean(horzcat(NPDmat{i,j,k,condsel,:})',1);
-                Cxy(Ftmp>48 & Ftmp<52) = [];
+                Pxy = abs(log10(mean(vertcat(nsPowmat{i,condsel,:}),1)));
+                Pxy(Ftmp>48 & Ftmp<52) = [];
                 Ftmp(Ftmp>48 & Ftmp<52) = [];
-                Cxy = interp1(Ftmp,Cxy,R.frqz);
-                Cxy = Cxy.*tukeywin(length(Cxy),0.1)'; %%NPD_sim_n(i,j,1,:)
-                plot(R.frqz,Cxy)
-                meannpd_data(i,j,k,:) = Cxy;
+                [xCalc yCalc b Rsq] = linregress(log10(Ftmp),Pxy');
+                Pxy = Pxy-yCalc';
+                Pxy = interp1(Ftmp,Pxy,R.frqz);
+                Pxy = (Pxy-mean(Pxy))./std(Pxy);
+                Pxy = Pxy - min(Pxy);
+                Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
+                meannpd_data(condsel,i,j,1,:) = Pxy;
+            else
+                for k = 1:size(NPDmat,3)
+                    Ftmp = F_data;
+                    Cxy = mean(horzcat(NPDmat{i,j,k,condsel,:})',1);
+                    Cxy(Ftmp>48 & Ftmp<52) = [];
+                    Ftmp(Ftmp>48 & Ftmp<52) = [];
+                    Cxy = interp1(Ftmp,Cxy,R.frqz);
+                    Cxy = Cxy.*tukeywin(length(Cxy),0.1)'; %%NPD_sim_n(i,j,1,:)
+                    plot(R.frqz,Cxy)
+                    meannpd_data(condsel,i,j,k,:) = Cxy;
+                end
             end
         end
     end
+    % Set data as working version
+    R.data.feat_emp = meannpd_data;
 end
-% Set data as working version
-R.data.feat_emp = meannpd_data;
+squeeze(meannpd_data(1,1,1,1,:))
 R.data.feat_xscale = R.frqz;
 
 % Plot CSD
@@ -74,7 +77,7 @@ m.Tint = [4 1 1 1 1 1];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
-m.dipfit.model(i).source = R.chsim_name{i};
+    m.dipfit.model(i).source = R.chsim_name{i};
 end
 
 m.outstates = {[0 0 0 0 0 0 1 0]  [1 0]  [1 0]  [1 0]  [1 0]  [1 0]};
@@ -100,7 +103,7 @@ m.xinds = xinds;
 % setup exogenous noise
 % m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 1e1; %.*R.InstP.dt;
+m.uset.p.scale = 5e1; %.*R.InstP.dt;
 u = innovate_timeseries(R,m);
 u = sqrt(R.IntP.dt).*u;
 
@@ -119,8 +122,9 @@ A(2,1) = 0; % M1 to STR
 A(4,1) = 0; % M1 to STN
 A(3,4) = 0; % STN to GPe
 A(5,4) = 0; % STN to GPi
-A(2,4) = 0; % STN to STR
+% A(2,4) = 0; % STN to STR
 A(1,6) = 0; % THAL to M1
+A(1,4) = 0; % THAL to STR
 
 % A(3,2) = 0; % STR to GPe
 % A(5,2) = 0; % STR to GPi
@@ -145,6 +149,10 @@ p.A{2} = A;
 A_s = repmat(1,size(A));
 p.A_s{2} = A_s;
 
+p.B = p.A;
+p.B_s{1} = repmat(1,size(A));
+p.B_s{2} = repmat(1,size(A));
+
 % Connection strengths
 p.C = zeros(m.m,1);
 p.C_s = repmat(0.5,size(p.C));
@@ -158,7 +166,7 @@ p.obs.mixing_s = repmat(0.2,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.01,size(p.D));
+p.D_s = repmat(0.05,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = [0 0];
@@ -203,14 +211,17 @@ xobs1 = varo;
 load([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
 parBank = varo;
 R.SimAn.rep =512; %512; %96; %512; % Repeats per temperature
-R.SimAn.Tm = 0.85;
+R.SimAn.Tm = 1;
 R.SimAn.jitter = 1;
+R.SimAn.searchN = 100;
 R.objfx.specspec = 'cross';
 parBank = [];
-for i = 2:4
+for i = 1:4
     %     R.out.tag = [R.out.tag num2str(i)];
     if i>1
         p = xobs1.Mfit.Pfit;
+        R.SimAn.searchN = R.SimAn.searchN * 0.5;
+        R.SimAn.Tm = R.SimAn.Tm -0.15;
     end
     [xobs1 parBank] = SimAn_ABC_110817(m.x,u,p,m,R,parBank);
 end

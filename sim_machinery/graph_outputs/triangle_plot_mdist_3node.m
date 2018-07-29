@@ -1,19 +1,20 @@
-function triangle_plot_mdist(R,p,m,xf)
+function triangle_plot_mdist_3node(R,p,m,xf)
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m,1); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
 
 r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,5000);
 
-labellist = {'M1 -> STR','M1 -> STN','STN -> GPe','STN -> GPi','Thal -> M1'};
+labellist = {'X1','X2','X3','X1','X2','X3'};
 set(gcf,'Position',[667         67        1024         1024])
 %% INDEXING ISNT RIGHT FOR r THIS IS THE OPTIMIZED
-A1 =  reshape(pInd.A{1},6,6);
-plist(1) = A1(2,1); % M1 to STR
-plist(2) = A1(4,1); % M1 to STN
-plist(3) = A1(3,4); % STN to GPe
-plist(4) = A1(5,4); % STN to GPi
-plist(5) = A1(2,4); % STN to STR
+A1 =  reshape(pInd.A{1},3,3);
+plist(2,1) = A1(2,1); % M1 to STR
+plist(3,1) = A1(3,1); % M1 to STN
+plist(1,2) = A1(1,2); % STN to GPe
+plist(3,2) = A1(3,2); % STN to GPi
+plist(2,3) = A1(2,3); % STN to STR
+plist(1,3) = A1(1,3); % STN to STR
 % plist(6) = A1(1,6); % THAL to M1
 
 % A2 =  reshape(pInd.A{2},6,6);
@@ -22,12 +23,12 @@ plist(5) = A1(2,4); % STN to STR
 % plist(8) = A2(4,3);
 cnt = 0;
 
-for j = 1:5
-    for i = 1:5
+for j = 1:3
+    for i = 1:3
         cnt = cnt+1;
-        if i<=j
-            I = find(pIndMap==plist(i));
-            J = find(pIndMap==plist(j));
+        if i~=j
+            I = find(pIndMap==plist(i,j));
+            J = find(pIndMap==plist(i,j));
             
             u1 = r(:,I);
             v1 = r(:,J);
@@ -36,11 +37,11 @@ for j = 1:5
             
             [n,c]  = hist3([x1, y1],[15 15]);
             % scatter(x1,y1);
-            subplot(5,5,cnt)
+            subplot(3,3,cnt)
 
             [dum a] = contour(c{1},c{2},n,10);
-%             xlim(R.SimAn.pOptBound.*0.075)
-%             ylim(R.SimAn.pOptBound.*0.075)
+            xlim([-1 3])
+            ylim([-2 3])
             a = gca;
             a.FontSize = 14;
 
@@ -50,7 +51,7 @@ for j = 1:5
             else
                 a.YTickLabel = [];
             end
-            if j==5
+            if j==3
                 xlabel(labellist{i});
             else
                 a.XTickLabel = [];

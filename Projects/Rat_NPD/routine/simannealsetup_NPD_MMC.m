@@ -1,4 +1,4 @@
-function R = simannealsetup_NPD_300817_OFF()
+function R = simannealsetup_NPD_STN_GPe()
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'NPD_Final_JNPPaper';
@@ -16,39 +16,36 @@ end
 %% DATA SPECIFICATION
 R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
-R.frqz = [6:.2:85];
+R.frqz = [6:.2:48];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MMC','GPE','STR','STN'};
-R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
-R.condnames = {'OFF','ON'}; % VERIFY!!!
+R.chloc_name = {'MMC'};
+R.chsim_name = {'MMC'};
+R.condnames = {'ON'}; % VERIFY!!!
 %% OBSERVATION 
-R.obs.obsFx = 'observe_data';
-R.obs.obsFxArgs = '(xsims,m,pnew,R)';
-R.obs.gainmeth = {'unitvar','leadfield','submixing'}; %,'lowpass'};  %unitvar'mixing'
+R.obs.obsFx = @observe_data;
+% R.obs.obsFxArgs = '(xsims,m,pnew,R)';
+R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 
-R.obs.transFx = 'constructNPDMat_190618'; %% @constructNPDMat;
-R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
+R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
+% R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
 R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 0.5;
-R.obs.csd.reps = 48; %96;
-R.obs.states = [7 9 11 13];
-% LF = [1 0.008 0.005 0.005 0.005 0.005]; % for non-normalised
-% LF = [1 1 1 1 1 1]; % Fit visually and for normalised data
-  LF = [0.8 0.5 0.5 0.5 0.5 0.5].*0.7; % Fit visually and for normalised data
+R.obs.csd.reps = 32; %96;
+  LF = [1]; % Fit visually and for normalised data
 R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
 R.obs.lowpass.order = 80;
-
+R.obs.logdetrend = 1; % Detrend Autospectra
 %% INTEGRATION
-R.IntP.intFx = 'spm_fx_compile_180817';
-R.IntP.intFxArgs = '(R,x,uc,p,m)';
-R.IntP.compFx= 'compareData_100717';
-R.IntP.compFxArgs = '(R,feat_sim{gl})';
+R.IntP.intFx = @spm_fx_compile_180817;
+% R.IntP.intFxArgs = '(R,x,uc,p,m)';
+R.IntP.compFx= @compareData_100717;
+% R.IntP.compFxArgs = '(R,feat_sim{gl})';
 
 R.IntP.dt = .001;
 R.IntP.Utype = 'white_covar'; %'white_covar'; % DCM_Str_Innov
@@ -77,17 +74,17 @@ R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross_only'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.S','.A','.B','.D','.C','.obs.LF'}; %,'.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.C'}; %,'.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
-R.SimAn.alpha = 0.95; % alpha increment
+R.SimAn.alpha = 0.98; % alpha increment
 R.SimAn.rep = 512; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
 R.SimAn.jitter = 1;
-R.SimAn.copout = [2 4];
+R.SimAn.copout = [2 3];
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

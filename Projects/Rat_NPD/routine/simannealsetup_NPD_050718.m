@@ -1,4 +1,4 @@
-function R = simannealsetup_NPD_300817_OFF()
+function R = simannealsetup_NPD_050718()
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'NPD_Final_JNPPaper';
@@ -26,8 +26,8 @@ R.obs.obsFx = 'observe_data';
 R.obs.obsFxArgs = '(xsims,m,pnew,R)';
 R.obs.gainmeth = {'unitvar','leadfield','submixing'}; %,'lowpass'};  %unitvar'mixing'
 
-R.obs.transFx = 'constructNPDMat_190618'; %% @constructNPDMat;
-R.obs.transFxArgs = '(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,[],R)';
+R.obs.transFx = 'constructNPDMat_050718'; %% @constructNPDMat;
+R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
 R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'False'; % z-transform CSDs

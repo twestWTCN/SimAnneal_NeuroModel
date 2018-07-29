@@ -1,42 +1,24 @@
 clear ; close all
 R = simannealsetup_NPD_300817_OFF;
-
+addpath(genpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\boundedline-pkg'))
 d = 'trialanalysisOFF';
 % Need m,p, parBank
 % load('emerg_save.mat','p')
 
 % load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\Saves\M_OFF_FRESH.mat')
 % 
-% R.out.tag = 'NPD_Final_JNPPaper_lesion_fresh';
-% R.out.dag = '2018627';
-% 
-% load([R.rootn '\' R.projectn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
-% R = varo;
-% R.out.dag = '2018627';
-% 
-% load([R.rootn '\' R.projectn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
-% parBank = varo;
-% clear varo 
+R.out.tag = 'NPD_Final_JNPPaper';
+R.out.dag = '180718_COND1_auto';
 
-load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\emerg_save.mat')
-p_off = xobs1.Mfit.Pfit;
+load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'])
+m = varo;
+load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
+R = varo;
+load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
+parBank = varo;
+p = R.Mfit.Pfit;
 R.obs.logdetrend = 1; % Detrend Autospectra
 
-
-
-fx = R.data.feat_emp;
-fxa(1,:,:,:,:) = fx;
-R.data.feat_emp = fxa;
-R.condnames = {'off'}
-m.outstates = {[0 0 0 0 0 0 1 0]  [1 0]  [1 0]  [1 0]  [1 0]  [1 0]};
-R.obs.outstates = find([m.outstates{:}]);
-for i=1:numel(R.chloc_name)
-    R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
-end
-addpath(genpath('C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\sim_machinery'))
-pathstr = [R.rootn '\outputs\' R.out.tag '\' d '\OptSaves\'];
-% load optimised model
-% load([pathstr 'modelfit_' R.out.tag '_' d '.mat'])
 
 % Create parameter index map
 pInd = parOptInds_110817(R,p,m.m,2); % in structure form
@@ -46,7 +28,7 @@ pIndMap = spm_vec(pInd); % in flat form
 % Re-compute optimised parbank
 R.analysis.modEvi.N = 100;
 R.analysis.modEvi.eps = 0.09;
-parOptBank = parBank(:,parBank(end,:)>-0.1);
+parOptBank = parBank(:,parBank(end,:)>-0.4);
 R.parOptBank = parOptBank;
 
 for i = 1:size(pIndMap,1)
@@ -68,7 +50,8 @@ triangle_plot_mdist(R,p,m,xf)
 
 %% Compute Model Evidence
 
-figure(2)
+figure(2);
+R.analysis.modEvi.N = 500;
 modelProbs(m.x,m,p,R,d)
 
 %% Plot Simulated Features with Confidence intervals

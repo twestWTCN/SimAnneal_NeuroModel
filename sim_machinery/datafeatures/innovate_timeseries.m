@@ -1,4 +1,4 @@
-function u  = innovate_timeseries(R,m)
+function uc  = innovate_timeseries(R,m)
 
 fs = 1/R.IntP.dt;
 nyq = fs/2;
@@ -11,29 +11,33 @@ end
 if rem(size(fw,1),2)==0
     fw(end) = []; % Make uneven length
 end
-
-switch R.IntP.Utype
-    case 'DCM_Str_Innov'
-        [Gu,Gs,Gn,f] = spm_csd_mtf_gu(m.uset.p,fw);
-        
-        for i = 1:size(Gu,2)
-            F =  [fw; 1]; % Freqencies
-            M = [Gu(:,i); 0]; % Magnitudes
-            b = firls(480,F,M); % Design Filter
-            [h1,w] = freqz(b,1); % Filter freq response
+for condsel = 1:numel(R.condnames)
+    
+    switch R.IntP.Utype
+        case 'DCM_Str_Innov'
+            [Gu,Gs,Gn,f] = spm_csd_mtf_gu(m.uset.p,fw);
             
-            x = randn(1,R.IntP.nt+(2*fs)); % White noise
-            x = (x-mean(x))/std(x); % normed
-            xr = filter(b,1,x); % Apply filter
-            xr = xr(fs*1:end-fs*1); % Remove transients
-            xr = (xr-mean(xr))./std(xr); % norm
+            for i = 1:size(Gu,2)
+                F =  [fw; 1]; % Freqencies
+                M = [Gu(:,i); 0]; % Magnitudes
+                b = firls(480,F,M); % Design Filter
+                [h1,w] = freqz(b,1); % Filter freq response
+                
+                x = randn(1,R.IntP.nt+(2*fs)); % White noise
+                x = (x-mean(x))/std(x); % normed
+                xr = filter(b,1,x); % Apply filter
+                xr = xr(fs*1:end-fs*1); % Remove transients
+                xr = (xr-mean(xr))./std(xr); % norm
+                
+                u(:,i) = xr.*m.uset.p.scale; % save filtered noise
+            end
             
-            u(:,i) = xr.*m.uset.p.scale; % save filtered noise
-        end
-    case 'white_covar'
-        u = (sqrtm(m.uset.p.covar)*randn(m.m,R.IntP.nt)).*m.uset.p.scale;
-        u = u';
-    case 'zero'
-        u = zeros(m.m,R.IntP.nt)';
-        
+        case 'white_covar'
+            u = (sqrtm(m.uset.p.covar)*randn(m.m,R.IntP.nt)).*m.uset.p.scale;
+            u = u';
+        case 'zero'
+            u= zeros(m.m,R.IntP.nt)';
+    end
+    u = u.*sqrt(R.IntP.dt);
+    uc{condsel} = u;
 end

@@ -68,50 +68,74 @@ switch R.data.datatype
     case 'NPD'
         NPDemp  = R.data.feat_emp; % empirical
         NPDsim  = sim_dat; % simulated
-        for i = 1:size(NPDemp,1)
-            for j = 1:size(NPDemp,2)
-                switch R.objfx.feattype
-                    case 'ForRev'
-                        if i==j
-                            yfx = (squeeze(NPDsim(i,j,1,:)));
-                            ffx = (squeeze(NPDemp(i,j,1,:)));
-                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
-                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
-                            r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
-                            r2loop(i,j) = r(2);
-                        else
-                            yfx = (squeeze(NPDsim(i,j,2,:)));
-                            ffx = (squeeze(NPDemp(i,j,2,:)));
-                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
-                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
-                            r(1) = goodnessOfFit(yfx,ffx,'NRMSE');
-                            
-                            yfx = (squeeze(NPDsim(i,j,3,:)));
-                            ffx = (squeeze(NPDemp(i,j,3,:)));
-                            ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
-                            yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
-                            r(2) = goodnessOfFit(yfx,ffx,'NRMSE');
-                            
-                            r2loop(i,j) = mean(r);
-                        end
+        yfxx = [];
+        ffxx = [];
+        for C = 1:numel(R.condnames)
+            for i = 1:numel(R.chloc_name)
+                for j = 1:numel(R.chloc_name)
+                    switch R.objfx.feattype
+                        case 'ForRev'
+                            if i==j
+                                yfx = (squeeze(NPDsim(C,i,j,1,:)));
+                                ffx = (squeeze(NPDemp(C,i,j,1,:)));
+                                ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
+                                yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
+                                
+                                if size(yfx,1)>size(yfx,2);yfx = yfx'; end
+                                if size(ffx,1)>size(ffx,2);ffx = ffx'; end
+                                yfxx = [yfxx yfx];
+                                ffxx  = [ffxx ffx];
+                                r(2) = goodnessOfFit(yfx',ffx','NRMSE');
+                                r2loop(C,i,j) = r(2);
+                            elseif j>i
+                                for k = 2:3 % 1 is zerolag
+                                    yfx = (squeeze(NPDsim(C,i,j,k,:)));
+                                    ffx = (squeeze(NPDemp(C,i,j,k,:)));
+                                    
+                                    if size(yfx,1)>size(yfx,2);yfx = yfx'; end
+                                    if size(ffx,1)>size(ffx,2);ffx = ffx'; end
+                                    
+                                    ffx(isnan(yfx)) = [];yfx(isnan(yfx)) = [];
+                                    yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
+                                    
+                                    yfxx = [yfxx yfx];
+                                    ffxx  = [ffxx ffx];
+                                    r(k) = goodnessOfFit(10.*yfx',10.*ffx','NRMSE');
+                                end
+                                r2loop(C,i,j) = mean(r(r~=0));
+                            end
+                    end
                 end
             end
         end
         switch R.objfx.specspec
             case 'auto'
-                r2mean = nanmean(diag(r2loop));
-                %         r2mean = sum(diag(r2loop));
+                for C = 1:numel(R.condnames)
+                    r2mean(C) = nanmean(diag(squeeze(r2loop(C,:,:))));
+                end
+                r2mean = mean(r2mean);
                 
             case 'cross'
-                r2mean = nanmean(r2loop(triu(r2loop)~=0));
+                for C = 1:numel(R.condnames)
+                    r2C = squeeze(r2loop(C,:,:));
+                    r2mean(C) = nanmean(r2C(triu(r2C)~=0));
+                end
                 %         r2mean = sum(r2loop(triu(r2loop)~=0));
+                r2mean = mean(r2mean);
+                %                 simdat = yfxx(:); simdat(isnan(simdat)) = 0;
+                %                 empdat = ffxx(:); empdat(isnan(empdat)) = 0;
+                %                 r2mean = goodnessOfFit(simdat,empdat,'NRMSE');
             case 'cross_only'
-                r2mean = nanmean(r2loop(logical(~eye(j).*(triu(r2loop)~=0))));
+                for C = 1:numel(R.condnames)
+                    r2C = squeeze(r2loop(C,:,:));
+                    r2mean(C) = nanmean(r2C(logical(~eye(j).*(triu(r2C)~=0))));
+                end
+                r2mean = mean(r2mean);
         end
         %% TIME
     case 'time' % time courses
-        TCemp  = R.data.feat_emp; % empirical
-        TCsim  = sim_dat; % simulated
+        TCemp  = R.data.feat_emp{1}; % empirical
+        TCsim  = sim_dat{1}; % simulated
         
         for i = 1:size(TCemp,1)
             try
@@ -123,8 +147,6 @@ switch R.data.datatype
                 if size(ffx,1)<size(ffx,2)
                     ffx = ffx';
                 end
-                
-                
                 r = goodnessOfFit(yfx,ffx,'NRMSE');
                 r2loop(i) = r;
             catch

@@ -1,7 +1,7 @@
 function R = simannealsetup_ICP()
 R.d = clock;
 
-R.rootn = 'C:\Users\twest\Documents\Work\PhD\LitvakProject\SimAnneal_NeuroModel\Projects\';
+R.rootn = 'C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\';
 R.projectn = 'Intracranial_pressure';
 R.filepathn = [R.rootn R.projectn '\data\storage'];
 R.data.datatype = 'time';
@@ -12,12 +12,13 @@ R.chsim_name = {'var1','var2'}; % Channels in Sim (if hidden states exist)
 R.out.tag = 'BPode';
 % Set SimAn Parameters 
 R.SimAn.pOptList = {'.Pic','.Ca','.KE','.Ro','.Can','.G','.Pc'};
-R.SimAn.pOptBound = [-6 6];
+R.SimAn.pOptBound = [-12 12];
+R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 1; % Initial temperature
-R.SimAn.alpha = 0.995; % alpha increment
-R.SimAn.rep = 32; % Repeats per temperature
+R.SimAn.alpha = 0.98; % alpha increment
+R.SimAn.rep = 128; % Repeats per temperature
 R.SimAn.rtol_repeat = 0.85;
 R.SimAn.rtol_converge = 0.95;
 R.SimAn.ntol = 15;
@@ -27,21 +28,23 @@ R.SimAn.maxdev = 6;
 R.SimAn.jitter = 1;
 R.SimAn.dSkew = 0.05;
 R.SimAn.dPrec = 0.05;
-
+R.SimAn.copout = [2 4];
 % Set simulation parameters
-R.IntP.intFunc = 'fx_simulateICP';
-R.IntP.intFuncArgs = '(.Z,.P)';
-R.IntP.compFunc = 'compareData_100717';
-R.IntP.intFuncArgs = '(R,sim_dat)';
-R.IntP.dt = .0001;
+R.IntP.intFx = @fx_simulateICP;
+R.IntP.intFxArgs = '(x,m,p)';
+R.IntP.compFx = @compareData_100717;
+% R.IntP.compFxArgs = '(R,sim_dat)';
+R.plot.outFeatFx = @plotTimeSeries;
+
+R.IntP.dt = .01;
 R.IntP.tend = 8;
 R.IntP.nt = R.IntP.tend/R.IntP.dt;
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
-R.IntP.Utype = 'white_covar'; %'white_covar'; % DCM_Str_Innov
+R.IntP.Utype = []; %'white_covar'; % DCM_Str_Innov
 R.IntP.buffer = ceil(0.050*(1/R.IntP.dt)); % buffer for delays
 
 % Set Observer variables
-R.obs.brn =1; % 2; % burn in time
+R.obs.brn =0; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'True'; % z-transform CSDs
 R.obs.csd.abovezero = 'True'; % Bring above zero
@@ -79,7 +82,7 @@ R.obs.gainmeth = {'unitvar','mixing'};  %'leadfield'
 R.objfx.feattype = 'complex';
 R.objfx.specspec = 'cross'; % which part of spectra to fit
 
-R.plot.save = 'True';
+R.plot.save = 'False';
 R.plot.gif.delay = 0.3;
 R.plot.gif.start_t = 1;
 R.plot.gif.end_t = 1;
