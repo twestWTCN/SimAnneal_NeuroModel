@@ -346,7 +346,7 @@ while ii <= searchN
         end
     elseif iflag == 0 && size(parOptBank,2)>12 && itry>R.SimAn.copout(2)
         disp(['No copula available, reverting to normal distribution on best fitting posteriors'])
-        mu = mean(parBank(1:0.25*R.SimAn.minRank,:),2);
+        mu = mean(parBank(1:end-1,1:R.SimAn.minRank*2),2);
         if any(isnan(mu))
             for jj = 1:repset
                 par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
@@ -355,7 +355,7 @@ while ii <= searchN
         end
         pm = spm_unvec(mu,p);
         if size(parBank,2)>0.25*R.SimAn.minRank
-            sig = cov(parBank(1:0.25*R.SimAn.minRank,:)');
+            sig = cov(parBank(1:end-1,1:R.SimAn.minRank*2)');
             sig = (sig + sig.') / 2; % Ensures symmetry constraints
             stdev = mean(diag(sig))*2;
         else
@@ -457,6 +457,12 @@ while ii <= searchN
         end
         ii = ii + 1;
     end
+    if itry>12
+        disp('Itry Exceeded: Covergence')
+        return
+    end
+    
+    
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end
 
