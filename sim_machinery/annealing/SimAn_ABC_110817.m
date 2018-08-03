@@ -456,6 +456,10 @@ while ii <= searchN
             Tm(ii+1) = Tm(ii);
         end
         ii = ii + 1;
+        if itry>12
+            disp('Itry exceeded: Max Convergence')
+            return
+        end
     end
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end
