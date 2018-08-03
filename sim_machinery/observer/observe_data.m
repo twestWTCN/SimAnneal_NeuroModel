@@ -15,6 +15,8 @@ for condsel = 1:numel(R.condnames)
                 LFF = zeros(m.m);
                 LFF(eye(size(LFF))~=0) = LF;
                 xsims = LFF*xsims;
+            case 'difference'
+                xsims = [xsims(:,1) diff(xsims,1,2)];
             case 'unitvar'
                 for i = 1:size(xsims,1)
                     xsims(i,:) = (xsims(i,:) - mean(xsims(i,:)))./std(xsims(i,:));
@@ -46,21 +48,27 @@ for condsel = 1:numel(R.condnames)
                     x = xsims(i,:);
                     xsims(i,:) = filtfilt(R.obs.lowpass.fwts,1,x);
                 end
+            case 'highpass'
+                for i = 1:size(xsims,1)
+                    x = xsims(i,:);
+                    xsims(i,:) = filtfilt(R.obs.highpass.fwts,1,x);
+                end
             case 'boring'
                 Xstab = [];
-%                 figure
-%                 plot(xsims'); shg
+                %                 figure
+                %                 plot(xsims'); shg
                 for i = 1:size(xsims,1)
                     swX = slideWindow(xsims(i,:), floor(size(xsims(i,:),2)/12), 0);
                     swX = swX(:,2:end-1);
                     Xstab(i) = std(abs(mean(swX)));
-%                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
+                    %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
                 end
                 if any(Xstab<0.05)
                     disp('SimFx is Stable (boring)!')
-%                     close all
+                    %                     close all
                     error('SimFx is Stable (boring)!')
                 end
+                
         end
     end
     xsims_c{condsel} = xsims;

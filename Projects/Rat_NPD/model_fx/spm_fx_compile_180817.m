@@ -71,8 +71,8 @@ for condsel = 1:numel(R.condnames)
     E(5,:) = [.2 .2 -.2 -.2]*10000;             % STR connections
     E(6,:) = [.2 .2 -.2 -.2]*10000;             % GPE connections
     E(7,:) = [.2 .2 -.2 -.2]*10000;             % STN connections
-    E(8,:) = [.2 .2 -.2 -.2]*5000;               % GPI connections
-    E(9,:) = [.2 .2 -.2 -.2]*5000;  %500              % THAL connections
+    E(8,:) = [.2 .2 -.2 -.2]*10000;               % GPI connections
+    E(9,:) = [.2 .2 -.2 -.2]*10000;  %500              % THAL connections
     
     % get the neural mass models {'ERP','CMC'}
     %--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ for condsel = 1:numel(R.condnames)
     D(1,6) = 10/1000;    % Thal to M1
     
     D(4,3) = 4/1000;    % GPe to STN (Fujimoto and Kita 1993)
-    D(6,5) = 4/1000;    % GPi to Thal
+    D(6,5) = 4/1000;    % GPi to Thal (Stoelzel J Neurosci. 2017)
     
     D = D(1:m.m,1:m.m);
     D = ceil(D.*exp(p.D).*(1/R.IntP.dt)); % As expectation of priors and convert units to steps
@@ -237,7 +237,7 @@ for condsel = 1:numel(R.condnames)
         xint = xint + (f.*dt);
         xstore = [xstore xint];
         if tstep >R.IntP.buffer*10
-            if any(xint>1e4)
+            if any(xint>1e4) || any(isnan(xint))
                 xstore_cond{condsel} = NaN;
                 wflag = 1;
                 break

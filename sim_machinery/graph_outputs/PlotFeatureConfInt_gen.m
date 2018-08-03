@@ -1,4 +1,5 @@
-function PlotFeatureConfInt_gen(R,d)
+function PlotFeatureConfInt_gen(R)
+d =  R.out.dag;
 % if nargin<2
 %     d = sprintf('%d',[R.d(1:3)]);
 % end
@@ -7,7 +8,7 @@ load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod
 
 CSD_data_n = permMod.feat_rep{1};
 % list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],1));
-list = find([permMod.r2rep{:}]>-1);
+list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],85));
 
 C = size(CSD_data_n,1); N = size(CSD_data_n,2); M = size(CSD_data_n,3);O = size(CSD_data_n,4);
 
@@ -40,8 +41,8 @@ if strncmp(R.data.datatype,'CSD',3)
 elseif strncmp(R.data.datatype,'NPD',3)
     partlabs ={'Instant','Forward','Backward'}; msr = 'NPD';
     CSD_mean = mean(CSD_bank,5);
-    CSD_std(:,:,:,:,1)  = prctile(CSD_bank,25,5); %std(CSD_bank,1,5); %./size(CSD_bank,5); %prctile(CSD_bank,25,5);
-    CSD_std(:,:,:,:,2)  = prctile(CSD_bank,75,5); %std(CSD_bank,1,5);%./size(CSD_bank,5); %prctile(CSD_bank,75,5);
+    CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5);%./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,25,5);
+    CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5);%./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,75,5);
 end
 % F = repmat(R.frqz',1,3);
 F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));
@@ -65,23 +66,23 @@ for i = 1:N
         Y = squeeze(CSD_mean(:,i,j,:));
         B = squeeze(CSD_std(:,i,j,:,:));
         B = permute(B,[1 3 2]);
-        if i==j
-            B = B./10; %size(CSD_bank,5);
-        end
-        [hl, hp] = boundedline(F(:,[1 lr]),Y(:,[1 lr]),B(:,[1 lr]),'cmap',cmap([1 c],:),'alpha','transparency',0.45);
-        hl(1).LineWidth = 2; hl(2).LineWidth = 1; %hl(3).LineWidth = 1; 
-        hl(1).LineStyle = '--'; hl(2).LineStyle = '--';% hl(3).LineStyle = '--';
+%         if i==j
+%             B = B./10; %size(CSD_bank,5);
+%         end
+        [hl, hp] = boundedline(F(:,lr),Y(:,lr),B(:,lr),'cmap',cmap([c],:),'alpha','transparency',0.45);
+        hl(1).LineWidth = 2; %hl(2).LineWidth = 1; %hl(3).LineWidth = 1; 
+        hl(1).LineStyle = '--';% hl(2).LineStyle = '--';% hl(3).LineStyle = '--';
         hout = outlinebounds(hl, hp);
-        set(hout(1:2),'LineWidth',1,'LineStyle','--'); set(hout(2),'LineWidth',1);% set(hout(3),'LineWidth',1);
+        set(hout(1),'LineWidth',1,'LineStyle','--'); %set(hout(2),'LineWidth',1);% set(hout(3),'LineWidth',1);
         hold on
         for L = lr
          plot(R.data.feat_xscale,squeeze(R.data.feat_emp(C,i,j,L,:)),'color',cmap(c,:)); hold on
         end
         if i == j
-            ylim([0 8])
+            ylim([0 4])
             ylabel('Amplitude')
         else
-            ylim([0 1])
+            ylim([0 0.3])
             ylabel(msr)
         end
         xlim([min(R.frqz) max(R.frqz)])
@@ -108,7 +109,7 @@ for i = 1:N
     for j = 1:M
         annotation(gcf,'textbox',...
             labPos(:,i,j)',...
-            'String',R.chloc_name{i},...
+            'String',R.chsim_name{i},...
             'FontWeight','Bold',...
             'LineStyle','none');
     end

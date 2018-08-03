@@ -1,7 +1,5 @@
-function [permMod] = modelProbs(x,m,p,R,d)
-if nargin<5
-    d = sprintf('%d',[R.d(1:3)]);
-end
+function [permMod] = modelProbs(x,m,p,R)
+d = R.out.dag;
 % load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
  parOptBank = R.parOptBank;
 % figure
@@ -59,7 +57,7 @@ xsims{1} = xsims{1} + linspace(m.m,0,m.m)';
  xlim([4 5])
 %%
 
-for jj = 1:N
+parfor jj = 1:N
 %     ppm.increment();
     pnew = par{jj};
     %% Simulate New Data

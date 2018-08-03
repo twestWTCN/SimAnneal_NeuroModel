@@ -192,7 +192,7 @@ while ii <= searchN
     eps = -5;
     if size(parBank,2)>R.SimAn.minRank
         
-        eps = (Tm(ii)^(1/4))-2.5; %.2; % temperature based epsilon (arbitrary function)
+        eps = (Tm(ii)^(1/4))-2; % 2; 2.5; % temperature based epsilon (arbitrary function)
         %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
         %         epgrad = r2eps-eps_p;
         %         eps = eps_p + epgrad;
@@ -201,9 +201,9 @@ while ii <= searchN
         parOptBank = parBank(:,parBank(end,:)>eps);
         
         if size(parOptBank,2)< R.SimAn.minRank-1
-            if itry>R.SimAn.copout(1)
+            if itry>R.SimAn.copout(1) && itry<=R.SimAn.copout(2)
                 delta = 1; eps = eps+1;
-                while abs(eps_p-eps) < 0.001
+                while eps_p-eps > 0.001
                     pip = 100;
                     A = [1];
                     while size(A,2)<(R.SimAn.minRank*delta)
@@ -251,7 +251,7 @@ while ii <= searchN
         % data and more than a given number of replicates are attempted
         % then choose epsilon to give bank exceeding rank (bare minimum for
         % copula formation
-        if itry>=R.SimAn.copout(1) && itry < 12
+        if R.SimAn.minRank-size(parOptBank,2) < (R.SimAn.minRank*0.1)
             disp(['Rank is within limits, filling with pseudopars: ' num2str(eps)])
             aN = R.SimAn.minRank-size(parOptBank,2);
             mu = mean(parBank(:,parBank(end,:)>eps),2);
@@ -262,7 +262,7 @@ while ii <= searchN
             catch
                 disp('covar matrix is non-symmetric postive definite')
             end
-%             itry =0;
+            itry =0;
         end
         %
         % Crops the optbank to stop it getting to big (memory)
@@ -296,6 +296,7 @@ while ii <= searchN
                 R.Mfit.nu = nu;
                 R.Mfit.tbr2 = parOptBank(end,1); % get best fit
                 R.Mfit.Pfit = spm_unvec(mean(parOptBank,2),p);
+                R.Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),p);
                 R.Mfit.Rho = Rho;
                 Mfit_hist(ii) = R.Mfit;
                 %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
@@ -343,9 +344,9 @@ while ii <= searchN
             base(pIndMap,i) = x1(:,i);
             par{i} = spm_unvec(base(:,i),p);
         end
-    elseif iflag == 0 && size(parOptBank,2)>2 && itry>=R.SimAn.copout(1)
+    elseif iflag == 0 && size(parOptBank,2)>12 && itry>R.SimAn.copout(2)
         disp(['No copula available, reverting to normal distribution on best fitting posteriors'])
-        mu = mean(parOptBank(1:end-1,:),2);
+        mu = mean(parBank(1:0.25*R.SimAn.minRank,:),2);
         if any(isnan(mu))
             for jj = 1:repset
                 par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior

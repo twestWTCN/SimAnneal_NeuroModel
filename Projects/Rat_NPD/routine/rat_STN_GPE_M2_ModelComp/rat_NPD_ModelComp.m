@@ -1,10 +1,5 @@
-%% RAT DATA- SIM ANNEAL PROJECT
-%%%%%%%%%%%%%%%%%%
-% This script will fit BvW's BGM/MC model using simulated annealing, from
-% the real part of the CSD for the group average OFF spectra
-% TO DO:
-% 1) Take all sims that are above criteria and include!
-% 2) Set Tm and anneal to be optimal - adjust to the gradient of the decent
+% THIS IS THE STN/GPE with Independent M2
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
 clear ; close all
@@ -17,16 +12,12 @@ clear ; close all
 % addpath('C:\spm12')
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-%
+% %
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
 rng(23123)
 
 %% Set Parameters of the Routine
-R = simannealsetup_NPD_MMC;
-R.d = clock; % clock
-
-%% Prepare the data
-% prepareratdata_group(R.rootn,R.projectn);
+R = simannealsetup_STN_GPe_M2_ModelComp;
 load([R.filepathn '\NPD_paper_RatNPD_150618.mat']);
 NPDmat = fyA;
 load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
@@ -35,10 +26,11 @@ load([R.filepathn '\frq_paper_RatNPD_150618.mat']);
 F_data = fxA(:,1);
 meannpd_data = [];
 % condsel = [1 2];
-R.condnames = {'ON'};
+R.condnames = {'OFF'};
 R.Bcond = 1;
-condsel = 1;
-chsel = [1 ];
+condsel = 2;
+chsel = [1 2 4]';
+
 for C =1:numel(R.condnames)
     %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
     for i = 1:size(chsel,1)
@@ -46,6 +38,8 @@ for C =1:numel(R.condnames)
             if i==j
                 Ftmp = F_data;
                 Pxy = abs(log10(mean(vertcat(nsPowmat{chsel(i),condsel(C),:}),1)));
+                %                 Pxy = Pxy(Ftmp>=R.frqz(1) & Ftmp<=R.frqz(end));
+                %                 Ftmp = Ftmp(Ftmp>=R.frqz(1) & Ftmp<=R.frqz(end));
                 Pxy(Ftmp>48 & Ftmp<52) = [];
                 Ftmp(Ftmp>48 & Ftmp<52) = [];
                 [xCalc yCalc b Rsq] = linregress(log10(Ftmp),Pxy');
@@ -53,25 +47,35 @@ for C =1:numel(R.condnames)
                 Pxy = interp1(Ftmp,Pxy,R.frqz);
                 Pxy = (Pxy-mean(Pxy))./std(Pxy);
                 Pxy = Pxy - min(Pxy);
-                Pxy = Pxy.* gausswin(length(Pxy),1)';% tukeywin(length(Pxy),0.1)';
-                 plot(R.frqz,Pxy)
+%                     plot(R.frqz,Pxy); hold on
+                f = fit(R.frqz',Pxy','gauss3');
+                Pxy = f(R.frqz)';
+%                 Pxy = Pxy.*tukeywin(length(Pxy),0.6)';
+%                     plot(R.frqz,Pxy)
                 meannpd_data(C,i,j,1,:) = Pxy;
             else
                 for k = 1:size(NPDmat,3)
                     Ftmp = F_data;
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
-                    Cxy = Cxy*2;
+                    Cxy = Cxy*1;
                     Cxy(Ftmp>48 & Ftmp<52) = [];
                     Ftmp(Ftmp>48 & Ftmp<52) = [];
                     Cxy = interp1(Ftmp,Cxy,R.frqz);
-                    Cxy = Cxy.*tukeywin(length(Cxy),0.1)'; %%NPD_sim_n(i,j,1,:)
+%                     Cxy = Cxy.*tukeywin(length(Cxy),0.6)'; %%NPD_sim_n(i,j,1,:)
+%                     plot(R.frqz,Cxy); hold on
+                    f = fit(R.frqz',Cxy','gauss3');
+                    Cxy = f(R.frqz)';
 %                     plot(R.frqz,Cxy)
                     meannpd_data(C,i,j,k,:) = Cxy;
+%                     close all
                 end
             end
         end
     end
 end
+
+%% Prepare the data
+% prepareratdata_group(R.rootn,R.projectn);
 % Set data as working version
 R.data.feat_emp = meannpd_data;
 % squeeze(meannpd_data(1,1,1,1,:))
@@ -86,16 +90,16 @@ end
 
 %% Prepare Model
 m.m = 1; % # of sources
-m.x = {[0 0 0 0 0 0 0 0]}; % Initial states
-m.Gint = [14];
-m.Tint = [4];
+m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
+m.Gint = [14 1 1];
+m.Tint = [4 1 1];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
     m.dipfit.model(i).source = R.chsim_name{i};
 end
 
-m.outstates = {[0 0 0 0 0 0 1 0]};
+m.outstates = {[0 0 0 0 0 0 1 0] [1 0] [1 0]};
 R.obs.outstates = find([m.outstates{:}]);
 for i=1:numel(R.chloc_name)
     R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
@@ -124,15 +128,15 @@ uc = innovate_timeseries(R,m);
 
 %% Prepare Priors
 % 1 MMC
-% 2 STR
 % 3 GPE
 % 4 STN
-% 5 GPI
-% 6 THAL
 
 % Excitatory connections
-p.A{1} = -32;
-p.A_s{1} = 0;
+p.A{1} =  repmat(-32,m.m,m.m);
+p.A{1}(2,3) = 0;
+p.A_s{1} = repmat(0,m.m,m.m);
+p.A_s{1}(2,3) = 1.5;
+
 p.A{2} = -32;
 p.A_s{2} = 0;
 % Connection strengths
@@ -163,7 +167,7 @@ for i = 1:m.m
     p.int{i}.S = zeros(1);
     p.int{i}.S_s = repmat(1,size(p.int{i}.S));
     p.int{i}.BT = zeros(1,m.Tint(i));
-    p.int{i}.BT_s = repmat(1,size(p.int{i}.T));   
+    p.int{i}.BT_s = repmat(1,size(p.int{i}.T));
 end
 pold = p;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,7 +187,7 @@ R.out.tag = 'NPD_MMC_ON';
 % A_s = repmat(0,size(A));
 % p.A_s{1} = A_s;
 % p.A_s{2} = A_s;
-% 
+%
 % % parBank = varo;
 R.SimAn.rep =40; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;

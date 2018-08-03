@@ -13,7 +13,7 @@ plist(1) = A1(2,1); % M1 to STR
 plist(2) = A1(4,1); % M1 to STN
 plist(3) = A1(3,4); % STN to GPe
 plist(4) = A1(5,4); % STN to GPi
-plist(5) = A1(2,4); % STN to STR
+plist(5) = A1(1,6); % STN to STR
 % plist(6) = A1(1,6); % THAL to M1
 
 % A2 =  reshape(pInd.A{2},6,6);
@@ -26,8 +26,8 @@ for j = 1:5
     for i = 1:5
         cnt = cnt+1;
         if i<=j
-            I = find(pIndMap==plist(i));
-            J = find(pIndMap==plist(j));
+            I = plist(i); %find(pIndMap==plist(i));
+            J = plist(j); %find(pIndMap==plist(j));
             
             u1 = r(:,I);
             v1 = r(:,J);
@@ -39,8 +39,8 @@ for j = 1:5
             subplot(5,5,cnt)
 
             [dum a] = contour(c{1},c{2},n,10);
-%             xlim(R.SimAn.pOptBound.*0.075)
-%             ylim(R.SimAn.pOptBound.*0.075)
+%             xlim(R.SimAn.pOptBound.*0.2)
+%             ylim(R.SimAn.pOptBound.*0.2)
             a = gca;
             a.FontSize = 14;
 

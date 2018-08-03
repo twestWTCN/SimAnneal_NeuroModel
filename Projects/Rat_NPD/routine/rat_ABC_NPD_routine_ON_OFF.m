@@ -17,9 +17,9 @@ clear ; close all
 % addpath('C:\spm12')
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-%
+% 
 % addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(421)
+rng(41213)
 
 %% Set Parameters of the Routine
 R = simannealsetup_NPD_Can_060718;
@@ -45,6 +45,8 @@ for C =1:numel(R.condnames)
             if i==j
                 Ftmp = F_data;
                 Pxy = abs(log10(mean(vertcat(nsPowmat{i,condsel(C),:}),1)));
+%                 Pxy = Pxy(Ftmp>=R.frqz(1) & Ftmp<=R.frqz(end));
+%                 Ftmp = Ftmp(Ftmp>=R.frqz(1) & Ftmp<=R.frqz(end));
                 Pxy(Ftmp>48 & Ftmp<52) = [];
                 Ftmp(Ftmp>48 & Ftmp<52) = [];
                 [xCalc yCalc b Rsq] = linregress(log10(Ftmp),Pxy');
@@ -52,7 +54,7 @@ for C =1:numel(R.condnames)
                 Pxy = interp1(Ftmp,Pxy,R.frqz);
                 Pxy = (Pxy-mean(Pxy))./std(Pxy);
                 Pxy = Pxy - min(Pxy);
-                Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
+                Pxy = Pxy.*tukeywin(length(Pxy),0.6)';
                 meannpd_data(C,i,j,1,:) = Pxy;
             else
                 for k = 1:size(NPDmat,3)
@@ -63,7 +65,7 @@ for C =1:numel(R.condnames)
                     Ftmp(Ftmp>48 & Ftmp<52) = [];
                     Cxy = interp1(Ftmp,Cxy,R.frqz);
                     Cxy = Cxy.*tukeywin(length(Cxy),0.1)'; %%NPD_sim_n(i,j,1,:)
-%                     plot(R.frqz,Cxy)
+                    plot(R.frqz,Cxy)
                     meannpd_data(C,i,j,k,:) = Cxy;
                 end
             end
@@ -137,7 +139,7 @@ A(5,4) = 0; % STN to GPi
 A(1,6) = 0; % THAL to M1
 
 p.A{1} = A;
-A_s = repmat(1,size(A));
+A_s = repmat(2,size(A));
 p.A_s{1} = A_s;
 
 % Inhbitory connections
@@ -160,7 +162,7 @@ p.A_s{2} = A_s;
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.2,size(p.C));
+p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = zeros(size(R.obs.LF)).*0.8;
@@ -177,11 +179,11 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     p.int{i}.T = zeros(1,m.Tint(i));
-    p.int{i}.T_s = repmat(0.5,size(p.int{i}.T));
+    p.int{i}.T_s = repmat(1.5,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
-    p.int{i}.G_s = repmat(0.5,size(p.int{i}.G));
+    p.int{i}.G_s = repmat(1.5,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(0.5,size(p.int{i}.S));
+    p.int{i}.S_s = repmat(1.5,size(p.int{i}.S));
     
     p.int{i}.BT = zeros(1,m.Tint(i));
     p.int{i}.BT_s = repmat(1.5,size(p.int{i}.T));
@@ -191,29 +193,26 @@ end
 %% BANK
 %  '180718_COND1_reauto' - Really nice auto fit!
 %  '180718_COND1_full' - partially fitted to all(~40% R2)
-
+%  '180718_COND1_full_run2' - higher density fit
  % Now fit Auto  
- R.out.dag = '180718_COND1_full'; % cross only
-R.plot.save = 'True';
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'])
-m = varo;
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
-xobs1 = varo;
-p = xobs1.Mfit.Pfit;
+%  R.out.dag = '180718_COND1_full_run3'; % cross only
+% R.plot.save = 'False';
+% load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'])
+% m = varo;
+% load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
+% xobs1 = varo;
+% p = xobs1.Mfit.Pfit;
 % load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
 % parBank = varo;
 parBank = [];
-p.A{1}(3,4) = 0;
-p.A{2}(4,3) = 0.5;
-p.A_s{1}(3,4) = 2;
-p.A_s{2}(4,3) = 2;
-
-R.out.dag = '180718_COND1_full_run2'; % cross only
+R.out.dag = '180718_COND1_full_run3'; % cross only
 R.objfx.specspec = 'cross';
-R = setSimTime(R,32);
+R = setSimTime(R,28);
 R.SimAn.rep = 128;
+R.SimAn.searchN = 400;
 R.SimAn.Tm = 1;
-R.SimAn.jitter =1;
+R.SimAn.jitter =1.5;
+R.obs.trans.norm = 1;
 R.Bcond = 0;
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.A','.S','.C'}; %
 [xcross_OFF] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);

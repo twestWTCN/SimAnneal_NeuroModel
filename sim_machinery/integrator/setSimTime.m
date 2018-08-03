@@ -1,5 +1,5 @@
 function R = setSimTime(R,N)
-R.obs.csd.df = 0.75;
+R.obs.csd.df = 0.5;
 fsamp = 1/R.IntP.dt;
 R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
 R.IntP.dt = .0005;

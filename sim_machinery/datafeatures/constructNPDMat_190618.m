@@ -1,9 +1,13 @@
-function [F meannpd wflag] = constructNPDMat_190618(dataS,chloc_name,chlist,fsamp,N,R)
+function [F meannpd wflag meanconf] = constructNPDMat_190618(dataS,chloc_name,chlist,fsamp,N,R)
 if isempty(N)
     N = floor(fsamp/R.obs.csd.df);
 end
 for C=1:numel(R.condnames)
     data(C,:,:) = dataS{C}(R.obs.obsstates,:);
+end
+
+if ~isfield(R.obs,'logscale')
+R.obs.logscale = 1;
 end
 wflag = 0;
 % N = R.obs.csd.pow2;
@@ -46,14 +50,23 @@ for C = 1:O
                         else
                             Pxy =  Pxy(F>4);
                         end
-                        Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
-                        Pxy = Pxy - min(Pxy);
+
+                        if R.obs.logscale == 1
+                            Pxy = Pxy;
+                        else
+                            Pxy = 10.^Pxy;
+                        end
+                        if R.obs.trans.norm == 1
+                            Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
+                            Pxy = Pxy - min(Pxy);
+                        end
                         Pxy(isnan(Pxy)) = 0;
-                        
                         Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                         xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
+                        xconf(p,r,1:3) = [0 0 0];
+
                     else
-                        [f13,~,~]=sp2a2_R2(squeeze(data(C,chindsP(p),:)),squeeze(data(C,chindsR(r),:)),fsamp,N);
+                        [f13,t,cl]=sp2a2_R2(squeeze(data(C,chindsP(p),:)),squeeze(data(C,chindsR(r),:)),fsamp,N);
                         if any(any(isnan(f13(:,12))))
                             warning('NPD is returning nans!!')
                             wflag = 1;
@@ -71,13 +84,15 @@ for C = 1:O
                                 Pxy =  Pxy(F>4);
                             end
                             %                         Pxy = Pxy./max(nPxy);
-                            Pxy = Pxy; %.*welchwin(length(Pxy))';
-                            Pxy = Pxy.*tukeywin(length(Pxy),0.1)';
+%                             Pxy = Pxy; %.*welchwin(length(Pxy))';
+%                             Pxy = Pxy.*tukeywin(length(Pxy),0.1)';
                             xcsd(p,r,z,:) = Pxy;
+                            xconf(p,r,z) = cl.ch_c95;
                         end
                     end
                 end
             end
+            meanconf(C,chI,chJ,:) = xconf;
             meannpd(C,chI,chJ,:,:) = (mean(mean(xcsd,1),2));
             clear xcsd
         end
