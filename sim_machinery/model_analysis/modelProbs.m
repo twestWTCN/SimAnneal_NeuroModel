@@ -33,15 +33,15 @@ for i = 1:N
     base(pIndMap,i) = x1(:,i);
     par{i} = spm_unvec(mean(base,2),p);
 end
-% 
+ plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
 % if isempty(gcp)
 %     parpool
 % end
-
+gcp
 ppm = ParforProgMon('Model Probability Calculation',N);
 %%Plot Example
 figure(5)
-pnew = par{1};
+pnew = par{2};
 %% Simulate New Data
 u = innovate_timeseries(R,m);
 u{1} = u{1}.*sqrt(R.IntP.dt);
@@ -87,9 +87,9 @@ end
 permMod.r2rep = r2rep;
 permMod.par_rep = par_rep;
 permMod.feat_rep = feat_rep;
-mkdir([R.rootn 'outputs\' R.out.tag '2\'])
-save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
-load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
+% mkdir([R.rootn 'outputs\' R.out.tag '2\'])
+% save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
+% load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 figure
 r2bank = [permMod.r2rep{:}];
