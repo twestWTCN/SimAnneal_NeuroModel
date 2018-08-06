@@ -1,4 +1,4 @@
-function R = prepareRatData_Group_NPD(R)
+function R = prepareRatData_Group_NPD_whiteM2(R)
 % prepareratdata_group(R.rootn,R.projectn);
 load([R.filepathn '\NPD_paper_RatNPD_150618.mat']);
 NPDmat = fyA;
@@ -38,23 +38,28 @@ for C =1:numel(R.condnames)
                 %                     plot(R.frqz,10.^(Pxy));
                 meannpd_data(C,i,j,1,:) = Pxy;
             else
-                
-                for k = 1:size(NPDmat,3)
-                    Ftmp = F_data;
-                    Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
-                    Cxy = Cxy*1.5;
-                    Cxy(Ftmp>48 & Ftmp<52) = [];
-                    Ftmp(Ftmp>48 & Ftmp<52) = [];
-                    Cxy = interp1(Ftmp,Cxy,R.frqz);
-                    %                     Cxy = Cxy.*tukeywin(length(Cxy),0.6)'; %%NPD_sim_n(i,j,1,:)
-                    %                     plot(R.frqz,Cxy); hold on
-                    f = fit(R.frqz',Cxy','gauss3');
-                    Cxy = f(R.frqz)';
-                    %                     plot(R.frqz,Cxy)
-                    meannpd_data(C,i,j,k,:) = Cxy;
-                    %                     close all
+                if i == 1 || j == 1
+                    for k = 1:size(NPDmat,3)
+                        Cxy = exp(-4).*randn(size(R.frqz));
+                        meannpd_data(C,i,j,k,:) = Cxy;
+                    end
+                else
+                    for k = 1:size(NPDmat,3)
+                        Ftmp = F_data;
+                        Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
+                        Cxy = Cxy*1.5;
+                        Cxy(Ftmp>48 & Ftmp<52) = [];
+                        Ftmp(Ftmp>48 & Ftmp<52) = [];
+                        Cxy = interp1(Ftmp,Cxy,R.frqz);
+                        %                     Cxy = Cxy.*tukeywin(length(Cxy),0.6)'; %%NPD_sim_n(i,j,1,:)
+                        %                     plot(R.frqz,Cxy); hold on
+                        f = fit(R.frqz',Cxy','gauss3');
+                        Cxy = f(R.frqz)';
+                        %                     plot(R.frqz,Cxy)
+                        meannpd_data(C,i,j,k,:) = Cxy;
+                        %                     close all
+                    end
                 end
-                
             end
         end
     end

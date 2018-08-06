@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model3(R)
-
+function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model6_wMd2Priors(R)
+% actually model 3 but with model 1 priors for STN/GPe
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1];
@@ -44,7 +44,7 @@ uc = innovate_timeseries(R,m);
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(2,3) = 0; % STN -> GPe
+p.A{1}(2,3) = 0.014; % STN -> GPe
 p.A{1}(1,3) = 0; % STN -> M2
 p.A{1}(3,1) = 0; % M2 -> STN
 p.A_s{1} = repmat(0.5,m.m,m.m);
@@ -88,3 +88,19 @@ for i = 1:m.m
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end
+
+%% SPECIFIC TO STN/GPe Resonator
+% GPe
+p.int{2}.T = 0.67;
+p.int{2}.T_s = 0.5;
+p.int{2}.G = -0.64;
+p.int{2}.G_s = 0.5;
+p.int{2}.S = 0.16;
+p.int{2}.S_s = 0.5;
+% STN
+p.int{3}.T = 1.5;
+p.int{3}.T_s = 0.5;
+p.int{3}.G = 2.25;
+p.int{3}.G_s = 0.5;
+p.int{3}.S = 0.09;
+p.int{3}.S_s = 0.5;

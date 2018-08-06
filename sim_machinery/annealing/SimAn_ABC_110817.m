@@ -192,7 +192,7 @@ while ii <= searchN
     eps = -5;
     if size(parBank,2)>R.SimAn.minRank
         
-        eps = (Tm(ii)^(1/4))-2; % 2; 2.5; % temperature based epsilon (arbitrary function)
+        eps = (Tm(ii)^(1/4))-2.5; % 2; 2.5; % temperature based epsilon (arbitrary function)
         %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
         %         epgrad = r2eps-eps_p;
         %         eps = eps_p + epgrad;
@@ -251,7 +251,7 @@ while ii <= searchN
         % data and more than a given number of replicates are attempted
         % then choose epsilon to give bank exceeding rank (bare minimum for
         % copula formation
-        if R.SimAn.minRank-size(parOptBank,2) < (R.SimAn.minRank*0.1)
+        if  size(parOptBank,2)<R.SimAn.minRank & size(parOptBank,2) > (R.SimAn.minRank*0.5)
             disp(['Rank is within limits, filling with pseudopars: ' num2str(eps)])
             aN = R.SimAn.minRank-size(parOptBank,2);
             mu = mean(parBank(:,parBank(end,:)>eps),2);
@@ -456,12 +456,8 @@ while ii <= searchN
             Tm(ii+1) = Tm(ii);
         end
         ii = ii + 1;
-        if itry>12
-            disp('Itry exceeded: Max Convergence')
-            return
-        end
     end
-    if itry>12
+    if itry>18
         disp('Itry Exceeded: Covergence')
         return
     end
@@ -470,3 +466,6 @@ while ii <= searchN
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end
 
+figure(2);
+R.analysis.modEvi.N = 500;
+modelProbs(m.x,m,p,R,d)

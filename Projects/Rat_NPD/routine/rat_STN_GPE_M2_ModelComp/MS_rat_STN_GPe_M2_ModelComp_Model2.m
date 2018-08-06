@@ -1,4 +1,4 @@
-function [p m] = MS_rat_STN_GPe_M2_ModelComp_Model1(R)
+function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model2(R)
 
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
@@ -46,13 +46,11 @@ uc = innovate_timeseries(R,m);
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,3) = 0; % STN -> GPe
 p.A{1}(3,1) = 0; % M2 -> STN
-p.A_s{1} = repmat(1,m.m,m.m);
-p.A_s{1}(2,3) = 1.5;
+p.A_s{1} = repmat(0.25,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % GPe -| STN
-p.A_s{2} = repmat(1,m.m,m.m);
-p.A_s{2}(3,2) = 1.5;
+p.A_s{2} = repmat(0.25,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);

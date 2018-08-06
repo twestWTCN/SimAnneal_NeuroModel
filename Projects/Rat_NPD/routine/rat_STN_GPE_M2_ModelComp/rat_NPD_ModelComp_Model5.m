@@ -3,17 +3,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
 clear ; close all
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
-addpath('C:\spm12')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-%
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
+% addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
+% addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
+% addpath('C:\spm12')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
+% %
+% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
 rng(12312)
 
 %% Set Routine Pars
@@ -23,9 +23,9 @@ R = simannealsetup_STN_GPe_M2_ModelComp;
 R = prepareRatData_Group_NPD(R);
 
 %% Prepare Model
-[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model1(R);
+[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model5_wMd2Priors(R);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-R.out.dag = 'NPD_ModComp_M1'; % 'All Cross'
+R.out.dag = 'NPD_ModComp_M5'; % 'All Cross'
 R.out.tag = 'ModComp';
 R.plot.save = 'True';
 R.obs.trans.norm = 1;
@@ -33,7 +33,7 @@ R.obs.logdetrend =1;
 
 R.SimAn.rep =256; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 1;
+R.SimAn.jitter = 0.5;
 R.SimAn.searchN = 200;
 R = setSimTime(R,18);
 R.objfx.specspec = 'cross';

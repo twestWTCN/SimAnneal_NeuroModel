@@ -11,7 +11,7 @@ for i = 1:length(plist)
     end
     for src = 1:L
         if isequal(plist{i},'.A') || isequal(plist{i},'.B') % Case for matrices where we loop through
-            for Ai = 1:size(eval(['p' plist{i}]),1)
+            for Ai = 1:size(eval(['p' plist{i}]),2)
                 X= eval(['p' plist{i} '{Ai}']);
                 x = reshape(X,1,[]);
                 xseq = rand(size(x));

@@ -186,7 +186,7 @@ for i = 1:m.m
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(1,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(1.5,size(p.int{i}.S));
+    p.int{i}.S_s = repmat(0.5,size(p.int{i}.S));
     
     p.int{i}.BT = zeros(1,m.Tint(i));
     p.int{i}.BT_s = repmat(1.5,size(p.int{i}.T));
@@ -197,21 +197,23 @@ end
 %  '180718_COND1_reauto' - Really nice auto fit!
 %  '180718_COND1_full' - partially fitted to all(~40% R2)
 %  '180718_COND1_full_run2' - higher density fit
+%  '0520818_lesion_cross' - beautiful fit!
+
 % Now fit Auto
-R.out.dag = '020818_lesion_cross'; % cross only
-R.plot.save = 'True';
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'])
-m = varo;
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
-xobs1 = varo;
-p = xobs1.Mfit.Pfit;
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
-% parBank = varo;
+% R.out.dag = '020818_lesion_cross'; % cross only
+% R.plot.save = 'True';
+% load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'])
+% m = varo;
+% load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
+% xobs1 = varo;
+% p = xobs1.Mfit.Pfit;
+% load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
+% % parBank = varo;
 parBank = [];
-R.out.dag = '020818_lesion_cross'; % cross only
+R.out.dag = '0520818_lesion_cross'; % cross only
 R.objfx.specspec = 'cross';
 R = setSimTime(R,24);
-R.SimAn.rep = 68;
+R.SimAn.rep = 256;
 R.SimAn.searchN = 400;
 R.SimAn.Tm = 1;
 R.SimAn.jitter =1;

@@ -23,9 +23,9 @@ R = simannealsetup_STN_GPe_M2_ModelComp;
 R = prepareRatData_Group_NPD(R);
 
 %% Prepare Model
-[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model1(R);
+[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model3(R);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-R.out.dag = 'NPD_ModComp_M1'; % 'All Cross'
+R.out.dag = 'NPD_ModComp_M3'; % 'All Cross'
 R.out.tag = 'ModComp';
 R.plot.save = 'True';
 R.obs.trans.norm = 1;
@@ -33,7 +33,7 @@ R.obs.logdetrend =1;
 
 R.SimAn.rep =256; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 1;
+R.SimAn.jitter = 0.5;
 R.SimAn.searchN = 200;
 R = setSimTime(R,18);
 R.objfx.specspec = 'cross';
