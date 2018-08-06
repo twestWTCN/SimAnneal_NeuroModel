@@ -1,4 +1,4 @@
-function [xstore_cond,tvec,wflag] = spm_fx_compile_180817(R,x,uc,pc,m)
+function [xstore_cond,tvec,wflag] = spm_fx_compile_findJacobian(x,R,uc,pc,m)
 cs = 0; % cond counter
 wflag= 0; tvec = [];
 for condsel = 1:numel(R.condnames)
@@ -204,6 +204,8 @@ for condsel = 1:numel(R.condnames)
     f = zeros(xinds(end),1); dt = R.IntP.dt;
     if iscell(x)
         xstore= full(repmat(spm_vec(x),1,R.IntP.buffer)); 
+    elseif size(x,2)
+        xstore= full(repmat(x,1,R.IntP.buffer));
     else
         xstore = x;
     end
@@ -247,12 +249,12 @@ for condsel = 1:numel(R.condnames)
                 wflag = 1;
                 break
             end
-            pp1 = 1;
         end
         % disp(tstep/R.IntP.nt)
         % xint= spm_unvec(x,M.x);
     end
-    xstore_cond{condsel} = xstore;
+    xstore_cond = xstore(:,end);
+%     xstore_cond{condsel} = xstore;
 %     J{condsel} = findJacobian(R,xstore(:,end-R.IntP.buffer:end),uc,pc,m);
     % tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
     a = 1;
