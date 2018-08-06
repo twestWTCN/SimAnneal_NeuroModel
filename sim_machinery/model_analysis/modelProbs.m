@@ -45,7 +45,8 @@ pnew = par{2};
 %% Simulate New Data
 u = innovate_timeseries(R,m);
 u{1} = u{1}.*sqrt(R.IntP.dt);
-xsims = R.IntP.intFx(R,m.x,u,pnew,m);
+[xsims,tvec,wflag] = R.IntP.intFx(R,m.x,u,pnew,m);
+if wflag ==0
 % Run Observer function
 if isfield(R.obs,'obsFx')
     [xsims R] = R.obs.obsFx(xsims,m,pnew,R);
@@ -56,14 +57,16 @@ xsims{1} = xsims{1} + linspace(m.m,0,m.m)';
  set(gcf,'Position',[705         678        1210         420]); 
  xlim([4 5])
 %%
-
-parfor jj = 1:N
+close all
+end
+for jj = 1:N
 %     ppm.increment();
     pnew = par{jj};
     %% Simulate New Data
         u = innovate_timeseries(R,m);
         u{1} = u{1}.*sqrt(R.IntP.dt);
-    xsims = R.IntP.intFx(R,m.x,u,pnew,m);
+    [xsims,tvec,wflag] = R.IntP.intFx(R,m.x,u,pnew,m);
+    if wflag == 0
     % Run Observer function
     if isfield(R.obs,'obsFx')
         xsims = R.obs.obsFx(xsims,m,pnew,R);
@@ -76,7 +79,11 @@ parfor jj = 1:N
     end
     % Compare Pseudodata with Real
     r2mean  = R.IntP.compFx(R,feat_sim);
-
+    else
+        r2mean = -inf;
+        feat_sim = NaN;
+        disp('Simulation error!')
+    end
 %     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
     r2rep{jj} = r2mean;
     par_rep{jj} = pnew;
@@ -120,4 +127,4 @@ annotation(gcf,'textbox',...
     'FitBoxToText','off',...
     'LineStyle','none');
 set(gcf,'Position',[680 437 1070 541])
-saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r200',1);
+% saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r200',1);

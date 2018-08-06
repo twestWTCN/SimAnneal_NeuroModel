@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model5_wMd2Priors(R)
-% actually model 4 (stn feed to M2) put with model 1 priors
+function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model7_wMd2Priors(R)
+% Model 2 (M2 FEED) but with model 1 priors
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1];
@@ -45,8 +45,9 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,3) = 0.014; % STN -> GPe
-p.A{1}(1,3) = 0; % STN -> M2
+p.A{1}(3,1) = 0; % M2 -> STN
 p.A_s{1} = repmat(0.5,m.m,m.m);
+
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
@@ -73,7 +74,7 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 1
+        prec = 1;
     else
         prec = 1;
     end

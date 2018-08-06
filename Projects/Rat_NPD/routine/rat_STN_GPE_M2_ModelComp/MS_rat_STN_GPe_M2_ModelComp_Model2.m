@@ -1,5 +1,5 @@
 function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model2(R)
-
+% M2 Input to STN/GPe
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1];

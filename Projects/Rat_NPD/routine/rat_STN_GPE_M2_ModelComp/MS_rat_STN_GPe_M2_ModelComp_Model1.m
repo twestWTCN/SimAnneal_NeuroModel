@@ -1,5 +1,5 @@
 function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model1(R)
-
+% THIS IS THE STN/GPE with Independent M2
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1];
@@ -45,11 +45,11 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,3) = 0; % STN -> GPe
-p.A_s{1} = repmat(0.25,m.m,m.m);
+p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % GPe -| STN
-p.A_s{2} = repmat(0.25,m.m,m.m);
+p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -73,7 +73,7 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 0.5;
+        prec = 1.5;
     else
         prec = 1.5;
     end

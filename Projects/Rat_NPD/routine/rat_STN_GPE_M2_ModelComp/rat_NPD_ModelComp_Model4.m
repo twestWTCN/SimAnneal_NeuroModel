@@ -1,4 +1,5 @@
-% THIS IS THE STN/GPE with Independent M2
+% MODEL 4
+% STN FEEDS TO M2
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
@@ -33,7 +34,7 @@ R.obs.logdetrend =1;
 
 R.SimAn.rep =256; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 0.5;
+R.SimAn.jitter = 1;
 R.SimAn.searchN = 200;
 R = setSimTime(R,18);
 R.objfx.specspec = 'cross';

@@ -1,4 +1,5 @@
-% THIS IS THE STN/GPE with Independent M2
+% MODEL 5
+% Model 4 (STN feed M2) but with Model 1 priors on STN/GPe
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()

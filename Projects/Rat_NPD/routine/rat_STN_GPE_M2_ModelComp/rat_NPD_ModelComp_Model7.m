@@ -1,5 +1,5 @@
-% Model 6
-% % Model 3 (reciprocal) but with model 1 priors
+% Model 7
+% % Model 3 (M2 Feed) but with model 1 priors
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,7 +16,7 @@ addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
 %
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(12312)
+rng(424124)
 
 %% Set Routine Pars
 R = simannealsetup_STN_GPe_M2_ModelComp;
@@ -25,9 +25,9 @@ R = simannealsetup_STN_GPe_M2_ModelComp;
 R = prepareRatData_Group_NPD(R);
 
 %% Prepare Model
-[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model6_wMd2Priors(R);
+[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model7_wMd2Priors(R);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-R.out.dag = 'NPD_ModComp_M6'; % 'All Cross'
+R.out.dag = 'NPD_ModComp_M7'; % 'All Cross'
 R.out.tag = 'ModComp';
 R.plot.save = 'True';
 R.obs.trans.norm = 1;

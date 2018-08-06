@@ -6,8 +6,6 @@ pIndMap = spm_vec(pInd); % in flat form
 
 
 % Re-compute optimised parbank
-R.analysis.modEvi.N = 100;
-R.analysis.modEvi.eps = 0.15;
 parOptBank = parBank(:,parBank(end,:)>R.analysis.modEvi.eps);
 R.parOptBank = parOptBank;
 
@@ -29,10 +27,10 @@ R.Mfit.nu = nu;
 % triangle_plot_mdist(R,p,m,xf)
 
 %% Compute Model Evidence
-% gcp
-% figure(2);
+gcp
+figure(2);
 % R.analysis.modEvi.N = 128;
-% modelProbs(m.x,m,p,R)
+modelProbs(m.x,m,p,R)
 
 %% Plot Simulated Features with Confidence intervals
 figure(3)

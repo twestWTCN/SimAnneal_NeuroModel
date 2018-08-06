@@ -1,5 +1,4 @@
-% THIS IS THE STN/GPE with Independent M2
-
+% % M2 Input to STN/GPe
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
 clear ; close all

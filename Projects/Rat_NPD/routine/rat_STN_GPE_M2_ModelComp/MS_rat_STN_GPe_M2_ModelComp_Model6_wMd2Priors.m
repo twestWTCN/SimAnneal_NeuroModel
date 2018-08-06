@@ -1,5 +1,5 @@
 function [R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model6_wMd2Priors(R)
-% actually model 3 but with model 1 priors for STN/GPe
+% Model 3 (reciprocal) but with model 1 priors
 m.m = 3; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1];
