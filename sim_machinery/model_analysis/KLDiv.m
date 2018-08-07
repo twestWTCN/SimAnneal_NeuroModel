@@ -38,10 +38,10 @@ for Q = 1:size(pIndMap,1)
 %     plot(f,x1./y,'g')
 end
 % KL = sum(KL)
-eps2 = priorVec(precIndMap).*eye(size(precIndMap,1));
-eps1 = cov(xf');
+eps1 = priorVec(precIndMap).*eye(size(precIndMap,1));
+eps2 = cov(xf');
 
-mu2 = priorVec(pIndMap);
-mu1 = mean(xf')';
+mu1 = priorVec(pIndMap);
+mu2 = mean(xf')';
 
-DKL = 0.5*(trace(eps2\eps1) + ((mu2-mu1)'*eps2)'\(mu2-mu1) - 38 + log(det(eps2)/det(eps1)));
+DKL = 0.5*(trace(eps2\eps1) + ((mu2-mu1)'*eps2)'\(mu2-mu1) - size(mu1,1) + log(det(eps2)/det(eps1)));

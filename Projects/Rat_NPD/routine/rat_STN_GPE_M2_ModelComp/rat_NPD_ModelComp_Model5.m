@@ -4,17 +4,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
 clear ; close all
-% addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
-% addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
-% addpath('C:\spm12')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-% %
-% addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
+addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
+addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
+addpath('C:\spm12')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
+%
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
 rng(12312)
 
 %% Set Routine Pars
@@ -24,7 +24,7 @@ R = simannealsetup_STN_GPe_M2_ModelComp;
 R = prepareRatData_Group_NPD(R);
 
 %% Prepare Model
-[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model5_wMd2Priors(R);
+[R p m uc] = MS_rat_STN_GPe_M2_ModelComp_Model5(R);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 R.out.dag = 'NPD_ModComp_M5'; % 'All Cross'
 R.out.tag = 'ModComp';
