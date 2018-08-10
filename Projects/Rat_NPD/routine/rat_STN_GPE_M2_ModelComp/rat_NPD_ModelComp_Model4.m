@@ -32,6 +32,10 @@ R.plot.save = 'True';
 R.obs.trans.norm = 1;
 R.obs.logdetrend =1;
 
+load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
+R = varo;
+p = R.Mfit.BPfit;
+
 R.SimAn.rep =256; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
 R.SimAn.jitter = 1;

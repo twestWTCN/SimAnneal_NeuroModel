@@ -1,10 +1,15 @@
 % COMPUTE MODEL RELATIVE PROBABILITIES
 % clear; close all
 R.rootn = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
-R.out.tag = 'ModComp';
-daglist = {'NPD_ModComp_M1','NPD_ModComp_M2','NPD_ModComp_M3',...
-    'NPD_ModComp_M4','NPD_ModComp_M5','NPD_ModComp_M6','NPD_ModComp_M7'};
-for mnum =2
+R.out.tag = 'InDrt_ModComp';
+daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
+    'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
+    'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
+
+    load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
+permMod = varo;
+
+for mnum =5
     % Load Model
     load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelspec_' R.out.tag '_' daglist{mnum} '.mat'])
     m = varo;
@@ -13,7 +18,7 @@ for mnum =2
     R = varo;
     p = R.Mfit.BPfit;
     
-    a = eval(['@MS_rat_STN_GPe_M2_ModelComp_Model' num2str(mnum)]);
+    a = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(mnum)]);
     [dum prior] = a(R);
     R.Mfit.prior = prior;
     % load parbank?

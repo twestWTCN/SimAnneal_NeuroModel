@@ -131,7 +131,7 @@ while ii <= searchN
 %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
 %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
 %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-                close all
+%                 close all
             catch
                 disp('Observation/Cost Function Failure!')
                 r2 = -inf;
@@ -192,7 +192,7 @@ while ii <= searchN
     eps = -5;
     if size(parBank,2)>R.SimAn.minRank
         
-        eps = (Tm(ii)^(1/4))-2.5; % 2; 2.5; % temperature based epsilon (arbitrary function)
+        eps = (Tm(ii)^(1/4))-R.SimAn.starttemp; % 2; 2.5; % temperature based epsilon (arbitrary function)
         %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
         %         epgrad = r2eps-eps_p;
         %         eps = eps_p + epgrad;
@@ -465,7 +465,3 @@ while ii <= searchN
     
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end
-
-figure(2);
-R.analysis.modEvi.N = 500;
-modelProbs(m.x,m,p,R,d)

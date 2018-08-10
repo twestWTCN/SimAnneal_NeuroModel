@@ -1,4 +1,4 @@
-function [xstore_cond,tvec,wflag] = spm_fx_compile_180817(R,x,uc,pc,m)
+function [xstore_cond,tvec,wflag,J,Es] = spm_fx_compile_180817(R,x,uc,pc,m)
 cs = 0; % cond counter
 wflag= 0; tvec = [];
 for condsel = 1:numel(R.condnames)
@@ -33,7 +33,7 @@ for condsel = 1:numel(R.condnames)
     efferent(3,:) = [9 9 9 9];               % sources of BGC connections (thalamus)
     afferent(3,:) = [2 6 2 6];               % targets of BGC connections (striatum & STN)
     
-%     efferent(4,:) = [3 3 6 7];               % ORIG sources of MMC connections
+    %     efferent(4,:) = [3 3 6 7];               % ORIG sources of MMC connections
     % afferent(4,:) = [2 4 8 0];               % targets of MMC connections
     efferent(4,:) = [7 7 7 7];               % sources of MMC connections
     afferent(4,:) = [8 8 8 8];                  % forward deep/middle; back deep/superficial
@@ -59,8 +59,8 @@ for condsel = 1:numel(R.condnames)
     E(1,:) = [1 0 1 0]*200;                    % ERP connections
     E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
     E(3,:) = [1.8 1.2 1.8 1.2]*10000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
-%     E(4,:) = [.2 .2 -.2 -.2]*(200);  %500           % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
-    E(4,:) = [.9 .9 -.9 -.9]*20000; 
+    %     E(4,:) = [.2 .2 -.2 -.2]*(200);  %500           % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
+    E(4,:) = [.9 .9 -.9 -.9]*20000;
     %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
     % E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
     % E(6,:) = [.5 .5 -.5 -.5]*100000;             % GPE connections
@@ -144,15 +144,15 @@ for condsel = 1:numel(R.condnames)
     Rz     = (Rz).*exp(p.S(1));
     S     = @(x,Rz,B)(1./(1 + exp(-Rz*x(:) + B))) - 1/(1 + exp(B));
     
-%     % Condition Dependent Modulation of Synaptic gains
-%     %-----------------------------------------
-%     for i = 1:m.m
-%         if cs ==~ R.Bcond
-%             p.int{i}.G = p.int{i}.G;
-%         else
-%             p.int{i}.G = p.int{i}.G + p.int{i}.BG;
-%         end
-%     end
+    %     % Condition Dependent Modulation of Synaptic gains
+    %     %-----------------------------------------
+    %     for i = 1:m.m
+    %         if cs ==~ R.Bcond
+    %             p.int{i}.G = p.int{i}.G;
+    %         else
+    %             p.int{i}.G = p.int{i}.G + p.int{i}.BG;
+    %         end
+    %     end
     
     % Condition Dependent Modulation of Synaptic gains
     %-----------------------------------------
@@ -162,7 +162,7 @@ for condsel = 1:numel(R.condnames)
         else
             p.int{i}.T = p.int{i}.T + p.int{i}.BT;
         end
-    end    
+    end
     
     % Rescale background Input
     for i = 1:m.m
@@ -203,7 +203,7 @@ for condsel = 1:numel(R.condnames)
     %% TIME INTEGRATION STARTS HERE ===========================================
     f = zeros(xinds(end),1); dt = R.IntP.dt;
     if iscell(x)
-        xstore= full(repmat(spm_vec(x),1,R.IntP.buffer)); 
+        xstore= full(repmat(spm_vec(x),1,R.IntP.buffer));
     else
         xstore = x;
     end
@@ -237,14 +237,13 @@ for condsel = 1:numel(R.condnames)
             Q.C  = p.C(i,:);
             xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
             f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
-%             f(Dt(1,i))  = f(Dt(1,i)) + sum(fA) ;
+            %             f(Dt(1,i))  = f(Dt(1,i)) + sum(fA) ;
         end
         xint = xint + (f.*dt);
         xstore = [xstore xint];
         if tstep >R.IntP.buffer*10
             if any(xint>1e4) || any(isnan(xint))
-                xstore_cond{condsel} = NaN;
-                wflag = 1;
+                wflag= 1;
                 break
             end
             pp1 = 1;
@@ -252,8 +251,12 @@ for condsel = 1:numel(R.condnames)
         % disp(tstep/R.IntP.nt)
         % xint= spm_unvec(x,M.x);
     end
+    if wflag == 1
+        xstore_cond{condsel} = NaN;
+    end
     xstore_cond{condsel} = xstore;
-%     J{condsel} = findJacobian(R,xstore(:,end-R.IntP.buffer:end),uc,pc,m);
-    % tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
+    if nargout>3
+        [J{condsel} Es{condsel}] = findJacobian(R,xstore(:,end-R.IntP.buffer:end),uc,p,m);
+    end    % tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
     a = 1;
 end

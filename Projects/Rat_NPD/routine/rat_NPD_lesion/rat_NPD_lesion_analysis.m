@@ -13,7 +13,9 @@ p = R.Mfit.BPfit;
 load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
 parBank = varo;
 
-
+[dum p] = MS_rat_FullModel(R);
+R.Mfit.prior = p;
+R.obs.gainmeth = R.obs.gainmeth(1);
 R = setSimTime(R,128);
 R.analysis.modEvi.N = 100;
 R.analysis.modEvi.eps = prctile(parBank(end,:),90);

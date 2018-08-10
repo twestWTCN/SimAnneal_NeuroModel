@@ -1,7 +1,7 @@
-function R = simannealsetup_STN_GPe_M2_ModelComp()
+function R = simannealsetup_InDirect_ModelComp()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'STN_GPe_M2_ModelComp';
+R.out.tag = 'InDirect_ModelComp';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
@@ -18,8 +18,8 @@ R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
 R.frqz = [6:.2:68];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MMC','GPE','STN'};
-R.chsim_name = {'MMC','GPE','STN'};
+R.chloc_name = {'MMC','STR','GPE','STN'};
+R.chsim_name = {'MMC','STR','GPE','STN'};
 R.condnames = {'OFF'}; % VERIFY!!!
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
