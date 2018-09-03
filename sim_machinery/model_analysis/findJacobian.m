@@ -22,3 +22,5 @@ for p = 1:length(plist)
     Js(:,:,p) = J;
     Es(p) = e(1);
 end% J
+
+J = mean(Js,3);

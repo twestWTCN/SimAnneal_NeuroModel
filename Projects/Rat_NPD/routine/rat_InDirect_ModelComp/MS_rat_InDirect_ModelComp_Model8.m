@@ -91,7 +91,7 @@ for i = 1:m.m
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end
-
+% Motor Cortex
 prec= 0.25;
 p.int{1}.T = [-0.0416 0.1269 -0.7104 -0.2497];
 p.int{1}.T_s = repmat(prec,size(p.int{1}.T));
@@ -103,15 +103,15 @@ p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
 %% SPECIFIC TO STN/GPe Resonator
 % GPe
 p.int{3}.T = 0.67;
-p.int{3}.T_s = 0.25;
+p.int{3}.T_s = prec;
 p.int{3}.G = -0.64;
-p.int{3}.G_s = 0.25;
+p.int{3}.G_s = prec;
 p.int{3}.S = 0.16;
-p.int{3}.S_s = 0.5;
+p.int{3}.S_s = prec;
 % STN
 p.int{4}.T = 1.5;
-p.int{4}.T_s = 0.25;
+p.int{4}.T_s = prec;
 p.int{4}.G = 2.25;
-p.int{4}.G_s = 0.25;
+p.int{4}.G_s = prec;
 p.int{4}.S = 0.09;
-p.int{4}.S_s = 0.25;
+p.int{4}.S_s = prec;

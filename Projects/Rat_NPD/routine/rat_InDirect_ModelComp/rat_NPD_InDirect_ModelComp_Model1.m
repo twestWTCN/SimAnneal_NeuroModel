@@ -30,11 +30,12 @@ R.plot.save = 'True';
 R.obs.trans.norm = 1;
 R.obs.logdetrend =1;
 
-R.SimAn.rep =256; %256; %96; %512; % Repeats per temperature
+R.SimAn.starttemp = 2;
+R.SimAn.rep =448; %256; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 1;
+R.SimAn.jitter = 0.5;
 R.SimAn.searchN = 200;
-R = setSimTime(R,18);
+R = setSimTime(R,32);
 R.objfx.specspec = 'cross';
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.Bcond = 0;

@@ -1,5 +1,5 @@
 function [R p m uc] = MS_rat_InDirect_ModelComp_Model5(R)
-% M3: Serial Flow - Indirect + Hyperdirect + M2 Auto Priors
+% M5: Serial Flow - Indirect + Hyperdirect + M2 Auto Priors
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];

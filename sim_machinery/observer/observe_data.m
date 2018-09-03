@@ -18,8 +18,8 @@ for condsel = 1:numel(R.condnames)
             case 'difference'
                 xsims = [xsims(:,1) diff(xsims,1,2)];
             case 'unitvar'
-                for i = 1:size(xsims,1)
-                    xsims(i,:) = (xsims(i,:) - mean(xsims(i,:)))./std(xsims(i,:));
+                for j = 1:size(xsims,1)
+                    xsims(j,:) = (xsims(j,:) - mean(xsims(j,:)))./std(xsims(j,:));
                 end
             case 'mixing'
                 %% REPLACE WITH DISTANCE MATRIX
@@ -55,15 +55,15 @@ for condsel = 1:numel(R.condnames)
                 end
             case 'boring'
                 Xstab = [];
-                %                 figure
-                %                 plot(xsims'); shg
-                for i = 1:size(xsims,1)
-                    swX = slideWindow(xsims(i,:), floor(size(xsims(i,:),2)/12), 0);
+%                                 figure
+%                                 plot(xsims'); shg
+                for j = 1:size(xsims,1)
+                    swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/12), 0);
                     swX = swX(:,2:end-1);
-                    Xstab(i) = std(abs(mean(swX)));
+                    Xstab(j) = std(abs(mean(swX)));
                     %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
                 end
-                if any(Xstab<0.05)
+                if any(Xstab<0.01)
                     disp('SimFx is Stable (boring)!')
                     %                     close all
                     error('SimFx is Stable (boring)!')

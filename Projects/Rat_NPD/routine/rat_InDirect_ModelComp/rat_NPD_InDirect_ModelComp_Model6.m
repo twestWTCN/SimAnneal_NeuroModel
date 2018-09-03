@@ -13,7 +13,7 @@ addpath('C:\spm12')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(24312321)
+rng(743213)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -30,16 +30,12 @@ R.plot.save = 'True';
 R.obs.trans.norm = 1;
 R.obs.logdetrend =1;
 
-load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
-R = varo;
-p = R.Mfit.BPfit;
-R.SimAn.starttemp = 1.5;
-
-R.SimAn.rep =256; %256; %96; %512; % Repeats per temperature
+R.SimAn.starttemp = 2;
+R.SimAn.rep =448; %256; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 1.25;
+R.SimAn.jitter = 1;
 R.SimAn.searchN = 200;
-R = setSimTime(R,18);
+R = setSimTime(R,32);
 R.objfx.specspec = 'cross';
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.Bcond = 0;

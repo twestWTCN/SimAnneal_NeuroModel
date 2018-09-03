@@ -1,7 +1,7 @@
 function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
-%%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION of NONLINEAR
-%%%% DYNAMICAL MODELS
-% ---- 11/08/17---------------------------
+%%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION for
+%%%% HIGH DIMENSIONAL DYNAMICAL MODELS
+% ---- 16/08/18---------------------------
 % This annealing function uses approximate Bayesian computation in order to
 % estimate the posterior parameter distributions, using a shifting epsilon
 % that moves with a cooling schedule.
@@ -14,13 +14,14 @@ function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
 % m - structure of model specfications
 % R - settings for annealing, plotting, integration etc.
 %
-%
 % This function will output R at each annealing loop (assigned into 'base'
-% workspace. The field R.mfit is appended with the Rho (covariance) and nu
+% workspace. The field R.mfit is appended with the Rho (normalized covariance) and nu
 % (degrees of freedom) of the estimated copula.
 % There are several plotting functions which will track the progress of the
 % annealing.
-%
+% 
+% Timothy West (2018) - UCL Centre for Maths and Physics in the Life Sciences
+% /Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
 % Setup for annealing
 if nargin<6
@@ -37,7 +38,6 @@ parOptBank = []; eps = -1;  iflag = 0; par = cell(1,R.SimAn.rep); psave = []; it
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
 Tm(1) =  R.SimAn.Tm;
-alpha = R.SimAn.alpha;
 ii = 1;
 
 % Compute indices of optimised parameter
@@ -76,8 +76,8 @@ while ii <= searchN
     %% Batch Loop for Replicates for Generation of Pseudodata
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
-    
-    parfor jj = 1:rep % Replicates for each temperature
+    clear xsims_rep feat_sim_rep
+   parfor jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else
@@ -86,6 +86,7 @@ while ii <= searchN
         x = ic;
         %% Resample Parameters
         pnew = par{jj};
+        wflag = 0;
         %% Simulate New Data
         % Integrate in time master fx function
         try
@@ -124,6 +125,7 @@ while ii <= searchN
                     error('TransFX could not compute data transform!')
                 end
                 [r2 ir2] = max(r2mean);
+                xsims_gl{gl}{1} = xsims_gl{gl}{1}(:,end-floor(1/R.IntP.dt):end);
                 %                 pnew.obs.LF = glorg + gainlist(ir2);
                 %         disp(pnew.obs.LF)
                 %         toc
@@ -149,7 +151,7 @@ while ii <= searchN
         
         r2rep{jj} = r2;
         par_rep{jj} = pnew;
-        xsims_rep{jj} = xsims_gl{ir2};
+        xsims_rep{jj} = xsims_gl{ir2}; % This takes too much memory: !Modified to store last second only!
         feat_sim_rep{jj} = feat_sim{ir2};
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % End of batch replicates
@@ -183,7 +185,7 @@ while ii <= searchN
     % Clip parBank to the best (keeps size manageable
     [dum V] = sort(parBank(end,:),'descend');
     if size(parBank,2)>2^13
-        parBank = parBank(:,V(1:2^13));
+        parBank = parBank(:,V(1:2^12));
     else
         parBank = parBank(:,V);
     end
@@ -292,15 +294,14 @@ while ii <= searchN
             try
                 [Rho,nu] = copulafit('t',copU','Method','ApproximateML'); % Fit copula
                 % Save outputs that specify the copula
-                R.Mfit.xf = xf;
-                R.Mfit.nu = nu;
-                R.Mfit.tbr2 = parOptBank(end,1); % get best fit
-                R.Mfit.Pfit = spm_unvec(mean(parOptBank,2),p);
-                R.Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),p);
-                R.Mfit.Rho = Rho;
-                Mfit_hist(ii) = R.Mfit;
+                Mfit.xf = xf;
+                Mfit.nu = nu;
+                Mfit.tbr2 = parOptBank(end,1); % get best fit
+                Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);
+                Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),pOrg);
+                Mfit.Rho = Rho;
+                Mfit_hist = Mfit;
                 %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
-                
                 figure(3)
                 clf
                 plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R,stdev)
@@ -309,22 +310,25 @@ while ii <= searchN
                 % If redraw then increase epsilon
             catch
                 disp('The estimate of Rho has become rank-deficient.  You may have too few data, or strong dependencies among variables.')
-                p = spm_unvec(mean(parOptBank,2),p);
+                p = spm_unvec(mean(parOptBank,2),pOrg);
                 iflag = 0;
             end
-        else  % If not enough samples - redraw using means from the best fitting model
+        elseif size(parOptBank,2)> (0.75*R.SimAn.minRank)  % If not enough samples - redraw using means from the parOptBank
             %             p = par_rep{Ilist(1)}; % The best par_rep
-            p = spm_unvec(mean(parOptBank,2),p);
+            p = spm_unvec(mean(parOptBank,2),pOrg);
+            iflag = 0;
+        else % or draw from the top n of the parBank 
+            p = spm_unvec(mean(parBank(:,1:128),2),pOrg);
             iflag = 0;
         end
     end
     eps_rec(ii) = eps;
     
     %% Now draw parameter sets for the next set of replicates
-    if iflag == 0 && (itry < R.SimAn.copout(2))
+    if iflag == 0 && (itry < R.SimAn.copout(1))
         disp(['To many tries/trying old copula ' num2str(stdev)])
         try
-            R.Mfit =  Mfit_hist(end);
+            Mfit =  Mfit_hist;
             iflag = 1;
         catch
             disp(['No copula available, reverting to normal distribution on best fitting posteriors with stdev ' num2str(stdev)])
@@ -332,7 +336,7 @@ while ii <= searchN
     end
     if iflag == 1
         disp('Drawing from copula...')
-        r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,rep);
+        r = copularnd('t',Mfit.Rho,Mfit.nu,rep);
         clear x1
         for Q = 1:size(xf,1)
             x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
@@ -342,9 +346,9 @@ while ii <= searchN
         base = repmat(spm_vec(p),1,rep);
         for i = 1:rep
             base(pIndMap,i) = x1(:,i);
-            par{i} = spm_unvec(base(:,i),p);
+            par{i} = spm_unvec(base(:,i),pOrg);
         end
-    elseif iflag == 0 && size(parOptBank,2)>12 && itry>R.SimAn.copout(2)
+    elseif iflag == 0 && size(parOptBank,2)>(0.25*R.SimAn.minRank) && itry>R.SimAn.copout(2)
         disp(['No copula available, reverting to normal distribution on best fitting posteriors'])
         mu = mean(parBank(1:end-1,1:R.SimAn.minRank*2),2);
         if any(isnan(mu))
@@ -354,12 +358,12 @@ while ii <= searchN
             break
         end
         pm = spm_unvec(mu,p);
-        if size(parBank,2)>0.25*R.SimAn.minRank
+        if size(parBank,2)>(0.25*R.SimAn.minRank)
             sig = cov(parBank(1:end-1,1:R.SimAn.minRank*2)');
             sig = (sig + sig.') / 2; % Ensures symmetry constraints
             stdev = mean(diag(sig))*2;
         else
-            stdev= Tm(ii)*R.SimAn.jitter;
+            stdev= R.SimAn.jitter;
         end
         for jj = 1:repset
             par{jj} = resampleParameters_240717(R,pm,stdev,m.m); % Draw from prior
@@ -403,16 +407,16 @@ while ii <= searchN
         R.IntP.tvec_obs = tvec_obs;
         ptr(1) = subplot(2,1,1);
         try
-            plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+            plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
             xlabel('Time (s)'); ylabel('Amplitude')
             if numel(xsims_rep{Ilist(1)})>1
                 ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
+                plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
                 linkaxes(ptr,'x'); %xlim([10 20])
             else
                 ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-                xlim  ([2000 2500])
+                plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+%                 xlim  ([2000 2500])
             end
             xlabel('Time (s)'); ylabel('Amplitude')
             legend(R.chsim_name)
@@ -443,25 +447,33 @@ while ii <= searchN
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
     %% Save data
     if rem(ii,10) == 0
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],R)
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'],R)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
     end
     % Or to workspace
     %     assignin('base','R_out',R)
     if iflag == 1
         if tflag == 1
-            Tm(ii+1) = Tm(ii)+1;
+            Tm(ii+1) = Tm(ii)+ 0.5;
         else
             Tm(ii+1) = Tm(ii);
         end
         ii = ii + 1;
     end
-    if itry>18
+    if itry>30
         disp('Itry Exceeded: Covergence')
         return
     end
     
+    for jj = 1:repset
+        if any(isnan(spm_vec(par{jj}))) 
+           a = 1;
+        end
+    end
     
+    uv = whos;
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end

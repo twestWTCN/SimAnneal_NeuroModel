@@ -103,15 +103,15 @@ p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
 %% SPECIFIC TO STN/GPe Resonator
 % GPe
 p.int{3}.T = 0.67;
-p.int{3}.T_s = 0.25;
+p.int{3}.T_s = prec;
 p.int{3}.G = -0.64;
-p.int{3}.G_s = 0.25;
+p.int{3}.G_s = prec;
 p.int{3}.S = 0.16;
-p.int{3}.S_s = 0.5;
+p.int{3}.S_s = prec;
 % STN
 p.int{4}.T = 1.5;
-p.int{4}.T_s = 0.25;
+p.int{4}.T_s = prec;
 p.int{4}.G = 2.25;
-p.int{4}.G_s = 0.25;
+p.int{4}.G_s = prec;
 p.int{4}.S = 0.09;
-p.int{4}.S_s = 0.25;
+p.int{4}.S_s = prec;

@@ -1,5 +1,4 @@
 function [permMod] = modelProbs(x,m,p,R)
-d = R.out.dag;
 % load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
 parOptBank = R.parOptBank;
 % figure
@@ -37,7 +36,7 @@ for i = 1:N
     base(pIndMap,i) = x1(:,i);
     par{i} = spm_unvec(mean(base,2),p);
 end
-%  plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
+ plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
 % if isempty(gcp)
 %     parpool
 % end

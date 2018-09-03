@@ -12,6 +12,8 @@ for mnum = 1:size(permMod,2)
     
     if ~isempty(A)
         r2rep = [A.r2rep{:}];
+        r2rep(isnan(r2rep) | isinf(r2rep)) = [];
+        
         r2repSave{mnum} = r2rep;
         pd = fitdist(r2rep','Normal');
         x_values = -1:0.01:1;
@@ -68,6 +70,7 @@ a = gca; a.XTick = 1:size(permMod,2);
 a.XTickLabel = shortlab; 
 grid on
 xlabel('Model'); ylabel('KL Divergence')
+
 % subplot(3,1,3)
 % bar(DKL)
 % xlabel('Model'); ylabel('Joint KL Divergence')

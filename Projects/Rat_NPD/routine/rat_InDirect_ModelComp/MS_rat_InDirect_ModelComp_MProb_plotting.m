@@ -7,7 +7,7 @@ daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',
     'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
     'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
 
-load([R.rootn 'outputs\' R.out.tag '\' daglist{1} '\modelfit_' R.out.tag '_' daglist{1} '.mat'])
+load([R.rootn 'outputs\' R.out.tag '\' daglist{1} '\R_' R.out.tag '_' daglist{1} '.mat'])
 R = varo;
 load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
 permMod = varo;

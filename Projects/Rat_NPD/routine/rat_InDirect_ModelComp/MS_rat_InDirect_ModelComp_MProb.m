@@ -1,5 +1,6 @@
 % COMPUTE MODEL RELATIVE PROBABILITIES
 % clear; close all
+simAnnealAddPaths()
 R.rootn = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
 R.out.tag = 'InDrt_ModComp';
 daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
@@ -9,15 +10,18 @@ daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',
     load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
 permMod = varo;
 
-for mnum =5
+for mnum =2:numel(permMod)
     % Load Model
     load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelspec_' R.out.tag '_' daglist{mnum} '.mat'])
     m = varo;
     % load modelfit
     load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelfit_' R.out.tag '_' daglist{mnum} '.mat'])
+    A = varo;
+    p = A.BPfit;
+    % Load Options
+    load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\R_' R.out.tag '_' daglist{mnum} '.mat'])
     R = varo;
-    p = R.Mfit.BPfit;
-    
+    R.Mfit = A;
     a = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(mnum)]);
     [dum prior] = a(R);
     R.Mfit.prior = prior;
@@ -26,11 +30,11 @@ for mnum =5
     parBank =  varo;
     R = setSimTime(R,32);
     
-    R.analysis.modEvi.eps = -0.5;
-    parOptBank = parBank(1:end-1,parBank(end,:)>R.analysis.modEvi.eps);
-    if size(parOptBank,2)>2^10
-        parOptBank = parOptBank(:,1:2^10);
-    end
+ R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
+    parOptBank = parBank(1:end-1,1:R.SimAn.minRank);
+%     if size(parOptBank,2)>2^10
+%         parOptBank = parOptBank(:,1:2^10);
+%     end
     
     if  size(parOptBank,2)>1
         R.parOptBank = parOptBank;

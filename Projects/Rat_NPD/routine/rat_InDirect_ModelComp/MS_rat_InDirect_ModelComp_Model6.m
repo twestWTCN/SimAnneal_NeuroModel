@@ -46,7 +46,7 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
-p.A{1}(4,1) = 0; % MMC -> STR
+p.A{1}(4,1) = 0; % MMC -> STN
 p.A{1}(3,4) = 0; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
@@ -57,7 +57,7 @@ p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.25,size(p.C));
+p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1];

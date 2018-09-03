@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model5(R)
-% M3: Serial Flow - Indirect + Hyperdirect + STN feedback
+function [R p m uc] = MS_rat_InDirect_ModelComp_Model4(R)
+% M4: Serial Flow - Indirect + Hyperdirect + STN feedback
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
@@ -57,7 +57,7 @@ p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.25,size(p.C));
+p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1];
