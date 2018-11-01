@@ -27,11 +27,14 @@ R.obs.obsFx = @observe_data;
 R.obs.gainmeth = {'boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 
 R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
+R.obs.trans.norm = 0;
+
 % R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
 R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
 R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
 R.obs.csd.abovezero = 'False'; % Bring above zero
+
 % desired freq res:
 R.obs.csd.df = 0.5;
 R.obs.csd.reps = 32; %96;

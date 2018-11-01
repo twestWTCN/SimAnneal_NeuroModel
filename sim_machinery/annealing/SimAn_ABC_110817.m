@@ -77,7 +77,7 @@ while ii <= searchN
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-   for jj = 1:rep % Replicates for each temperature
+   parfor jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else
@@ -98,15 +98,16 @@ while ii <= searchN
         if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
             try
                 % Run Observer function
-                %                 glorg = pnew.obs.LF;
+
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
-                gainlist = 0; %linspace(-0.5,1,8);
+                glorg = pnew.obs.LF;
+                gainlist = linspace(-2,2,6);
                 feat_sim = cell(1,length(gainlist));
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
                 for gl = 1:length(gainlist)
-                    %                     pnew.obs.LF = glorg + gainlist(gl);
+                    pnew.obs.LF = glorg + gainlist(gl);
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
                     else
@@ -126,14 +127,14 @@ while ii <= searchN
                 end
                 [r2 ir2] = max(r2mean);
                 xsims_gl{gl}{1} = xsims_gl{gl}{1}(:,end-floor(1/R.IntP.dt):end);
-                %                 pnew.obs.LF = glorg + gainlist(ir2);
+                pnew.obs.LF = glorg + gainlist(ir2);
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
-                                                R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
-                                                figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
-                                                subplot(2,1,2); plot(xsims_gl{1}{2}')
-                close all
+% %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+% %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
+% % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
+% %                 close all
             catch
                 disp('Observation/Cost Function Failure!')
                 r2 = -inf;
@@ -407,16 +408,16 @@ while ii <= searchN
         R.IntP.tvec_obs = tvec_obs;
         ptr(1) = subplot(2,1,1);
         try
-            plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+            plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
             xlabel('Time (s)'); ylabel('Amplitude')
             if numel(xsims_rep{Ilist(1)})>1
                 ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
+                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
                 linkaxes(ptr,'x'); %xlim([10 20])
             else
                 ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs(:,end-floor(1/R.IntP.dt):end),size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-%                 xlim  ([2000 2500])
+                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+                xlim  ([8 10])
             end
             xlabel('Time (s)'); ylabel('Amplitude')
             legend(R.chsim_name)
