@@ -11,6 +11,10 @@ R.IntP.nt = R.IntP.tend/R.IntP.dt;
 dfact = fsamp/(2*2^(R.obs.SimOrd));
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
 
+tvec_obs = R.IntP.tvec;
+tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
+R.IntP.tvec_obs = tvec_obs;
+
 disp(sprintf('The Simulation is now %.2f seconds long',R.IntP.tend))
 
 disp(sprintf('The target simulation df is %.2f Hz',R.obs.csd.df));

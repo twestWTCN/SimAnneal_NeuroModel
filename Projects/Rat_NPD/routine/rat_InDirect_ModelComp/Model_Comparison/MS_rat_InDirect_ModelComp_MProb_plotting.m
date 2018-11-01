@@ -9,7 +9,7 @@ daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',
 
 load([R.rootn 'outputs\' R.out.tag '\' daglist{1} '\R_' R.out.tag '_' daglist{1} '.mat'])
 R = varo;
-load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
+load([R.rootn 'outputs\' R.out.tag '\modeProbs_v2.mat'])
 permMod = varo;
 
  R.analysis.modEvi.eps = -0.25;

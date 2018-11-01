@@ -6,11 +6,11 @@ R.out.tag = 'InDrt_ModComp';
 daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
     'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
     'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
+% If concatanating to previously computed model comp structure
+% %     load([R.rootn 'outputs\' R.out.tag '\modeProbs_v2.mat'])
+% % permMod = varo;
 
-    load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
-permMod = varo;
-
-for mnum =2:numel(permMod)
+for mnum =1:numel(daglist)
     % Load Model
     load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelspec_' R.out.tag '_' daglist{mnum} '.mat'])
     m = varo;
@@ -31,6 +31,7 @@ for mnum =2:numel(permMod)
     R = setSimTime(R,32);
     
  R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
+R.analysis.BAA = 0; % Turn off BAA flag (time-locked analysis)
     parOptBank = parBank(1:end-1,1:R.SimAn.minRank);
 %     if size(parOptBank,2)>2^10
 %         parOptBank = parOptBank(:,1:2^10);
@@ -46,5 +47,5 @@ for mnum =2:numel(permMod)
     else
         permMod{mnum} = [];
     end
-    saveMkPath([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'],permMod)
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\modeProbs_v2.mat'],permMod)
 end

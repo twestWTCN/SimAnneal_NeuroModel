@@ -1,4 +1,4 @@
-function [permMod xsimMod] = modelProbs(x,m,p,R)
+function [permMod] = modelProbs(x,m,p,R)
 % load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
 parOptBank = R.parOptBank;
 % figure
@@ -7,7 +7,7 @@ eps = R.analysis.modEvi.eps;
 
 % parOptBank = parOptBank(:,parOptBank(end,:)>eps);
 %% Compute KL Divergence
-[KL DKL] = KLDiv(R,p,m,parOptBank);
+[KL DKL] = KLDiv(R,p,m,parOptBank)
 N = R.analysis.modEvi.N;
 
 %% Resample parameters
@@ -33,32 +33,18 @@ end
 clear base
 base = repmat(spm_vec(p),1,N);
 for i = 1:N
-    base(pIndMap,i) = x1(:,i); % Insert changing pars into whole base pars
-    par{i} = spm_unvec(base(:,i),p);
+    base(pIndMap,i) = x1(:,i);
+    par{i} = spm_unvec(mean(base,2),p);
 end
-plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
-
-if R.analysis.BAA == 0
-    %% Setup Parfor
-    % if isempty(gcp)
-    %     parpool
-    % end
-    a = gcp;
-    ppm = ParforProgMon('Model Probability Calculation',N);
-    parforArg = a.NumWorkers;
-elseif R.analysis.BAA
-    % If doing BAA analysis of model
-    parforArg =0;
-    ppm = [];
-    N = 1;
-    % Take the expected parameters from distribution
-    par = [];
-    par{1} = spm_unvec(mean(base,2),p);
-end
-
+ plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
+% if isempty(gcp)
+%     parpool
+% end
+gcp
+ppm = ParforProgMon('Model Probability Calculation',N);
 %%Plot Example
 figure(5)
-pnew = par{1};
+pnew = par{2};
 %% Simulate New Data
 u = innovate_timeseries(R,m);
 u{1} = u{1}.*sqrt(R.IntP.dt);
@@ -76,9 +62,7 @@ if wflag ==0
     %%
     close all
 end
-parfor (jj = 1:N, parforArg)
-% for jj = 1:N
-    
+for jj = 1:N
     %     ppm.increment();
     pnew = par{jj};
     %% Simulate New Data
@@ -98,7 +82,6 @@ parfor (jj = 1:N, parforArg)
         end
         % Compare Pseudodata with Real
         r2mean  = R.IntP.compFx(R,feat_sim);
-        disp('Simulation Success!')
     else
         r2mean = -inf;
         feat_sim = NaN;
@@ -108,55 +91,46 @@ parfor (jj = 1:N, parforArg)
     r2rep{jj} = r2mean;
     par_rep{jj} = pnew;
     feat_rep{jj} = feat_sim;
-        disp(jj); %
-    if ~R.analysis.BAA
-        ppm.increment();
-        xsims_rep{jj} = [];
-    else
-        xsims_rep{jj} = xsims;
-    end
+    %     disp(jj); %
+    ppm.increment();
 end
 permMod.r2rep = r2rep;
 permMod.par_rep = par_rep;
 permMod.feat_rep = feat_rep;
 permMod.DKL = DKL;
 permMod.KL = KL;
-xsimMod = xsims_rep;
-
 % mkdir([R.rootn 'outputs\' R.out.tag '2\'])
 % save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 % load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
-% Do plotting
-if ~R.analysis.BAA
-    figure
-    r2bank = [permMod.r2rep{:}];
-    [h r] = hist(r2bank,50); %D is your data and 140 is number of bins.
-    h = h/sum(h); % normalize to unit length. Sum of h now will be 1.
-    bar(h, 'DisplayName', 'Model NRMSE');
-    xD = r(2:2:end);
-    xL = 2:2:length(r); % list of indices
-    set(gca,'XTick',xL)
-    set(gca,'XTickLabel',strsplit(num2str(xD,2),' '))
-    
-    legend('show');
-    ylabel('P(D-D*)'); xlabel('D-D*');
-    hold on
-    Yval = get(gca,'YLim')
-    
-    tmp = abs(xD-eps);
-    [idx idx] = min(tmp); %index of closest value
-    epsm = xL(xD==xD(idx)); %closest value
-    
-    plot([epsm epsm],Yval,'B--','linewidth',3)
-    
-    Pmod = numel(r2bank(r2bank>eps))/R.analysis.modEvi.N;
-    annotation(gcf,'textbox',...
-        [0.28 0.81 0.19 0.09],...
-        'String',{sprintf('eps = %.2f',eps),sprintf('P(m|D) = %.2f',Pmod)},...
-        'HorizontalAlignment','right',...
-        'FitBoxToText','off',...
-        'LineStyle','none');
-    set(gcf,'Position',[680 437 1070 541])
-    % saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r200',1);
-end
+figure
+r2bank = [permMod.r2rep{:}];
+[h r] = hist(r2bank,50); %D is your data and 140 is number of bins.
+h = h/sum(h); % normalize to unit length. Sum of h now will be 1.
+bar(h, 'DisplayName', 'Model NRMSE');
+xD = r(2:2:end);
+xL = 2:2:length(r); % list of indices
+set(gca,'XTick',xL)
+set(gca,'XTickLabel',strsplit(num2str(xD,2),' '))
+
+legend('show');
+ylabel('P(D-D*)'); xlabel('D-D*');
+hold on
+Yval = get(gca,'YLim')
+
+tmp = abs(xD-eps);
+[idx idx] = min(tmp); %index of closest value
+epsm = xL(xD==xD(idx)); %closest value
+
+plot([epsm epsm],Yval,'B--','linewidth',3)
+
+Pmod = numel(r2bank(r2bank>eps))/R.analysis.modEvi.N;
+annotation(gcf,'textbox',...
+    [0.28 0.81 0.19 0.09],...
+    'String',{sprintf('eps = %.2f',eps),sprintf('P(m|D) = %.2f',Pmod)},...
+    'HorizontalAlignment','right',...
+    'FitBoxToText','off',...
+    'LineStyle','none');
+set(gcf,'Position',[680 437 1070 541])
+% saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\modelEvidence.jpg'],'-jpg',1,'-r200',1);
+

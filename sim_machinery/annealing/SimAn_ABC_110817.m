@@ -20,8 +20,8 @@ function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
 % There are several plotting functions which will track the progress of the
 % annealing.
 % 
-% Timothy West (2018) - UCL Centre for Maths and Physics in the Life Sciences
-% /Wellcome Trust Centre for Human Neuroscience
+% Timothy West (2018) - UCL CoMPLEX
+% / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
 % Setup for annealing
 if nargin<6
@@ -77,7 +77,7 @@ while ii <= searchN
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-   parfor jj = 1:rep % Replicates for each temperature
+   for jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else
@@ -130,10 +130,10 @@ while ii <= searchN
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
-%                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
-%                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
-%                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-%                 close all
+                                                R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+                                                figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
+                                                subplot(2,1,2); plot(xsims_gl{1}{2}')
+                close all
             catch
                 disp('Observation/Cost Function Failure!')
                 r2 = -inf;
