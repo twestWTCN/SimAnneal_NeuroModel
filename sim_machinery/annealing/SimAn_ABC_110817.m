@@ -102,7 +102,7 @@ while ii <= searchN
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 glorg = pnew.obs.LF;
-                gainlist = linspace(-2,12,12);
+                gainlist = linspace(R.obs.glist(1),R.obs.glist(2),R.obs.glist(3));
                 feat_sim = cell(1,length(gainlist));
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
@@ -115,7 +115,7 @@ while ii <= searchN
                     end
                     % Run Data Transform d
                     if isfield(R.obs,'transFx')
-                        [~, feat_sim{gl} wflag] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
+                        [~, feat_sim{gl}, wflag] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
                     else
                         feat_sim{gl} = xsims_gl{gl}; % else take raw time series
                     end
