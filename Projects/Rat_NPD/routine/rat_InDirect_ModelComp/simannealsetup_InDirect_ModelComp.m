@@ -24,7 +24,7 @@ R.condnames = {'OFF'}; % VERIFY!!!
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
 % R.obs.obsFxArgs = '(xsims,m,pnew,R)';
-R.obs.gainmeth = {'boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.gainmeth = {'leadfield','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 
 R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
 R.obs.trans.norm = 0;
@@ -38,7 +38,7 @@ R.obs.csd.abovezero = 'False'; % Bring above zero
 % desired freq res:
 R.obs.csd.df = 0.5;
 R.obs.csd.reps = 32; %96;
-  LF = [1]; % Fit visually and for normalised data
+  LF = [1 1 1 1]*100; % Fit visually and for normalised data
 R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;

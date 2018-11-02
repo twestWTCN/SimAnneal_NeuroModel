@@ -102,12 +102,12 @@ while ii <= searchN
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 glorg = pnew.obs.LF;
-                gainlist = linspace(-2,2,6);
+                gainlist = linspace(-2,12,12);
                 feat_sim = cell(1,length(gainlist));
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
                 for gl = 1:length(gainlist)
-                    pnew.obs.LF = glorg + gainlist(gl);
+                    pnew.obs.LF = glorg + gainlist(gl)
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
                     else
@@ -131,7 +131,7 @@ while ii <= searchN
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
-% %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+%                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
 % %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
 % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
 % %                 close all
