@@ -1,4 +1,4 @@
-function [] = npdplotter_110717(NPD_data,NPD_sim,F,R,bestn,labelna)
+function ab = npdplotter_110717(NPD_data,NPD_sim,F,R,bestn,labelna)
 if isempty(NPD_data)
     NPD_data = {zeros(size(NPD_sim{1}))};
 end
@@ -29,8 +29,8 @@ for L = 1:length(NPD_sim)
                 k = k+1;
                 subplot(N,M,k)
                 if i == j
-                    plot(F,squeeze(NPD_sim_n(C,i,j,1,:)),'k--','linewidth',lwid); hold on
-                    plot(F,squeeze(NPD_data_n(C,i,j,1,:)),'k','linewidth',2)
+                    ab(1) = plot(F,squeeze(NPD_sim_n(C,i,j,1,:)),'k--','linewidth',lwid); hold on
+                    ab(2) = plot(F,squeeze(NPD_data_n(C,i,j,1,:)),'k','linewidth',2);
                     xlabel('Hz'); ylabel('Power'); %title(sprintf('Ch %1.f Pxx',i))
                 else
                     %                     a(3) = plot(F,squeeze(NPD_sim_n(C,i,j,1,:)),'k--','linewidth',lwid); hold on

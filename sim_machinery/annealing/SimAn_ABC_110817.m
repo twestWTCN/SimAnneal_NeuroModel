@@ -319,7 +319,8 @@ while ii <= searchN
             p = spm_unvec(mean(parOptBank,2),pOrg);
             iflag = 0;
         else % or draw from the top n of the parBank 
-            p = spm_unvec(mean(parBank(:,1:128),2),pOrg);
+            N = 1:size(parBank,2);
+            p = spm_unvec(mean(parBank(:,N<=128),2),pOrg);
             iflag = 0;
         end
     end
@@ -474,7 +475,7 @@ while ii <= searchN
         end
     end
     
-    uv = whos;
-    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
+%     uv = whos;
+%     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end

@@ -18,15 +18,16 @@ R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
 R.frqz = [6:.2:48];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MMC'};
-R.chsim_name = {'MMC'};
-R.condnames = {'ON'}; % VERIFY!!!
+R.chloc_name = {'GPE','STN'};
+R.chsim_name = {'GPE','STN'};
+R.condnames = {'OFF'}; % VERIFY!!!
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
 % R.obs.obsFxArgs = '(xsims,m,pnew,R)';
-R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.gainmeth = {'leadfield','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 
 R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
+R.obs.trans.norm = 0;
 % R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
 R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
