@@ -463,7 +463,7 @@ while ii <= searchN
         end
         ii = ii + 1;
     end
-    if itry>30
+    if itry>20
         disp('Itry Exceeded: Covergence')
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)

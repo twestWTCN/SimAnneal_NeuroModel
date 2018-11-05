@@ -1,8 +1,19 @@
 % MODEL 1:
 % SERIAL FLOW
 %%%%%%%%%%%%%%%%%%%%%%%%
+% IF FRESH!
+% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+%
+
 % simAnnealAddPaths()
 clear ; close all
+
+% Close all msgboxes
+handles = allchild(0);
+tags = get(handles,'Tag');
+isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
+delete(handles(isMsg));
+
 addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
 addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
@@ -13,7 +24,7 @@ addpath('C:\spm12')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(24312321)
+rng(342346)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -31,14 +42,18 @@ catch
     disp('Making Mod List!!')
 end
 %% Prepare Model
-for modID = 1:14
+for modID = 1:18
+    load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
         save([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
         disp('Writing to Mod List!!')
         fprintf('Now Fitting Model %.0f',modID)
         f = msgbox(sprintf('Fitting Model %.0f',modID));
-        [R p m uc] = MS_rat_InDirect_ModelComp_Model1(R);
+        
+        modelspec = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(modID)]);
+        [R p m uc] = modelspec(R);
+        pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_InDrt_ModComp_M%.0f',modID); % 'All Cross'
         

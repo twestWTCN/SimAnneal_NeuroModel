@@ -25,7 +25,7 @@ for i = 1:2
             Ma_s = M_s(M(:)>-30); Ma = M(M(:)>-30);
         end
         cmap = linspecer(5);
-        X = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
+        X = R.SimAn.pOptBound(1):.05:R.SimAn.pOptBound(2);
         QL = length(Ma);
         if QL>5
             QL = 5;
