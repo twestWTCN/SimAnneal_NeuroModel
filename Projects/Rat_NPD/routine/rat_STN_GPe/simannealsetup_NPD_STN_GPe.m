@@ -1,7 +1,7 @@
 function R = simannealsetup_NPD_STN_GPe()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'NPD_Final_JNPPaper';
+R.out.tag = 'STN_GPe_ModComp';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
@@ -25,9 +25,8 @@ R.condnames = {'OFF'}; % VERIFY!!!
 R.obs.obsFx = @observe_data;
 % R.obs.obsFxArgs = '(xsims,m,pnew,R)';
 R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
-R.obs.glist = [-2 10 13];
+R.obs.glist = [0 0 1];
 R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
-R.obs.trans.norm = 0;
 % R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
 R.obs.brn =2; % 2; % burn in time
 R.obs.norm = 'False';
@@ -43,7 +42,9 @@ R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
 R.obs.lowpass.order = 80;
-R.obs.logdetrend = 1; % Detrend Autospectra
+R.obs.logdetrend =1;
+R.obs.trans.norm = 1;
+R.obs.logscale = 0;
 %% INTEGRATION
 R.IntP.intFx = @spm_fx_compile_180817;
 % R.IntP.intFxArgs = '(R,x,uc,p,m)';
@@ -77,13 +78,14 @@ R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross_only'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.BG','.A','.B','.C','.obs.LF'}; %,'.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
 R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.starttemp = 2;
 R.SimAn.alpha = 0.98; % alpha increment
-R.SimAn.rep = 512; %512; % Repeats per temperature
+R.SimAn.rep = 80; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
 R.SimAn.jitter = 1;
