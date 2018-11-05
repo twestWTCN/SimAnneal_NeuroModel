@@ -1,7 +1,7 @@
 function R = simannealsetup_InDirect_ModelComp()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'InDirect_ModelComp';
+R.out.tag = 'InDrt_ModComp';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
@@ -44,7 +44,8 @@ R.obs.LF = LF;
 R.obs.mixing = [0.005 0.05];
 R.obs.lowpass.cutoff = 80;
 R.obs.lowpass.order = 80;
-R.obs.logdetrend = 1; % Detrend Autospectra
+R.obs.logdetrend =1;
+R.obs.trans.norm = 1;
 R.obs.logscale = 0;
 %% INTEGRATION
 R.IntP.intFx = @spm_fx_compile_180817;
@@ -76,19 +77,21 @@ R.obs.lowpass.fwts = fir1(R.obs.lowpass.order,Wn);
 
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'ForRev'; %%'ForRev'; %
-R.objfx.specspec = 'cross_only'; %%'auto'; % which part of spectra to fit
+R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.C'}; %,'.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
-R.SimAn.searchN = 100;
-R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.searchN = 200;
+R.SimAn.starttemp = 2;
+
+R.SimAn.Tm = 1; % Initial temperature
 R.SimAn.alpha = 0.98; % alpha increment
-R.SimAn.rep = 512; %512; % Repeats per temperature
+R.SimAn.rep = 448; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
-R.SimAn.jitter = 1;
+R.SimAn.jitter = 0.5;
 R.SimAn.copout = [2 3];
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
