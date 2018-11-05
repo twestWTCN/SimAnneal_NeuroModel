@@ -1,18 +1,18 @@
 % Compute Beta Burst Aligned Analysis
 % clear; close all
-simAnnealAddPaths()
-R.rootn = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
+% simAnnealAddPaths()
+R.rootn = 'C:\Users\Tim\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
 R.out.tag = 'InDrt_ModComp';
 daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
     'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
     'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
 
-    load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
-permMod = varo;
+%     load([R.rootn 'outputs\' R.out.tag '\modeProbs.mat'])
+% permMod = varo;
 mnum = 6; % best model
 
 % Load Model
-load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelspec_' R.out.tag '_' daglist{mnum} '.mat'])
+load([R.rootn 'outputs R.out.tag '\' daglist{mnum} '\modelspec_' R.out.tag '_' daglist{mnum} '.mat'])
 m = varo;
 % load modelfit
 load([R.rootn 'outputs\' R.out.tag '\' daglist{mnum} '\modelfit_' R.out.tag '_' daglist{mnum} '.mat'])

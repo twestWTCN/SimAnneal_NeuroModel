@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model4(R)
-% M4: Serial Flow - Indirect + Hyperdirect + STN feedback
+function [R p m uc] = MS_rat_InDirect_ModelComp_Model13(R)
+% Model 13 - NoStriatal/Naive
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
@@ -46,12 +46,12 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
-p.A{1}(4,1) = 0; % MMC -> STN
-p.A{1}(3,4) = 0; % STN -> GPe
+% p.A{1}(3,4) = 0; % STN -> GPe
+p.A{1}(4,1) = 0; % MMC -> STN (hyperdirect)
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-p.A{2}(3,2) = 0; % STR -| GPe
+% p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 
@@ -77,9 +77,9 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 1;
+        prec = 2;
     else
-        prec = 1;
+        prec = 1.5;
     end
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
@@ -91,3 +91,27 @@ for i = 1:m.m
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end
 
+% % % MMC Auto Flat Priors
+% % prec= 0.25;
+% % p.int{1}.T = [-0.0416 0.1269 -0.7104 -0.2497];
+% % p.int{1}.T_s = repmat(prec,size(p.int{1}.T));
+% % p.int{1}.G =[0.2380 0.5183 0.4816 0.7886 -0.1513 -0.8945 0.4353 0.2208 -0.4308 0.2065 0.7281 0.9148 0.6130 0.0499];
+% % p.int{1}.G_s = repmat(prec,size(p.int{1}.G));
+% % p.int{1}.S = 0.820;
+% % p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
+% % 
+% % %% SPECIFIC TO STN/GPe Resonator
+% % % GPe
+% % p.int{3}.T = 0.67;
+% % p.int{3}.T_s = prec;
+% % p.int{3}.G = -0.64;
+% % p.int{3}.G_s = prec;
+% % p.int{3}.S = 0.16;
+% % p.int{3}.S_s = prec;
+% % % STN
+% % p.int{4}.T = 1.5;
+% % p.int{4}.T_s = prec;
+% % p.int{4}.G = 2.25;
+% % p.int{4}.G_s = prec;
+% % p.int{4}.S = 0.09;
+% % p.int{4}.S_s = prec;
