@@ -24,7 +24,8 @@ R.condnames = {'OFF'}; % VERIFY!!!
 %% OBSERVATION 
 R.obs.obsFx = @observe_data;
 % R.obs.obsFxArgs = '(xsims,m,pnew,R)';
-R.obs.gainmeth = {'leadfield','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.glist = [0 0 1];
 
 R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
 R.obs.trans.norm = 0;

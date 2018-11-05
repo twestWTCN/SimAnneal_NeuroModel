@@ -1,16 +1,17 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model2(R)
-% M2: Serial Flow - Indirect with STN feedback
-m.m = 4; % # of sources
-m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
-m.Gint = [14 1 1 1 1];
-m.Tint = [4 1 1 1 1];
+function [R p m uc] = MS_rat_STN_GPe_ModelComp_Model3(R)
+% THIS IS THE STN/GPE
+% Gpe only!
+m.m = 2; % # of sources
+m.x = {[0 0]  [0 0]}; % Initial states
+m.Gint = [1 1];
+m.Tint = [1 1];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
     m.dipfit.model(i).source = R.chsim_name{i};
 end
 
-m.outstates = {[0 0 0 0 0 0 1 0] [1 0] [1 0] [1 0]};
+m.outstates = {[1 0] [1 0]};
 R.obs.outstates = find([m.outstates{:}]);
 for i=1:numel(R.chloc_name)
     R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
@@ -39,19 +40,16 @@ uc = innovate_timeseries(R,m);
 
 %% Prepare Priors
 % 1 MMC
-% 2 STR
 % 3 GPE
 % 4 STN
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(2,1) = 0; % MMC -> STR
-p.A{1}(3,4) = 0; % STN -> GPe
+% p.A{1}(1,2) = 0; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-p.A{2}(3,2) = 0; % STR -| GPe
-p.A{2}(4,3) = 0; % GPe -| STN
+p.A{2}(2,1) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
@@ -59,7 +57,7 @@ p.C = zeros(m.m,1);
 p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
-p.obs.LF = [1 1 1 1];
+p.obs.LF = [1 1];
 p.obs.LF_s = repmat(2,size(p.obs.LF));
 
 p.obs.mixing = [1]; %zeros(size(R.obs.mixing));
@@ -75,11 +73,9 @@ p.S_s = [0.2 0.2];
 
 % time constants and gains
 for i = 1:m.m
-    if i == 1
-        prec = 2;
-    else
-        prec = 1.5;
-    end
+    
+    prec = 1.5;
+    
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));

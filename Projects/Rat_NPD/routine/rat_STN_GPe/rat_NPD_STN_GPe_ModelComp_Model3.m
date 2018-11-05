@@ -1,5 +1,5 @@
-% MODEL 3:
-% SERIAL FLOW with Hyperdirect
+% THIS IS THE STN/GPE Model Comp
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 % simAnnealAddPaths()
 clear ; close all
@@ -9,37 +9,38 @@ addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
-addpath('C:\spm12')
+% addpath('C:\spm12')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
+%
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(24312321)
+rng(12312)
 
 %% Set Routine Pars
-R = simannealsetup_InDirect_ModelComp;
+R = simannealsetup_NPD_STN_GPe;
 
 %% Prepare the data
-R = prepareRatData_InDirect_Group_NPD(R);
-[R p m uc] = MS_rat_InDirect_ModelComp_Model3(R);
+R = prepareRatData_STN_GPe_NPD(R);
+
+%% Prepare Model
+[R p m uc] = MS_rat_STN_GPe_ModelComp_Model3(R);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-R.out.dag = 'NPD_InDrt_ModComp_M3'; % 'All Cross'
-R.out.tag = 'InDrt_ModComp';
+R.out.dag = 'NPD_STN_GPe_ModComp_M3'; % 'All Cross'
+R.out.tag = 'ModComp';
 R.plot.save = 'False';
-R.obs.logdetrend =1;
+R.obs.logdetrend = 1;
 R.obs.trans.norm = 1;
 
 R.SimAn.starttemp = 2;
-R.SimAn.rep =448; %256; %96; %512; % Repeats per temperature
+R.SimAn.rep =256; %512; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 1;(R);
-
-%% Prepare Model
+R.SimAn.jitter = 1;
 R.SimAn.searchN = 200;
-R = setSimTime(R,32);
+R = setSimTime(R,18);
 R.objfx.specspec = 'cross';
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.Bcond = 0;
 parBank = [];
 R.SimAn.copout = [2 3];
-[p] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);
+[p_M1] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);
 

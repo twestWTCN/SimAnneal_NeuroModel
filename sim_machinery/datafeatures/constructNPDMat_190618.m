@@ -50,7 +50,7 @@ for C = 1:O
                         else
                             Pxy =  Pxy(F>4);
                         end
-
+    
                         if R.obs.logscale == 1
                             Pxy = Pxy;
                         else

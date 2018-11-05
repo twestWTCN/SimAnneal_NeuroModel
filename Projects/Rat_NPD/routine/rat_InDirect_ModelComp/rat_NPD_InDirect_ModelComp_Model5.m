@@ -31,9 +31,9 @@ R.obs.trans.norm = 1;
 R.obs.logdetrend =1;
 
 R.SimAn.starttemp = 2;
-R.SimAn.rep =512; %256; %96; %512; % Repeats per temperature
+R.SimAn.rep =448; %256; %96; %512; % Repeats per temperature
 R.SimAn.Tm = 1;
-R.SimAn.jitter = 0.75;
+R.SimAn.jitter = 1;
 R.SimAn.searchN = 200;
 R = setSimTime(R,32);
 R.objfx.specspec = 'cross';
