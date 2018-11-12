@@ -1,4 +1,4 @@
-function optP = getOptParMean(m,p,R,d)
+function optP = getOptParMean(m,p,R,parBank)
 %% Resample parameters
 % load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\CSD_ABC_neatmodel_iterate2\parBank_CSD_ABC_neatmodel_iterate2_2017818.mat')
 % load([R.rootn 'outputs\' R.out.tag '2\parBank_' R.out.tag '2_' d '.mat'])
@@ -6,7 +6,7 @@ function optP = getOptParMean(m,p,R,d)
 % hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])
 eps = R.analysis.modEvi.eps;
 N = R.analysis.modEvi.N;
- parOptBank = R.parOptBank;
+parOptBank = parBank(1:end-1,1:R.SimAn.minRank);
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form

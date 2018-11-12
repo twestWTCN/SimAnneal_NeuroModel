@@ -27,7 +27,7 @@ rng(4342131)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
-R.objfx.specspec = 'cross'; 
+R.objfx.specspec = 'auto'; 
 %% Prepare the data
 R = prepareRatData_STN_GPe_NPD(R);
 
