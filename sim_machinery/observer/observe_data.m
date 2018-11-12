@@ -70,7 +70,7 @@ for condsel = 1:numel(R.condnames)
                 if any(Xstab(:)<0.2)
                     disp('SimFx is Stable (boring)!')
                     %                     close all
-                    error('SimFx is Stable (boring)!')
+%                     error('SimFx is Stable (boring)!')
                     wflag = 1;
                 end
                 
