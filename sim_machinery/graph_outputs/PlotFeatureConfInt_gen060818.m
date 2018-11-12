@@ -3,7 +3,7 @@ function  [hl, hp, dl,flag] = PlotFeatureConfInt_gen060818(R,permMod,fighan)
 CSD_data_n = permMod.feat_rep{1};
 % list = find([permMod.r2rep{:}]>-0.2,1)
 % list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],99));
-list = find([permMod.r2rep{:}]>R.analysis.modEvi.eps);
+list = find([permMod.r2rep{:}]>R.modcomp.modEvi.eps);
 C = size(CSD_data_n,1); N = size(CSD_data_n,2); M = size(CSD_data_n,3);O = size(CSD_data_n,4);
 if ~isempty(list)
     for ii = 1:size(list,2)

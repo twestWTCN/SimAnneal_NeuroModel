@@ -75,17 +75,17 @@ R.obs.lowpass.fwts = fir1(R.obs.lowpass.order,Wn);
 
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'ForRev'; %%'ForRev'; %
-R.objfx.specspec = 'cross_only'; %%'auto'; % which part of spectra to fit
+R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
 R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 100;
-R.SimAn.Tm = 0.8; % Initial temperature
+R.SimAn.Tm = 1; % Initial temperature
 R.SimAn.starttemp = 2;
 R.SimAn.alpha = 0.98; % alpha increment
-R.SimAn.rep = 80; %512; % Repeats per temperature
+R.SimAn.rep = 256; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 % R.SimAn.maxdev = 12;
 R.SimAn.jitter = 1;

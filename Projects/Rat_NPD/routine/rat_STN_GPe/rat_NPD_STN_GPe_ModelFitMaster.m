@@ -1,5 +1,4 @@
-% MODEL 1:
-% SERIAL FLOW
+%STN GPE MOD FIT MASTER
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH!
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
@@ -28,7 +27,7 @@ rng(4342131)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
-
+R.objfx.specspec = 'auto'; 
 %% Prepare the data
 R = prepareRatData_STN_GPe_NPD(R);
 

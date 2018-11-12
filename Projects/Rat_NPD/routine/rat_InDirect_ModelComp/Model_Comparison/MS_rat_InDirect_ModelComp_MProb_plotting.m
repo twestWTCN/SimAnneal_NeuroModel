@@ -1,16 +1,14 @@
+% PLOT MODEL RELATIVE PROBABILITIES
+clear; close all
+%% Add Paths
 % simAnnealAddPaths()
-close all
+%% Set Routine Pars
+R = simannealsetup_InDirect_ModelComp;
 
-R.rootn = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
-R.out.tag = 'InDrt_ModComp';
-daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
-    'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
-    'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
+%% Get Data Features
+R = prepareRatData_InDirect_Group_NPD(R);
 
-load([R.rootn 'outputs\' R.out.tag '\' daglist{1} '\R_' R.out.tag '_' daglist{1} '.mat'])
-R = varo;
-load([R.rootn 'outputs\' R.out.tag '\modeProbs_v2.mat'])
-permMod = varo;
-
- R.analysis.modEvi.eps = -0.25;
-plotModComp(R,permMod)
+R.modcomp.modEvi.eps = -0.5;
+R.modcomp.modN = 18;
+R.modcompplot.NPDsel = [6 12 15];
+plotModComp_091118(R)

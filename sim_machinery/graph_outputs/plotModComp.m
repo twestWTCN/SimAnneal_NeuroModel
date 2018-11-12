@@ -1,4 +1,4 @@
-function plotModComp(R,permMod)
+function plotModComp_091118(R,permMod)
 % addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\violin')
 R.plot.confint = 'none';
 % cmap = brewermap(7,'Set2');

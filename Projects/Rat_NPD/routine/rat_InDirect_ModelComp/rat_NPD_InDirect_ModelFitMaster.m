@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH!
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
-%
+% MODEL 4 6 (NOT WORKING!)
 
 % simAnnealAddPaths()
 clear ; close all
@@ -41,7 +41,7 @@ catch
     save([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     disp('Making Mod List!!')
 end
-%% Prepare Model
+
 for modID = 1:18
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
@@ -51,12 +51,13 @@ for modID = 1:18
         fprintf('Now Fitting Model %.0f',modID)
         f = msgbox(sprintf('Fitting Model %.0f',modID));
         
+        %% Prepare Model
         modelspec = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_InDrt_ModComp_M%.0f',modID); % 'All Cross'
         
+        %% Run ABC Optimization
         R = setSimTime(R,32);
         R.Bcond = 0;
         parBank = [];
