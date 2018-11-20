@@ -1,10 +1,7 @@
-% COMPUTE MODEL RELATIVE PROBABILITIES
-% clear; close all
-%% Add Paths
-simAnnealAddPaths()
-%% Set Routine Pars
-R = simannealsetup_InDirect_ModelComp;
-
+function modelCompMaster(R,WML)
+if nargin>1
+      save([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
+end  
 
 %% Setup for parallelisation (multiple MATLAB sessions)
 try
@@ -19,7 +16,7 @@ catch
 end
 
 %% Main Loop
-for modID =1:18
+for modID =1:3
     load([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
     permMod = [];
     if ~any(intersect(WML,modID))
@@ -30,7 +27,7 @@ for modID =1:18
         f = msgbox(sprintf('Probabilities for Model %.0f',modID));
        
         
-        dagname = sprintf('NPD_InDrt_ModComp_M%.0f',modID);
+        dagname = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
         % Load Model
         load([R.rootn 'outputs\' R.out.tag '\' dagname '\modelspec_' R.out.tag '_' dagname '.mat'])
         m = varo;
@@ -42,7 +39,7 @@ for modID =1:18
         load([R.rootn 'outputs\' R.out.tag '\' dagname '\R_' R.out.tag '_' dagname '.mat'])
         R = varo;
         R.Mfit = A;
-        a = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(modID)]);
+        a = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
         [dum prior] = a(R);
         R.Mfit.prior = prior;
         % load parbank?
@@ -52,10 +49,7 @@ for modID =1:18
         
         R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
         R.analysis.BAA = 0; % Turn off BAA flag (time-locked analysis)
-        parOptBank = parBank(1:end-1,1:R.SimAn.minRank);
-        %     if size(parOptBank,2)>2^10
-        %         parOptBank = parOptBank(:,1:2^10);
-        %     end
+        parOptBank = parBank(1:end-1,1:2^10);
         
         if  size(parOptBank,2)>1
             R.parOptBank = parOptBank;

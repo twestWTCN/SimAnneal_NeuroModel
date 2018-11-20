@@ -45,7 +45,7 @@ uc = innovate_timeseries(R,m);
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-% p.A{1}(1,2) = 0; % STN -> GPe
+p.A{1}(1,2) = -4; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);

@@ -3,7 +3,7 @@ function  [hl, hp, dl,flag] = PlotFeatureConfInt_gen060818(R,permMod,fighan)
 CSD_data_n = permMod.feat_rep{1};
 % list = find([permMod.r2rep{:}]>-0.2,1)
 % list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],99));
-list = find([permMod.r2rep{:}]>R.modcomp.modEvi.eps);
+list = find([permMod.r2rep{:}]>R.modcomp.modEvi.epspop);
 C = size(CSD_data_n,1); N = size(CSD_data_n,2); M = size(CSD_data_n,3);O = size(CSD_data_n,4);
 if ~isempty(list)
     for ii = 1:size(list,2)
@@ -35,8 +35,8 @@ if ~isempty(list)
     elseif strncmp(R.data.datatype,'NPD',3)
         partlabs ={'Instant','Forward','Backward'}; msr = 'NPD';
         CSD_mean = mean(CSD_bank,5);
-        CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5);%./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,25,5);
-        CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5);%./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,75,5);
+        CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,25,5);
+        CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,75,5);
     end
     % F = repmat(R.frqz',1,3);
     F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));

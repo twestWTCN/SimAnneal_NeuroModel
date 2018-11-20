@@ -1,7 +1,7 @@
 clear ; close all
 
 %  simAnnealAddPaths()
-rng(6453)
+rng(23123)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
@@ -12,29 +12,16 @@ R.analysis.modEvi.eps = prctile(parBank(end,:),75); % Get models above 75th perc
 R.analysis.modEvi.N = 1000;
 optP = getOptParMean(m,p,R,parBank);
 
-%% Set expected values
-% GPE Prior means
-GPe.G = [2]*200;   % synaptic connection strengths
-GPe.T = [8];       % synaptic time constants;
-GPe.E  = [.2 .2 -.2 -.2]*10000;             % GPE connections
-
-% STN Prior means
-STN.G = [2]*200;   % synaptic connection strengths
-STN.T = [4];       % synaptic time constants ;
-STN.E  = [.2 .2 -.2 -.2]*10000;             % STN connections
-contmap = [5 10 15 20;-1 0 1 2];
-
 %% Parameter Sweep across STN/GPe Subcircuit Connections
-N = 32;
+N = 8;
 parsweep.N = N;
 parsweep.R = '.A{1}(1,2)';
-parsweep.Rname = 'STN-> GPe Connections Strength (kHz)';
+parsweep.Rname = 'STN-> GPe Connections Strength';
 parsweep.Rlist = linspace(-2,3,N);
-parsweep.Rlist_tick = STN.E(1)*exp(parsweep.Rlist);
 parsweep.Q = '.A{2}(2,1)';
-parsweep.Qname = 'GPe-|STN Connections Strength (kHz)';
+parsweep.Qname = 'GPe-|STN Connections Strength';
 parsweep.Qlist = linspace(-2,3,N);
-parsweep.Qlist_tick = GPe.E(1)*exp(parsweep.Qlist);
+
 parsweep.InvertXY = [optP.A{1}(1,2) optP.A{2}(2,1)];
 
 % Conduct sweep
@@ -49,22 +36,14 @@ load([pathstr '\'  R.out.dag '_A_parsweep'],'parsweep');
 
 % Plot heatmap
 figure(4)
-set(gcf,'Position',[680   319   853   779])
 for i = 1:numel(R.chsim_name)
     if i == 1
         parsweep.plot.feat = squeeze(parsweep.maxfrqBank(2,:,:));
-        parsweep.contmap = contmap(1,:);
     elseif i == 2
         parsweep.plot.feat = log10(squeeze(parsweep.frqPowBank(2,:,:)));
-        parsweep.contmap = contmap(2,:);
     end
     subplot(2,2,i)
     parSweepPlot(R,parsweep)
-    
-    g = gca;
-    g.XTickLabel = sprintfc('%.2f',(STN.E(1).*exp(g.XTick))./1000);
-    g.YTickLabel = sprintfc('%.2f',(GPe.E(1).*exp(g.YTick))./1000);
-         
     xlabel(parsweep.Rname,'FontSize',10)
     ylabel(parsweep.Qname,'FontSize',10)
     axis square
@@ -87,17 +66,16 @@ R.analysis.modEvi.eps = -0.5;
 R.analysis.modEvi.N = 1000;
 optP = getOptParMean(m,p,R,parBank);
 
-N = 32;
+N = 128;
 parsweep.N = N;
-parsweep.R = '.int{2}.T';
-parsweep.Rname = 'STN Time Constant (ms)';
+parsweep.R = '.int{1}.T';
+parsweep.Rname = 'GPe Time Constant';
 parsweep.Rlist = linspace(-2,3,N);
-parsweep.Rlist_tick = STN.T.*exp(parsweep.Rlist);
-parsweep.Q = '.int{1}.T';
-parsweep.Qname = 'GPe Time Constant (ms)';
+parsweep.Q = '.int{2}.T';
+parsweep.Qname = 'STN Time Constant';
 parsweep.Qlist = linspace(-2,3,N);
-parsweep.Qlist_tick = GPe.T.*exp(parsweep.Rlist);
-parsweep.InvertXY = [optP.int{2}.T optP.int{1}.T];
+parsweep.InvertXY = [optP.int{1}.T optP.int{2}.T];
+
 % Conduct sweep
 R.obs.gainmeth = {'unitvar'};
 parsweep = modelBetaParSweep(m,optP,parsweep,R);
@@ -112,18 +90,11 @@ figure(4)
 for i = 1:numel(R.chsim_name)
     if i == 1
         parsweep.plot.feat = squeeze(parsweep.maxfrqBank(2,:,:));
-        parsweep.contmap = contmap(1,:);
     elseif i == 2
         parsweep.plot.feat = log10(squeeze(parsweep.frqPowBank(2,:,:)));
-        parsweep.contmap = contmap(2,:);
     end
     subplot(2,2,i+2)
     parSweepPlot(R,parsweep)
-    
-    g = gca;
-    g.XTickLabel = sprintfc('%.2f',(STN.T(1).*exp(g.XTick)));
-    g.YTickLabel = sprintfc('%.2f',(GPe.T(1).*exp(g.YTick)));
-    
     xlabel(parsweep.Rname,'FontSize',10)
     ylabel(parsweep.Qname,'FontSize',10)
     axis square

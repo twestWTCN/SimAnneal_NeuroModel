@@ -1,8 +1,24 @@
-function plotModComp_091118(R)
+function plotModComp_091118(R,cmap)
 % addpath('C:\Users\Tim\Documents\MATLAB_ADDONS\violin')
-R.plot.confint = 'none';
-cmap = brewermap(18,'Spectral');
-% cmap = linspecer(R.modcomp.modN);
+% R.plot.confint = 'none';
+if nargin<2
+    cmap = brewermap(R.modcomp.modN,'Spectral');
+    % cmap = linspecer(R.modcomp.modN);
+end
+%% First get probabilities so you can compute model space epsilon
+for modID = 1:R.modcomp.modN
+    dagname = sprintf([R.out.tag '_M%.0f'],modID);
+    load([R.rootn 'outputs\' R.out.tag '\NPD_' dagname '\modeProbs_' R.out.tag '_NPD_' dagname '.mat'])
+    A = varo; %i.e. permMod
+    
+    if ~isempty(A)
+        r2rep = [A.r2rep{:}];
+        r2rep(isnan(r2rep) | isinf(r2rep)) = [];
+        r2bank{modID} = r2rep;
+    end
+end
+r2bank = horzcat(r2bank{:});
+R.modcomp.modEvi.epspop = prctile(r2bank,50); % threshold becomes median of model fits
 
 p = 0;
 mni = 0;
@@ -28,7 +44,7 @@ for modID = 1:R.modcomp.modN
         
         KL(modID) = sum(A.KL);
         DKL(modID) = sum(A.DKL);
-        pmod(modID) = sum(r2rep>R.modcomp.modEvi.eps)/ size(r2rep,2);
+        pmod(modID) = sum(r2rep>R.modcomp.modEvi.epspop)/ size(r2rep,2);
         
         h = figure(10);
         R.plot.cmap = cmap(modID,:);
@@ -59,6 +75,8 @@ longlab{end+1} = 'Data';
 figure(2)
 subplot(3,1,1)
 violin(r2repSave,'facecolor',cmap,'medc','k:','xlabel',shortlab)
+hold on
+plot([0 R.modcomp.modN+1],[R.modcomp.modEvi.epspop R.modcomp.modEvi.epspop],'k--') 
 xlabel('Model'); ylabel('NMRSE'); grid on; ylim([-1.5 0.25])
 a = gca; a.XTick = 1:R.modcomp.modN;
 a.XTickLabel = shortlab;
@@ -75,7 +93,7 @@ for i = 1:R.modcomp.modN
 end
 a = gca; a.XTick = 1:R.modcomp.modN; grid on
 a.XTickLabel = shortlab;
-xlabel('Model'); ylabel('-log_10 P(M|D)')
+xlabel('Model'); ylabel('-log_{10} P(M|D)')
 
 subplot(3,1,3)
 for i = 1:R.modcomp.modN

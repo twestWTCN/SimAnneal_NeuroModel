@@ -1,4 +1,7 @@
-function R = prepareRatData_STN_GPe_NPD(R)
+function R = prepareRatData_STN_GPe_NPD(R,plotop)
+if nargin<2
+    plotop = 1;
+end
 % prepareratdata_group(R.rootn,R.projectn);
 load([R.filepathn '\NPD_paper_RatNPD_150618.mat']);
 NPDmat = fyA;
@@ -66,8 +69,10 @@ R.data.feat_emp = meannpd_data;
 R.data.feat_xscale = R.frqz;
 
 % Plot CSD
-if strcmp('CSD',R.data.datatype)
-    csdplotter_220517({meannpd_data},[],F_data,R)
-elseif strcmp('NPD',R.data.datatype)
-    npdplotter_110717({meannpd_data},[],R.frqz,R,[],[])
+if plotop ==1
+    if strcmp('CSD',R.data.datatype)
+        csdplotter_220517({meannpd_data},[],F_data,R)
+    elseif strcmp('NPD',R.data.datatype)
+        npdplotter_110717({meannpd_data},[],R.frqz,R,[],[])
+    end
 end

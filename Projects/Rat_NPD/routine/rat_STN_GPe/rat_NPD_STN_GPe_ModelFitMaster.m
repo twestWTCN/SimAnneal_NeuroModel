@@ -50,7 +50,7 @@ for modID = 1:3
         fprintf('Now Fitting Model %.0f',modID)
         f = msgbox(sprintf('Fitting Model %.0f',modID));
         
-        modelspec = eval(['@MS_rat_STN_GPe_ModelComp_Model' num2str(modID)]);
+        modelspec = eval(['@MS_rat_STN_GPe_ModComp_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

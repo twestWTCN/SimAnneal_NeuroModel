@@ -49,7 +49,7 @@ p.A{1}(1,2) = 0; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-% p.A{2}(2,1) = 0; % GPe -| STN
+p.A{2}(2,1) = -4; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
