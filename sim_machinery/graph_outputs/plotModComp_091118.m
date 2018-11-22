@@ -84,7 +84,7 @@ a.XTickLabel = shortlab;
 figure(2)
 subplot(3,1,1)
 h = findobj(gca,'Type','line');
-legend(hl,longlab{[R.modcompplot.NPDsel end]})
+% legend(hl,{longlab{[R.modcompplot.NPDsel end]}})
 
 subplot(3,1,2)
 for i = 1:R.modcomp.modN

@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model12(R)
-% Model 12 - Hyperdirect/M2 Flat + STN Beta
+function [R p m uc] = MS_rat_InDrt_ModComp_Model18(R)
+% Model 18 - NoStriatal/M2 Flat + STN Beta
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
@@ -51,7 +51,7 @@ p.A{1}(4,1) = 0; % MMC -> STN (hyperdirect)
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-p.A{2}(3,2) = 0; % STR -| GPe
+% p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 

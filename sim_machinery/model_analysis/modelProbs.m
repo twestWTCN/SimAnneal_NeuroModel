@@ -63,7 +63,7 @@ pnew = par{1};
 u = innovate_timeseries(R,m);
 u{1} = u{1}.*sqrt(R.IntP.dt);
 [xsims,tvec,wflag] = R.IntP.intFx(R,m.x,u,pnew,m);
-if wflag ==0
+if wflag == 0
     % Run Observer function
     if isfield(R.obs,'obsFx')
         [xsims R] = R.obs.obsFx(xsims,m,pnew,R);
@@ -76,46 +76,55 @@ if wflag ==0
     %%
     close all
 end
-parfor (jj = 1:N, parforArg)
-% for jj = 1:N
-    
-    %     ppm.increment();
-    pnew = par{jj};
-    %% Simulate New Data
-    u = innovate_timeseries(R,m);
-    u{1} = u{1}.*sqrt(R.IntP.dt);
-    [xsims,tvec,wflag] = R.IntP.intFx(R,m.x,u,pnew,m);
-    if wflag == 0
-        % Run Observer function
-        if isfield(R.obs,'obsFx')
-            xsims = R.obs.obsFx(xsims,m,pnew,R);
-        end
-        % Run Data Transform
-        if isfield(R.obs,'transFx')
-            [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
+
+wfstr = ones(1,N);
+while wfstr(end)>0
+    parfor (jj = 1:N, parforArg)
+        % for jj = 1:N
+        
+        %     ppm.increment();
+        pnew = par{jj};
+        %% Simulate New Data
+        u = innovate_timeseries(R,m);
+        u{1} = u{1}.*sqrt(R.IntP.dt);
+        [xsims,tvec,wflag] = R.IntP.intFx(R,m.x,u,pnew,m);
+        wfstr(jj) = wflag;
+        if wflag == 0
+            % Run Observer function
+            if isfield(R.obs,'obsFx')
+                xsims = R.obs.obsFx(xsims,m,pnew,R);
+            end
+            % Run Data Transform
+            if isfield(R.obs,'transFx')
+                [~,feat_sim] = R.obs.transFx(xsims,R.chloc_name,R.chloc_name,1/R.IntP.dt,R.obs.SimOrd,R);
+            else
+                feat_sim = xsims; % else take raw time series
+            end
+            % Compare Pseudodata with Real
+            r2mean  = R.IntP.compFx(R,feat_sim);
+            disp('Simulation Success!')
         else
-            feat_sim = xsims; % else take raw time series
+            r2mean = -inf;
+            feat_sim = NaN;
+            disp('Simulation error!')
         end
-        % Compare Pseudodata with Real
-        r2mean  = R.IntP.compFx(R,feat_sim);
-        disp('Simulation Success!')
-    else
-        r2mean = -inf;
-        feat_sim = NaN;
-        disp('Simulation error!')
-    end
-    %     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
-    r2rep{jj} = r2mean;
-    par_rep{jj} = pnew;
-    feat_rep{jj} = feat_sim;
+        %     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
+        r2rep{jj} = r2mean;
+        par_rep{jj} = pnew;
+        feat_rep{jj} = feat_sim;
         disp(jj); %
+        if ~R.analysis.BAA
+            ppm.increment();
+            xsims_rep{jj} = [];
+        else
+            xsims_rep{jj} = xsims;
+        end
+    end
     if ~R.analysis.BAA
-        ppm.increment();
-        xsims_rep{jj} = [];
-    else
-        xsims_rep{jj} = xsims;
+        wfstr(end) = 0;
     end
 end
+
 permMod.r2rep = r2rep;
 permMod.par_rep = par_rep;
 permMod.feat_rep = feat_rep;

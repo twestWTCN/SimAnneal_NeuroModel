@@ -6,9 +6,11 @@ R.out.tag = 'InDrt_ModComp';
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
+    R.BBA_path = 'C:\Users\Tim\Documents\Work\GIT\Cortical_Parkinsons_Networks\BetaBursts';
 else
     R.rootn = ['C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\sim_machinery';
+    R.BBA_path = 'C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\BetaBursts';
 end
 % addpath(genpath(R.rootn))
 % addpath(genpath(R.rootm))

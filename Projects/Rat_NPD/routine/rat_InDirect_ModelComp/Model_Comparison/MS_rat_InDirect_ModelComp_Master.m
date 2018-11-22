@@ -9,16 +9,16 @@ delete(handles(isMsg));
 %% Add Paths
 % simAnnealAddPaths()
 %% Set Routine Pars
-R = simannealsetup_NPD_STN_GPe;
+R = simannealsetup_InDirect_ModelComp;
 % Get empirical data
-R = prepareRatData_STN_GPe_NPD(R,0); 
+R = prepareRatData_InDirect_Group_NPD(R,0); 
 
 %% Do the model probability computations
 modelCompMaster(R)
 
 %% Plot the modComp results
-R.modcomp.modN = 3;
-R.modcompplot.NPDsel = [1:3];
+R.modcomp.modN = 18;
+R.modcompplot.NPDsel = [6 12 15];
 R.plot.confint = 'yes';
 cmap = linspecer(R.modcomp.modN);
 plotModComp_091118(R,cmap)
