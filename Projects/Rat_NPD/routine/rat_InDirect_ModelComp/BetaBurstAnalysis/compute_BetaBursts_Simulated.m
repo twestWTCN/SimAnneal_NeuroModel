@@ -1,16 +1,16 @@
 function BB = compute_BetaBursts_Simulated(R)
-addpath(R.BBA_path)
-load([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'])
+load([R.rootn '\routine\rat_InDirect_ModelComp\BetaBurstAnalysis\Data\Indirect_Sims.mat'])
+
 for cond = 1:3
     if cond == 1
-        vc_clean.trial{1} = xsimMod{1}{1}{1}([1 4],:);
+        vc_clean.trial{1} = xsimMod{1}{1}([1 4],:);
     elseif cond == 2
-        vc_clean.trial{1} = xsimMod{2}{1}{1}([1 4],:);
+        vc_clean.trial{1} = xsimModHD{1}{1}([1 4],:);
     elseif cond == 3
-        vc_clean.trial{1} = xsimMod{3}{1}{1}([1 4],:);
+        vc_clean.trial{1} = xsimModSTR{1}{1}([1 4],:);
     end
     vc_clean.fsample = 2000;
-    vc_clean.time{1} = linspace(0,size(xsimMod{1}{1}{1},2)/2000,size(xsimMod{1}{1}{1},2));
+    vc_clean.time{1} = linspace(0,size(xsimModSTR{1}{1},2)/2000,size(xsimMod{1}{1},2));
     vc_clean.label = {'MMC','STN'};
     
     cfg = [];
@@ -21,7 +21,7 @@ for cond = 1:3
     plotop = 1;
     surflag = 0;
     R.BB.PLmeth = 'PPC';
-    R.bandinits = {'\alpha','\beta_1','\beta_2'};
+R.bandinits = {'\alpha','\beta_1','\beta_2'};
     R.bandname = {'Alpha','B1','B2'};
     R.SW.winsize = 0.5;
     R.SW.winover = 0.95;
@@ -49,8 +49,8 @@ BB.TSw = linspace(0,length([BB.PLV{1:2}])/BB.fsamp_sw,length([BB.PLV{1:2}]));
 %                                         surflag = 0;
 % ThresholdAmplitude
 if surflag == 0
-    BB.epsAmp = prctile([BB.A{1:2}],80,2);
-    BB.epsPLV = prctile([BB.PLV{1:2}],80,2);
+    BB.epsAmp = prctile([BB.A{:}],80,2);
+    BB.epsPLV = prctile([BB.PLV{:}],80,2);
 else
     BORG = load([R.datapathr R.subname{sub} '\ftdata\BetaBursts\BetaBurstAnalysis_' R.siden{side} '_' R.ipsicon  '_' R.bregname{breg} '_org'],'BB');
     BB.epsAmp = BORG.BB.epsAmp;
@@ -95,5 +95,5 @@ BB = computeBetaBurstRPStats(R,BB,F,plotop);
 % Save to data structure
 %     mkdir([R.datapathr R.subname{sub} '\ftdata\BetaBursts'])
 %     save([R.datapathr R.subname{sub} '\ftdata\BetaBursts\BetaBurstAnalysis_' R.siden{side} '_' R.ipsicon  '_' R.bregname{breg} '_' surrtag],'BB')
-rmpath(R.BBA_path)
+
 % ! shutdown /h

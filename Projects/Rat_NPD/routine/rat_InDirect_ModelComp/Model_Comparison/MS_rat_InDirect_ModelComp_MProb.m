@@ -4,7 +4,7 @@
 simAnnealAddPaths()
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
-modelCompMaster(R,WML)
+
 
 %% Setup for parallelisation (multiple MATLAB sessions)
 try

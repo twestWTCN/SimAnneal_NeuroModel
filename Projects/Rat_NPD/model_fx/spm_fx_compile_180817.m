@@ -207,7 +207,6 @@ for condsel = 1:numel(R.condnames)
     else
         xstore = x;
     end
-%     xstore = [xstore nan(size(xstore,1),R.IntP.nt-R.IntP.buffer)];
     xint = zeros(m.n,1);
     TOL = exp(-4);
     for tstep = R.IntP.buffer:R.IntP.nt
