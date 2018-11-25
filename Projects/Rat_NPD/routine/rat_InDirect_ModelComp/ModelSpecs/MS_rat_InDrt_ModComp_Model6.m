@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model12(R)
-% Model 12 - Hyperdirect/M2 Flat + STN Beta
+function [R p m uc] = MS_rat_InDrt_ModComp_Model6(R)
+% Model 6 - Serial/M2 Flat + STN Beta
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
@@ -47,7 +47,6 @@ uc = innovate_timeseries(R,m);
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
 p.A{1}(3,4) = 0; % STN -> GPe
-p.A{1}(4,1) = 0; % MMC -> STN (hyperdirect)
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);

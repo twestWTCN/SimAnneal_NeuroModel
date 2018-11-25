@@ -1,9 +1,16 @@
 function [xsims_c R wflag] = observe_data(xstore,m,p,R)
 for condsel = 1:numel(R.condnames)
-    
+    wflag = 0;
     xsims = xstore{condsel}(R.obs.outstates,:);
     % Delete burnin
-    xsims(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
+    if size(xsims,2) > 5*round(R.obs.brn*(1/R.IntP.dt))
+        xsims(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
+    else
+        wflag = 1;
+        xsims_c{condsel} = xsims;
+        warning('Simulation is shorter than burn length!!!')
+        return
+    end
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
@@ -55,22 +62,22 @@ for condsel = 1:numel(R.condnames)
                 end
             case 'boring'
                 Xstab = [];
-%                                 figure
-%                                 plot(xsims'); shg
+                %                                 figure
+                %                                 plot(xsims'); shg
                 for j = 1:size(xsims,1)
-%                     swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/12), 0);
-%                     swX = swX(:,2:end-1);
-%                     Xstab(j,1) = std(abs(mean(swX)));%<0.01;
+                    %                     swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/12), 0);
+                    %                     swX = swX(:,2:end-1);
+                    %                     Xstab(j,1) = std(abs(mean(swX)));%<0.01;
                     Xstab(j,1) =std(diff(abs(hilbert(xsims(j,:)))))/std(diff(xsims(j,:)));
                     A = xsims(j,:);
                     Xstab(j,2) = std(diff(findpeaks(A)))/std(diff(xsims(j,:)));
-%                     autocorr(
+                    %                     autocorr(
                     %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
                 end
                 if any(Xstab(:)<0.2)
                     disp('SimFx is Stable (boring)!')
                     %                     close all
-%                     error('SimFx is Stable (boring)!')
+                    %                     error('SimFx is Stable (boring)!')
                     wflag = 1;
                 end
                 

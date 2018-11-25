@@ -1,5 +1,5 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model14(R)
-% Model 14 - NoStriatal/M2 Flat
+function [R p m uc] = MS_rat_InDrt_ModComp_Model5(R)
+% Model 5 - Serial/M2 Flat
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
@@ -46,12 +46,11 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
-% p.A{1}(3,4) = 0; % STN -> GPe
-p.A{1}(4,1) = 0; % MMC -> STN (hyperdirect)
+p.A{1}(3,4) = 0; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-% p.A{2}(3,2) = 0; % STR -| GPe
+p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 

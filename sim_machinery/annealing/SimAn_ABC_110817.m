@@ -463,8 +463,8 @@ while ii <= searchN
         end
         ii = ii + 1;
     end
-    if itry>20
-        disp('Itry Exceeded: Covergence')
+    if itry>R.SimAn.convterm
+        disp('Itry Exceeded: Convergence')
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'],R)

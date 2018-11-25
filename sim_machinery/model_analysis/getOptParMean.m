@@ -6,7 +6,12 @@ function optP = getOptParMean(m,p,R,parBank)
 % hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])
 eps = R.analysis.modEvi.eps;
 N = R.analysis.modEvi.N;
-parOptBank = parBank(1:end-1,1:R.SimAn.minRank);
+parOptBank = parBank(1:end-1,parBank(end,:)>eps);
+% Ensure manageable size
+if size(parOptBank,2)>2^10
+    parOptBank = parOptBank(:,1:2^10);
+end
+
 % Compute indices of optimised parameter
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form

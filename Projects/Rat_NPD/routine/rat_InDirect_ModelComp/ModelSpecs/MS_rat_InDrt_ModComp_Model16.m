@@ -1,4 +1,4 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_Model16(R)
+function [R p m uc] = MS_rat_InDrt_ModComp_Model16(R)
 % Model 16 - NoStriatal/STN Beta
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states

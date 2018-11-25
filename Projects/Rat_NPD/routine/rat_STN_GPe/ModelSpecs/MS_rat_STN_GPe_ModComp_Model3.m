@@ -1,6 +1,6 @@
-function [R p m uc] = MS_rat_STN_GPe_ModelComp_Model2(R)
+function [R p m uc] = MS_rat_STN_GPe_ModelComp_Model3(R)
 % THIS IS THE STN/GPE
-% stn only!
+% Gpe only!
 m.m = 2; % # of sources
 m.x = {[0 0]  [0 0]}; % Initial states
 m.Gint = [1 1];
@@ -45,11 +45,11 @@ uc = innovate_timeseries(R,m);
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(1,2) = 0; % STN -> GPe
+p.A{1}(1,2) = -4; % STN -> GPe
 p.A_s{1} = repmat(0.5,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-% p.A{2}(2,1) = 0; % GPe -| STN
+p.A{2}(2,1) = 0; % GPe -| STN
 p.A_s{2} = repmat(0.5,m.m,m.m);
 
 % Connection strengths
