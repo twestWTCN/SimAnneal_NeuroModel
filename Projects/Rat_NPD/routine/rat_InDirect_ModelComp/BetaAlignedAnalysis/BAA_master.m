@@ -3,44 +3,65 @@ clear; close all
 % simAnnealAddPaths()
 
 %% Setup
-% R.rootn = 'C:\Users\Tim\Documents\Work\Github\SimAnneal_NeuroModel\Projects\Rat_NPD\';
-R.rootn = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\';
-R.out.tag = 'InDrt_ModComp';
-daglist = {'NPD_InDrt_ModComp_M1','NPD_InDrt_ModComp_M2','NPD_InDrt_ModComp_M3',...
-    'NPD_InDrt_ModComp_M4', 'NPD_InDrt_ModComp_M5', 'NPD_InDrt_ModComp_M6',...
-    'NPD_InDrt_ModComp_M7', 'NPD_InDrt_ModComp_M8'};
-mnum = 6; % best model
+%% Set Routine Pars
+R = simannealsetup_InDirect_ModelComp;
+
 R.bandinits = {'\alpha','\beta_1','\beta_2'};
-%% get data from model
- [R,permMod,xsimMod,permModHD,xsimModHD,permModSTR,xsimModSTR] = getSimData(R,daglist,mnum);
 R.condname = {'Full','No HD','No M-STR'};
 R.condcmap = linspecer(3);
 R.cohband = 2;
 
-save([R.rootn '\routine\rat_InDirect_ModelComp\BetaBurstAnalysis\Data\Indirect_Sims.mat'],...
-    'R','permMod','xsimMod','permModHD','xsimModHD','permModSTR','xsimModSTR')
+modlist = [6 12 15];
+i = 0;
+for modID = modlist
+    i = i + 1;
+    R.out.tag = 'InDrt_ModComp';
+    R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
+    [R,m,p,parBank] = loadABCData(R);
+    %% get data from model
+    R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
+    [R,permMod(i),xsimMod(i)] = getSimData_v2(R,modID,500);
+end
+R.out.tagOld = 'rat_InDirect_ModelComp';
+mkdir([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data'])
+save([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'],...
+    'permMod','xsimMod')
 % OR
-% load([R.rootn '\routine\rat_InDirect_ModelComp\BetaBurstAnalysis\Data\Indirect_Sims.mat'])
+% load([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'])
 %% Get autospectra (for frequency finding)
-AS = squeeze(permMod.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
-AS_HD = squeeze(permModHD.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
-AS_STR = squeeze(permModSTR.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
+AS{1} = squeeze(permMod{1}.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
+AS{2} = squeeze(permMod{2}.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
+AS{3} = squeeze(permMod{3}.feat_rep{1}(1,:,4,1,:)); % get STN autospectra
 clear('permMod','permModHD','permModSTR')
 
+%% CROSS OVER
+R.BBA_path = 'C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\BetaBursts';
+addpath('C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\statistics');
+addpath('C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\Plotting');
+addpath(genpath('C:\Users\twest\Documents\Work\GitHub\superbar'))
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\PEB_DFA');
+addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MLDFA');
+
+R.bandinits = {'\alpha','\beta_1','\beta_2'};
+R.condname = {'Full','No HD','No M-STR'};
+R.condcmap = linspecer(3);
+R.cohband = 2;
+%%
 BB = compute_BetaBursts_Simulated(R);
 
-
 %% Do Beta Locked Analysis
+addpath(R.BBA_path)
+
 PLVcmp = 0;
 close all
-F(1) = figure; F(2) = figure; 
-BA_analysis(R,1,BB,xsimMod{1},AS_HD,PLVcmp,F);
+F(1) = figure; F(2) = figure;
+BA_analysis(R,1,BB,xsimMod{1}{1},AS{1},PLVcmp,F);
 figure(F(1)); title('Full Model');figure(F(2)); title('Full Model')
 
-BA_analysis(R,2,BB,xsimModHD{1},AS_HD,PLVcmp,F);
+BA_analysis(R,2,BB,xsimMod{2}{1},AS{2},PLVcmp,F);
 figure(F(1)); title('No Hyperdirect'); figure(F(2)); title('No Hyperdirect')
 
-BA_analysis(R,3,BB,xsimModSTR{1},AS_STR,PLVcmp,F);
+BA_analysis(R,3,BB,xsimMod{3}{1},AS{3},PLVcmp,F);
 figure(F(1)); title('No Cortico-Striatal');figure(F(2)); title('No Cortico-Striatal')
 
 set(F(1),'Position',[374.0000  258.5000  894.5000  620.0000])
@@ -50,13 +71,13 @@ set(F(2),'Position',[374.0000  88.0000   894.5000  224.0000])
 PLVcmp = 1;
 close all
 F(1) = figure; F(2) = figure;
-BA_analysis(R,1,BB,xsimMod{1},AS_HD,PLVcmp,F);
-figure(F(1)); title('Full Model');figure(F(2)); title('Full Model'); 
+BA_analysis(R,1,BB,xsimMod{1}{1},AS{1},PLVcmp,F);
+figure(F(1)); title('Full Model');figure(F(2)); title('Full Model');
 
-BA_analysis(R,2,BB,xsimModHD{1},AS_HD,PLVcmp,F);
+BA_analysis(R,2,BB,xsimMod{2}{1},AS{2},PLVcmp,F);
 figure(F(1)); title('No Hyperdirect'); figure(F(2)); title('No Hyperdirect')
 
-BA_analysis(R,3,BB,xsimModSTR{1},AS_STR,PLVcmp,F);
+BA_analysis(R,3,BB,xsimMod{3}{1},AS{3},PLVcmp,F);
 figure(F(1)); title('No Cortico-Striatal');figure(F(2)); title('No Cortico-Striatal')
 
 set(F(1),'Position',[374.0000  258.5000  894.5000  620.0000])
