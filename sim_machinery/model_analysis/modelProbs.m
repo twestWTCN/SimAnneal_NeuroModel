@@ -59,7 +59,7 @@ end
 %%Plot Example
 figure(5)
 pnew = par{1};
-[r2mean,pnew,feat_sim,wflag] = computeSimData(R,m,pnew,1);
+[r2mean,pnew,feat_sim,wflag] = computeSimData(R,m,pnew,0,1);
 wfstr = ones(1,N);
 while wfstr(end)>0
     parfor (jj = 1:N, parforArg)
@@ -67,7 +67,7 @@ while wfstr(end)>0
         
         %     ppm.increment();
         pnew = par{jj};
-        [r2mean,pnew,feat_sim,xsims,wflag] = computeSimData(R,m,pnew);
+        [r2mean,pnew,feat_sim,xsims,wflag] = computeSimData(R,m,pnew,0);
         
         %     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
         wfstr(jj) = wflag;

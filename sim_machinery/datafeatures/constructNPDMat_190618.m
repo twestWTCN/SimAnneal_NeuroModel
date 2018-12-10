@@ -56,10 +56,10 @@ for C = 1:O
                         else
                             Pxy = 10.^Pxy;
                         end
-                        if R.obs.trans.norm == 1
-                            Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
-                            Pxy = Pxy - min(Pxy);
-                        end
+%                         if R.obs.trans.norm == 1
+%                             Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
+%                             Pxy = Pxy - min(Pxy);
+%                         end
                         Pxy(isnan(Pxy)) = 0;
                         Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                         xcsd(p,r,1:3,:) = repmat(Pxy,3,1);

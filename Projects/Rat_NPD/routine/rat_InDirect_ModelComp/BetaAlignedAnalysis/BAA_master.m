@@ -13,22 +13,39 @@ R.cohband = 2;
 
 i = 0;
 i = i + 1;
+modID = 12;
 R.out.tag = 'InDrt_ModComp';
 R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
 [R,m,p,parBank] = loadABCData(R);
 %% get data from model
 R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
-[R,permMod,xsimMod] = getSimData_v2(R,8,25);
+[R,permMod,xsimMod] = getSimData_v2(R,8,20);
 
-clear r2mean feat_sim xsims
-Alist = -4:0.5:3;
+close all
+clear r2mean feat_sim xsims dfx
+Alist = 0.15:0.15:0.9; % [0,0.25,0.33,0.5,1];
+Alist(3) = 0.4483;
+cmap = linspecer(numel(Alist));
 for i = 1:length(Alist)
     pnew = permMod{1}.par_rep{1};
     pnew.A{1}(4,1) = Alist(i);
-    [r2mean{i},dum,feat_sim{i},xsims{i}] = computeSimData(R,m,pnew,30,1); 
-    fx = squeeze(feat_sim{i}(1,4,4,1,:));
-    bp(i) = sum(fx(R.frqz>14 & R.frqz<24));
+    [r2mean{i},dum,feat_sim{i},xsims{i}] = computeSimData(R,m,pnew,2000,0); 
+    fx(1,:) = squeeze(feat_sim{i}(1,1,1,1,:));
+    fx(2,:) = squeeze(feat_sim{i}(1,4,4,1,:));
+    fx(3:4,:) = squeeze(feat_sim{i}(1,1,4,2:3,:));
+    dfx{i} = fx;
+    bp(i) = sum(fx(1,R.frqz>14 & R.frqz<24));
+    for p = 1:4
+        subplot(1,4,p)
+        plot(R.frqz,fx(p,:),'color',cmap(i,:));
+        hold on
+    end
 end  
+
+    subplot(1,4,1); ylim([0 18]); xlabel('Frequency Hz'); ylabel('Amplitude'); title('M2 Autospectra')
+    subplot(1,4,2); ylim([0 18]); xlabel('Frequency Hz'); ylabel('Amplitude'); title('STN Autospectra')
+    subplot(1,4,3); ylim([0 0.2]); xlabel('Frequency Hz'); ylabel('NPD'); title('M2 -> STN NPD')
+    subplot(1,4,4); ylim([0 0.2]); xlabel('Frequency Hz'); ylabel('NPD'); title('STN -> M2 NPD')
     
 R.out.tagOld = 'rat_InDirect_ModelComp';
 mkdir([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data'])

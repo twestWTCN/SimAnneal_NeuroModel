@@ -2,7 +2,9 @@ function [r2mean,pnew,feat_sim,xsims,wflag] = computeSimData(R,m,pnew,simtime,pl
 if nargin<5
     plotop = 0;
 end
-R = setSimTime(R,simtime);
+if simtime ~= 0
+    R = setSimTime(R,simtime);
+end
 %% Simulate New Data
 u = innovate_timeseries(R,m);
 u{1} = u{1}.*sqrt(R.IntP.dt);

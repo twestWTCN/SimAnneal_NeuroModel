@@ -187,7 +187,7 @@ f(:,4) =  (u - 2*x(:,4) - x(:,3)./T(:,2))./T(:,2);
 % Supra-granular layer (inhibitory interneurons): Hidden states - error
 %--------------------------------------------------------------------------
 u      = 0;%- A{4}*S(:,7);
-u      =  - G(:,4).*S(:,5) + G(:,5).*S(:,1) + G(:,6).*S(:,7) + G(:,13).*S(:,3) + u;
+u      =  - G(  :,4).*S(:,5) + G(:,5).*S(:,1) + G(:,6).*S(:,7) + G(:,13).*S(:,3) + u;
 f(:,6) =  (u - 2*x(:,6) - x(:,5)./T(:,3))./T(:,3);
  
 % Infra-granular layer (deep pyramidal cells): Hidden states
