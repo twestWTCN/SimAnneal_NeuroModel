@@ -1,9 +1,10 @@
-% MODEL 1:
-% SERIAL FLOW
+% MASTER FUNCTION FOR MODEL FITTING
+% Models are specified in ModelSpecs of project folder. Will batch fit
+% models to the data specified in fx prepareRatData. WML stores batch
+% progress and can be accessed by multiple MATLAB realizations.
 %%%%%%%%%%%%%%%%%%%%%%%%
-% IF FRESH!
-% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
-% MODEL 4 6 (NOT WORKING!)
+% IF FRESH START
+delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -14,16 +15,8 @@ tags = get(handles,'Tag');
 isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
 delete(handles(isMsg));
 
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
-addpath('C:\spm12')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
+% Add relevant paths for toolboxes
+% simAnnealAddPaths()
 rng(342346)
 
 %% Set Routine Pars
@@ -42,7 +35,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 1:18
+for modID = 12
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
@@ -52,15 +45,18 @@ for modID = 1:18
         f = msgbox(sprintf('Fitting Model %.0f',modID));
         
         %% Prepare Model
-        modelspec = eval(['@MS_rat_InDirect_ModelComp_Model' num2str(modID)]);
+        modelspec = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
         R.out.dag = sprintf('NPD_InDrt_ModComp_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
         R = setSimTime(R,32);
+         R.obs.logdetrend = 0;
+         R.SimAn.convterm = 15;
         R.Bcond = 0;
         parBank = [];
+        R.SimAn.rep = 256; %448
         [p] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);
     end
 end

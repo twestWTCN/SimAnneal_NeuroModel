@@ -106,11 +106,12 @@ for condsel = 1:numel(R.condnames)
     D = zeros(m.m);
     D(p.D>-30) = 4/1000; % set all delay priors to 4ms.
     
-    D(2,1) = 10/1000;  % M1 to STR (Gerfen and Wilson 1996)
-    D(4,1) = 2.5/1000;   % M1 to STN (Nakanishi et al. 1987)
+    D(2,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)
+    D(4,1) = 2.5/1000;  % M1 to STN (Nakanishi et al. 1987)
+   
     D(3,4) = 2/1000;    % STN to GPe (Kita and Kitai 1991)
-    D(5,4) = 5/1000;    % STR to GP (Kita and Kitai 1991)
-    D(1,6) = 10/1000;    % Thal to M1
+    D(5,4) = 5/1000;    % STR to GPi (Kita and Kitai 1991)
+    D(1,6) = 10/1000;   % Thal to M1
     
     D(4,3) = 4/1000;    % GPe to STN (Fujimoto and Kita 1993)
     D(6,5) = 4/1000;    % GPi to Thal (Stoelzel J Neurosci. 2017)

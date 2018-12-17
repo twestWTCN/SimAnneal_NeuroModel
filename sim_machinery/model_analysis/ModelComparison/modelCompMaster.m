@@ -16,7 +16,7 @@ catch
 end
 
 %% Main Loop
-for modID =1:3
+for modID = 12
     load([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
     permMod = [];
     if ~any(intersect(WML,modID))
@@ -48,7 +48,7 @@ for modID =1:3
         R = setSimTime(R,32);
         
         R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
-        R.analysis.BAA = 0; % Turn off BAA flag (time-locked analysis)
+        R.analysis.BAA.flag = 0; % Turn off BAA flag (time-locked analysis)
         parOptBank = parBank(1:end-1,1:2^10);
         
         if  size(parOptBank,2)>1

@@ -1,4 +1,7 @@
 function [permMod, xsimMod] = modelProbs(x,m,p,R)
+if ~isfield(R.analysis.BAA,'flag')
+    R.analysis.BAA.flag = 0;
+end
 % load([R.rootn 'outputs\' R.out.tag '\parBank_' R.out.tag '_' d '.mat'])
 parOptBank = R.parOptBank;
 % figure
@@ -9,6 +12,8 @@ eps = R.analysis.modEvi.eps;
 %% Compute KL Divergence
 [KL DKL] = KLDiv(R,p,m,parOptBank);
 N = R.analysis.modEvi.N;
+
+if R.analysis.BAA.flag == 0
 
 %% Resample parameters
 % Compute indices of optimised parameter
@@ -38,7 +43,6 @@ for i = 1:N
 end
 plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
 
-if R.analysis.BAA == 0
     %% Setup Parfor
     % if isempty(gcp)
     %     parpool
@@ -46,14 +50,26 @@ if R.analysis.BAA == 0
     a = gcp;
     ppm = ParforProgMon('Model Probability Calculation',N);
     parforArg = a.NumWorkers;
-elseif R.analysis.BAA
+elseif R.analysis.BAA.flag
+    base = parOptBank(1:end,:);
     % If doing BAA analysis of model
     parforArg =0;
     ppm = [];
     N = 1;
-    % Take the expected parameters from distribution
-    par = [];
-    par{1} = spm_unvec(mean(base,2),p);
+    
+    switch R.analysis.BAA.redmeth
+        case 'average'
+            % Take the expected parameters from distribution
+            par = [];
+            par{1} = spm_unvec(mean(base,2),p);
+        case 'best'
+            par = [];
+            par{1} = spm_unvec(base(:,1),p);
+        case 'quartile'
+            %     par = [];
+            %     par{1} = spm_unvec(mean(base,2),p);
+    end
+
 end
 
 %%Plot Example
@@ -75,14 +91,14 @@ while wfstr(end)>0
         par_rep{jj} = pnew;
         feat_rep{jj} = feat_sim;
         disp(jj); %
-        if ~R.analysis.BAA
+        if ~R.analysis.BAA.flag
             ppm.increment();
             xsims_rep{jj} = [];
         else
             xsims_rep{jj} = xsims;
         end
     end
-    if ~R.analysis.BAA
+    if ~R.analysis.BAA.flag
         wfstr(end) = 0;
     end
 end
@@ -99,7 +115,7 @@ xsimMod = xsims_rep;
 % load([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')
 
 % Do plotting
-if ~R.analysis.BAA
+if ~R.analysis.BAA.flag
     figure
     r2bank = [permMod.r2rep{:}];
     [h r] = hist(r2bank,50); %D is your data and 140 is number of bins.

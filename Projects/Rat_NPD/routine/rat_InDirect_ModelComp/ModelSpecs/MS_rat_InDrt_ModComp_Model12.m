@@ -61,7 +61,7 @@ p.C_s = repmat(0.5,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1 1 1];
-p.obs.LF_s = repmat(0.2,size(p.obs.LF));
+p.obs.LF_s = repmat(1.5,size(p.obs.LF));
 
 p.obs.mixing = [1]; %zeros(size(R.obs.mixing));
 p.obs.mixing_s = repmat(0,size(p.obs.mixing));

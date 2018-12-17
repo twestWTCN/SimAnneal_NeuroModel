@@ -1,4 +1,4 @@
-function [R,permMod,xsimMod] = getSimModelData_v2(R,modID,simtime)
+function [R,m,permMod,xsimMod] = getSimModelData_v2(R,modID,simtime)
 % This function will specficailly get the parameters from postieror fit of
 % model and will simulate some data.
 for pn = 1:numel(modID)
@@ -11,15 +11,16 @@ for pn = 1:numel(modID)
     R.Mfit.prior = prior;
     
     R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
-    parOptBank = parBank(1:end-1,2^10);
+    parOptBank = parBank(1:end-1,1:2^10);
     
     R.parOptBank = parOptBank;
     R.obs.gainmeth = R.obs.gainmeth(1);
     
     R.analysis.modEvi.N = 2000;
-    R.analysis.BAA = 1;
+    R.analysis.BAA.flag = 1;
+    R.analysis.BAA.redmeth = 'best'; % average samples to get parameters
     R = setSimTime(R,simtime);
-    
+       
     % With Hyperdirect
     [permMod{pn} xsimMod{pn}] = modelProbs(m.x,m,p,R);
 end

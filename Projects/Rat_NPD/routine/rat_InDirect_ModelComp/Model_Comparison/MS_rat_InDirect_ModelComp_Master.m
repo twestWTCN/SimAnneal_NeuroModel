@@ -11,7 +11,7 @@ delete(handles(isMsg));
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
 % Get empirical data
-R = prepareRatData_InDirect_Group_NPD(R,0); 
+R = prepareRatData_InDirect_Group_NPD(R); 
 
 %% Do the model probability computations
 modelCompMaster(R)

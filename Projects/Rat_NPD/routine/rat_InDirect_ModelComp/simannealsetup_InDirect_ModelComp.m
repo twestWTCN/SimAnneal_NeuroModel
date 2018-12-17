@@ -22,14 +22,16 @@ R.frqz = [6:.2:68];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MMC','STR','GPE','STN'};
 R.chsim_name = {'MMC','STR','GPE','STN'};
-R.condnames = {'OFF'}; % VERIFY!!!
+R.condnames = {'OFF'};
 %% OBSERVATION 
+% observation function
 R.obs.obsFx = @observe_data;
 % R.obs.obsFxArgs = '(xsims,m,pnew,R)';
-R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
-R.obs.glist = [0 0 1];
+R.obs.gainmeth = {'leadfield','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.glist = [-2 8 12]; % gain sweep optimization range [min max listn] (log scaling)
 
-R.obs.transFx = @constructNPDMat_190618; %% @constructNPDMat;
+% fx to construct data features
+R.obs.transFx = @constructNPDMat_190618;
 R.obs.trans.norm = 0;
 
 % R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
@@ -49,7 +51,9 @@ R.obs.lowpass.order = 80;
 R.obs.logdetrend =1;
 R.obs.trans.norm = 1;
 R.obs.logscale = 0;
+
 %% INTEGRATION
+% Main dynamics function
 R.IntP.intFx = @spm_fx_compile_180817;
 % R.IntP.intFxArgs = '(R,x,uc,p,m)';
 R.IntP.compFx= @compareData_100717;
@@ -79,10 +83,10 @@ R.obs.lowpass.fwts = fir1(R.obs.lowpass.order,Wn);
 
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'ForRev'; %%'ForRev'; %
-R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
+R.objfx.specspec = 'auto'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D','.obs.LF'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 200;

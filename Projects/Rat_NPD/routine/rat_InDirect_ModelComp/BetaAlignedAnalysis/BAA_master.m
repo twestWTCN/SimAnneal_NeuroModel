@@ -14,7 +14,7 @@ R.condcmap = linspecer(3);
 R.cohband = 2;
 
 %% Simulate Data
-R = BAA_sim_data(R,[12 6 18],5000);
+R = BAA_sim_data(R,12,128);
 % OR load
 R.out.tagOld = 'rat_InDirect_ModelComp'; % This is hack for old naming system
 load([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'],...

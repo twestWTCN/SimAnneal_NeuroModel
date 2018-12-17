@@ -32,7 +32,7 @@ for C =1:numel(R.condnames)
                 Pxy = f(R.frqz)';
 %                 plot(R.frqz,Pxy); hold on
                 Pxy = 10.^Pxy;
-                Pxy = (Pxy-mean(Pxy))./std(Pxy);
+%                 Pxy = (Pxy-mean(Pxy))./std(Pxy);
                 Pxy = Pxy - min(Pxy);
                 %                 Pxy = Pxy.*tukeywin(length(Pxy),0.6)';
                 
@@ -44,7 +44,7 @@ for C =1:numel(R.condnames)
                 for k = 1:size(NPDmat,3)
                     Ftmp = F_data;
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
-                    Cxy = Cxy*1.5;
+%                     Cxy = Cxy*1.5;
                     Cxy(Ftmp>48 & Ftmp<52) = [];
                     Ftmp(Ftmp>48 & Ftmp<52) = [];
                     Cxy = interp1(Ftmp,Cxy,R.frqz);

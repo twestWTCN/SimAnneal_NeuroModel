@@ -1,5 +1,10 @@
 function R = BAA_sim_data(R,modID,simtime)
-[R,permMod,xsimMod] = getSimModelData_v2(R,modID,simtime); 
+[R,m,permMod,xsimMod] = getSimModelData_v2(R,modID,simtime);
+
+% Now Modify
+[r2mean,pnew,feat_sim,xsims,wflag] = computeSimData(R,m,permMod{1}.par_rep{1},0);
+
+
 
 % Now you have posterior expectations you can use the inside computeSim
 % Data Function

@@ -19,7 +19,7 @@ function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
 % (degrees of freedom) of the estimated copula.
 % There are several plotting functions which will track the progress of the
 % annealing.
-% 
+%
 % Timothy West (2018) - UCL CoMPLEX
 % / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
@@ -33,7 +33,7 @@ end
 pOrg = p; % Record prior parameters.
 
 % Initialise variables
-parOptBank = []; eps = -1;  iflag = 0; par = cell(1,R.SimAn.rep); psave = []; itry = 0;
+parOptBank = [];   iflag = 0; par = cell(1,R.SimAn.rep);
 % Set Fixed Annealing Parameters
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
@@ -77,7 +77,7 @@ while ii <= searchN
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-   parfor jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else
@@ -98,7 +98,7 @@ while ii <= searchN
         if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
             try
                 % Run Observer function
-
+                
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 glorg = pnew.obs.LF;
@@ -107,7 +107,7 @@ while ii <= searchN
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
                 for gl = 1:length(gainlist)
-                    pnew.obs.LF = glorg + gainlist(gl)
+                    pnew.obs.LF = glorg + gainlist(gl);
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
                     else
@@ -130,10 +130,10 @@ while ii <= searchN
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
-%                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
-% %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
-% % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-% %                 close all
+                %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
+                % %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
+                % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
+                % %                 close all
             catch
                 disp('Observation/Cost Function Failure!')
                 r2 = -inf;
@@ -253,7 +253,7 @@ while ii <= searchN
         % data and more than a given number of replicates are attempted
         % then choose epsilon to give bank exceeding rank (bare minimum for
         % copula formation
-        if  size(parOptBank,2)<R.SimAn.minRank & size(parOptBank,2) > (R.SimAn.minRank*0.5)
+        if  size(parOptBank,2)<R.SimAn.minRank && size(parOptBank,2) > (R.SimAn.minRank*0.5)
             disp(['Rank is within limits, filling with pseudopars: ' num2str(eps)])
             aN = R.SimAn.minRank-size(parOptBank,2);
             mu = mean(parBank(:,parBank(end,:)>eps),2);
@@ -317,7 +317,7 @@ while ii <= searchN
             %             p = par_rep{Ilist(1)}; % The best par_rep
             p = spm_unvec(mean(parOptBank,2),pOrg);
             iflag = 0;
-        else % or draw from the top n of the parBank 
+        else % or draw from the top n of the parBank
             N = 1:size(parBank,2);
             p = spm_unvec(mean(parBank(:,N<=128),2),pOrg);
             iflag = 0;
@@ -468,17 +468,17 @@ while ii <= searchN
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'],R)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)       
+        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
         return
     end
     
     for jj = 1:repset
-        if any(isnan(spm_vec(par{jj}))) 
-           a = 1;
+        if any(isnan(spm_vec(par{jj})))
+            a = 1;
         end
     end
     
-%     uv = whos;
-%     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
+    %     uv = whos;
+    %     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
 end
