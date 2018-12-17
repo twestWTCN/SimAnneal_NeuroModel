@@ -1,10 +1,15 @@
-function BB = BA_analysis(R,cond,BB,data,AS,PLVcmp,F)
-% Tool for conducting the
+function BB = AlignedBursts_analysis(R,cond,BB,data,AS,PLVcmp,F)
+% Tool for conducting the aligned bursts
 ftdata = [];
 ftdata.label = R.chsim_name;
 ftdata.trial{1} = data{1};
-ftdata.time{1} = R.IntP.tvec_obs;
 ftdata.fsample = 1/R.IntP.dt;
+
+if isfield(R.IntP,'tvec_obs')
+    ftdata.time{1} = R.IntP.tvec_obs;
+else
+    ftdata.time{1} = linspace(0,size(ftdata.trial{1},2)/ftdata.fsample,size(ftdata.trial{1},2));
+end
 
 % cfg = [];
 % cfg.length = 1;
@@ -62,7 +67,7 @@ X = BB.Amp(4,:);
 Xcd = X>BB.epsAmp;
 Xcd = double(Xcd);
 
-period = (3/banddef(1,1))*BB.fsamp;
+period = (2/banddef(1,1))*BB.fsamp;
 consecSegs = SplitVec(find(Xcd(1,:)),'consecutive');
 
 % Work first with lengths
@@ -93,15 +98,17 @@ for i = 1:numel(segInds)
     postBo = [Bo(1): Bo(1) + floor((onsetT(2)/1e3)*BB.fsamp)]; % post burst onset
     epochdef = [preBo(1):postBo(end)];
     % Convert from full time to SW time
-    [dum T(1)] = min(abs(BB.SWTvec{cond}-BB.Time(epochdef(1))));
-    T(2) = T(1) + floor(sum(abs(onsetT/1000))/diff(BB.SWTvec{1}(1:2)));
-    if epochdef(end)<size(BB.Amp,2) && epochdef(1) > 0 && T(2)<=size(BB.PLV{cond},2)
-        BEpoch(:,:,i) = BB.Amp(:,epochdef);
-        REpoch(:,:,i) = BB.RawInt(:,epochdef);
-        PLVpoch(:,:,i) = BB.PLV{cond}(2,T(1):T(2));
-        meanPLV(i) = computePPC(squeeze(BB.Phi([1 4],Bo)));
-        maxAmp(i) = max(BB.Amp(4,Bo));
-        minAmp(i) = min(BB.Amp(4,preBo));
+    if preBo(1)>0
+        [dum T(1)] = min(abs(BB.SWTvec{cond}-BB.Time(epochdef(1))));
+        T(2) = T(1) + floor(sum(abs(onsetT/1000))/diff(BB.SWTvec{1}(1:2)));
+        if epochdef(end)<size(BB.Amp,2) && epochdef(1) > 0 && T(2)<=size(BB.PLV{cond},2)
+            BEpoch(:,:,i) = BB.Amp(:,epochdef);
+            REpoch(:,:,i) = BB.RawInt(:,epochdef);
+            PLVpoch(:,:,i) = BB.PLV{cond}(1,T(1):T(2));
+            meanPLV(i) = computePPC(squeeze(BB.Phi([1 4],Bo)));
+            maxAmp(i) = max(BB.Amp(4,Bo));
+            minAmp(i) = min(BB.Amp(4,preBo));
+        end
     end
 end
 pinds{1} = 1:size(meanPLV,2);
