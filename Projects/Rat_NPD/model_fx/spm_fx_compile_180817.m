@@ -124,6 +124,13 @@ for condsel = 1:numel(R.condnames)
         R.IntP.buffer = max(max(D)) + 2;
         disp(['Delay is bigger than buffer, increasing buffer to: ' num2str(R.IntP.buffer)])
     end
+    if R.IntP.buffer > 1e3
+        disp('Delays are implausibly large!')
+        wflag = 1;
+        break
+    end
+        
+        
     Ds = zeros(size(D));Dt = zeros(size(D));
     % Now find indices of inputs
     % Currently no seperation between inh and excitatory
@@ -143,7 +150,8 @@ for condsel = 1:numel(R.condnames)
     Rz     = 2/3;                      % gain of sigmoid activation function
     B     = 0;                        % bias or background (sigmoid)
     Rz     = (Rz).*exp(p.S(1));
-    S     = @(x,Rz,B)(1./(1 + exp(-Rz*x(:) + B))) - 1/(1 + exp(B));
+%     S     = @(x,Rz,B)(1./(1 + exp(-Rz*x(:) + B))) - 1/(1 + exp(B));
+    % Now named function
     
     %     % Condition Dependent Modulation of Synaptic gains
     %     %-----------------------------------------
@@ -201,6 +209,16 @@ for condsel = 1:numel(R.condnames)
             end
         end
     end
+    nbank = cell(1,n); qbank = cell(1,n);
+    for i = 1:n
+            N.x  = m.x{i};
+            nbank{i} = N;
+            Q    = p.int{i};
+            Q.C  = p.C(i,:);
+            qbank{i} = Q;
+    end
+    
+    
     %% TIME INTEGRATION STARTS HERE ===========================================
     f = zeros(xinds(end),1); dt = R.IntP.dt;
     if iscell(x)
@@ -227,18 +245,15 @@ for condsel = 1:numel(R.condnames)
                         %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
                         xD = xstore(Ds(i,j),tstep-D(i,j));
                         %                     fA(Dt(i,j)) = A{k}(i,j)*S(xD,Rz,B);
-                        fA = [fA  A{k}(i,j)*S(xD,Rz,B)];
+                        fA = [fA  A{k}(i,j)*sigmoidin(xD,Rz,B)];
                     end
                 end
             end
             % intrinsic flow
             %----------------------------------------------------------------------
-            N.x  = m.x{i};
-            ui   = u(tstep,i)+ sum(fA) ;
-            Q    = p.int{i};
-            Q.C  = p.C(i,:);
+            ui   = u(tstep,i)+ sum(fA);
             xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
-            f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,Q,N);
+            f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,qbank{i},nbank{i});
             %             f(Dt(1,i))  = f(Dt(1,i)) + sum(fA) ;
         end
         xint = xint + (f.*dt);
@@ -262,3 +277,4 @@ for condsel = 1:numel(R.condnames)
     end    % tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
     a = 1;
 end
+

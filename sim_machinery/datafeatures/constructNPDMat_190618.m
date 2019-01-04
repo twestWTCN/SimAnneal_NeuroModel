@@ -26,22 +26,13 @@ for C = 1:O
                     chindsR = chinds{chJ};
                     if chI == chJ
                         [Pxy,F] = pwelch(squeeze(data(C,chindsP(p),:)),hanning(2^N),[],2^(N),fsamp);
-                        %                     [nPxy,F] = pwelch(normnoise(1,:),hanning(2^N),[],2^(N),fsamp);
-                        %                      Pxy = (Pxy-mean(Pxy))./std(Pxy);
-                        %                     Pxy = Pxy - min(Pxy);
-                        %                     if nargin>5
-                        %                         Pxy = interp1(F,Pxy,F_scale);
-                        %                     else
-                        %                         Pxy =  Pxy(F>4);
-                        %                     end
-                        %                     Pxy = Pxy./max(nPxy);
                         Pxy = Pxy; %.*welchwin(length(Pxy))';
                         Pxy = -abs(log10(Pxy));
                         Pxy(F>48 & F<52) = [];
                         F(F>48 & F<52) = [];
                         Pxy(F==0) = [];
                         F(F==0) = [];
-                        if R.obs.logdetrend == 1
+                        if R.obs.trans.logdetrend == 1
                             [xCalc yCalc b Rsq] = linregress(log10(F),Pxy);
                             Pxy = Pxy-yCalc;
                         end
@@ -56,10 +47,10 @@ for C = 1:O
                         else
                             Pxy = 10.^Pxy;
                         end
-%                         if R.obs.trans.norm == 1
-%                             Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
-%                             Pxy = Pxy - min(Pxy);
-%                         end
+                        if R.obs.trans.norm == 1
+                            Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
+                            Pxy = Pxy - min(Pxy);
+                        end
                         Pxy(isnan(Pxy)) = 0;
                         Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                         xcsd(p,r,1:3,:) = repmat(Pxy,3,1);

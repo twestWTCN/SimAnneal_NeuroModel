@@ -1,4 +1,4 @@
-function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
+function [R,parBank] = SimAn_ABC_211218(ic,~,p,m,R,parBank)
 %%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION for
 %%%% HIGH DIMENSIONAL DYNAMICAL MODELS
 % ---- 16/08/18---------------------------
@@ -23,7 +23,7 @@ function [R,parBank] = SimAn_ABC_110817(ic,~,p,m,R,parBank)
 % Timothy West (2018) - UCL CoMPLEX
 % / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
-% Setup for annealing
+%% Setup for annealing
 if nargin<6
     parBank = [];
 end
@@ -33,19 +33,20 @@ end
 pOrg = p; % Record prior parameters.
 
 % Initialise variables
-parOptBank = [];   iflag = 0; par = cell(1,R.SimAn.rep);
+par = cell(1,R.SimAn.rep);
 % Set Fixed Annealing Parameters
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
 Tm(1) =  R.SimAn.Tm;
 ii = 1;
-
-% Compute indices of optimised parameter
+eps_prior = -3; % prior eps (needed for gradient approximation);
+eps_exp = -2; eps_act = eps_prior;
+cflag = 0; delta_act = 1;
+% Compute indices of parameters to be optimized
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
-R.SimAn.minRank = ceil(size(pIndMap,1)*2.2); %1.8 multiplier
+R.SimAn.minRank = ceil(size(pIndMap,1)*2); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
-stdev = 1*R.SimAn.jitter; % set the global precision
 if isfield(R,'Mfit')
     xf = R.Mfit.xf;
     rep = repset;
@@ -62,14 +63,12 @@ if isfield(R,'Mfit')
         base(pIndMap,i) = x1(:,i);
         par{i} = spm_unvec(base(:,i),p);
     end
-    iflag = 1;
 else
     for jj = 1:repset
-        par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
+        par{jj} = resampleParameters_240717(R,p,p,m.m,1); % Draw from prior
     end
 end
 itry = 0;
-eps_p = -5;
 %% Main Annealing Loop
 while ii <= searchN
     rep = repset;
@@ -98,7 +97,6 @@ while ii <= searchN
         if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
             try
                 % Run Observer function
-                
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 glorg = pnew.obs.LF;
@@ -126,7 +124,7 @@ while ii <= searchN
                     error('TransFX could not compute data transform!')
                 end
                 [r2 ir2] = max(r2mean);
-%                 R.plot.outFeatFx({R.data.feat_emp},feat_sim,R.data.feat_xscale,R,ir2,[])
+                %                 R.plot.outFeatFx({R.data.feat_emp},feat_sim,R.data.feat_xscale,R,ir2,[])
                 pnew.obs.LF = glorg+gainlist(ir2);
                 %         disp(pnew.obs.LF)
                 %         toc
@@ -191,158 +189,68 @@ while ii <= searchN
         parBank = parBank(:,V);
     end
     
-    % Find error threshold for temperature (epsilon)
-    eps = -5;
-    if size(parBank,2)>R.SimAn.minRank
-        eps = 1-(R.SimAn.lr(1)/(exp(R.SimAn.lr(2)*Tm(ii))));
-        %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
-        %         epgrad = r2eps-eps_p;
-        %         eps = eps_p + epgrad;
-        
-        clear parOptBank
-        parOptBank = parBank(:,parBank(end,:)>eps);
-        
-        if size(parOptBank,2)< R.SimAn.minRank-1
-            if itry>R.SimAn.copout(1) && itry<=R.SimAn.copout(2)
-                delta = 1; eps = eps+1;
-                while eps_p-eps > 0.001
-                    pip = 100;
-                    A = [1];
-                    while size(A,2)<(R.SimAn.minRank*delta)
-                        pip = pip-0.001;
-                        if pip<0
-                            break
-                        end
-                        eps = prctile(parBank(end,:),pip);
-                        A = parBank(:,parBank(end,:)>eps);
-                    end
-                    parOptBank = A;
-                    clear A
-                    delta = delta-0.005;
-                    if delta<0.30
-                        break
-                    end
-                end
-            end
-            %             if itry<=R.SimAn.copout(2) || eps-eps_p < 0.005
-            %                 pip = 100;
-            %                 A = [1];
-            %                 while size(A,2)<(R.SimAn.minRank)*0.35
-            %                     pip = pip-0.001;
-            %                     if pip<0
-            %                         break
-            %                     end
-            %                     eps = prctile(parBank(end,:),pip);
-            %                     A = parBank(:,parBank(end,:)>eps);
-            %                 end
-            %                 parOptBank = A;
-            %                 clear A
-            %             end
-            itry = itry + 1;
-            tflag = 0;
-        else
-            tflag = 1;
-            itry = 0;
-            disp(['Using Annealing EPS: ' num2str(eps) ', length ' num2str(size(parBank(:,parBank(end,:)>eps),2))])
-        end
-        clear A
-        eps_p = eps; % past value of eps (for next loop)
-        
-        % Form the bank of parameters exceeding acceptance level
-        % If the size of the bank is less than the rank of the optimized
-        % data and more than a given number of replicates are attempted
-        % then choose epsilon to give bank exceeding rank (bare minimum for
-        % copula formation
-        if  size(parOptBank,2)<R.SimAn.minRank && size(parOptBank,2) > (R.SimAn.minRank*0.5)
-            disp(['Rank is within limits, filling with pseudopars: ' num2str(eps)])
-            aN = R.SimAn.minRank-size(parOptBank,2);
-            mu = mean(parBank(:,parBank(end,:)>eps),2);
-            sig = cov(parBank(:,parBank(end,:)>eps)');
-            sig = (sig + sig.') / 2; % Ensures symmetry constraints
-            try
-                parOptBank = [parOptBank mvnrnd(mu,sig,aN)'];
-            catch
-                disp('covar matrix is non-symmetric postive definite')
-            end
-            itry =0;
-        end
-        %
-        % Crops the optbank to stop it getting to big (memory)
-        if size(parOptBank,2)> 2^9
-            [dum V] = sort(parOptBank(end,:),'descend');
-            parOptBank = parOptBank(:,V(1:2^9));
-        end
-        
-        % assign to base workspace in case stop early
-        %         assignin('base','parOptBank',parOptBank)
-        %         assignin('base','parBank',parBank)
-        
-        disp(['The number of parsets within epsilon is ' num2str(size(parOptBank,2))])
-        
-        %% This is where the multivariate posterior parameter estimate is computed using copulas
-        if size(parOptBank,2)> R.SimAn.minRank-1 % Ensure rank is larger than parameters
-
-        elseif size(parOptBank,2)> (0.75*R.SimAn.minRank)  % If not enough samples - redraw using means from the parOptBank
-            %             p = par_rep{Ilist(1)}; % The best par_rep
-            p = spm_unvec(mean(parOptBank,2),pOrg);
-            iflag = 0;
-        else % or draw from the top n of the parBank
-            N = 1:size(parBank,2);
-            p = spm_unvec(mean(parBank(:,N<=128),2),pOrg);
-            iflag = 0;
-        end
-    end
-    eps_rec(ii) = eps;
+    %% Find error threshold for temperature (epsilon)
+    parOptBank = parBank(:,parBank(end,:)>eps_exp);
     
-    %% Now draw parameter sets for the next set of replicates
-    if iflag == 0 && (itry < R.SimAn.copout(1))
-        disp(['To many tries/trying old copula ' num2str(stdev)])
-        try
-            Mfit =  Mfit_hist;
-            iflag = 1;
-        catch
-            disp(['No copula available, reverting to normal distribution on best fitting posteriors with stdev ' num2str(stdev)])
+    if size(parOptBank,2)> R.SimAn.minRank-1
+        if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
+        disp('Bank satisfies current eps')
+            eps_act = eps_exp;
+            cflag = 1; % copula flag (enough samples)
+            itry = 0;  % set counter to 0
+        else % if the bank is very large than take subset
+        disp('Bank is large taking new subset to form eps')
+            parOptBank = parBank(:,1:R.SimAn.minRank);
+            eps_act = parOptBank(end,end);
+            cflag = 1; % copula flag (enough samples)
+            itry = 0;  % set counter to 0
+        end
+    elseif itry < 2
+        disp('Trying once more with current eps')
+        if exist('Mfit')
+            cflag = 1;
+        end
+        itry = itry + 1;
+    elseif itry> 1
+        disp('Recomputing eps from parbank')
+        parOptBank = parBank(:,1:R.SimAn.minRank);
+        eps_act = parOptBank(end,end);
+        cflag = 1;
+        itry = 0;
+    end
+    if itry==0 
+        % Compute expected gradient for next run
+        delta_exp = eps_exp-eps_prior;
+        fprintf('Expected gradient was %0.2f \n',delta_exp)
+        delta_act = eps_act-eps_prior;
+        if any([delta_exp delta_act]==0)
+            a = 1;
+        end
+        fprintf('Actual gradient was %0.2f \n',delta_exp)
+        eps_exp = eps_act + delta_act;
+        fprintf('Exp-Act gradient was %0.2f \n',delta_exp-delta_act)
+        % Save eps history and make actual eps new prior eps
+        eps_prior = eps_act;
+        
+    end
+    eps_rec(ii) = eps_act;
+    %% Compute Posterior
+    par = {};
+    if cflag == 1 && itry == 0 % estimate new copula
+        [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
+        par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
+    elseif cflag == 1 && itry<= 2 % Draw from old copula
+        par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
+    else % Draw from Normal Distribution
+        mm = mean(parBank(1:end-1,:),2);
+        mu = std(parBank(1:end-1,:),[],2);
+        pm = spm_unvec(mm,p);
+        pu = spm_unvec(mu,p);
+        for jj = 1:repset
+            par{jj} = resampleParameters_240717(R,pm,pu,m.m,0); % Draw from prior
         end
     end
-    if iflag == 1
-        disp('Drawing from copula...')
-        r = copularnd('t',Mfit.Rho,Mfit.nu,rep);
-        clear x1
-        for Q = 1:size(xf,1)
-            x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
-        end
-        % setup pars from base
-        clear base
-        base = repmat(spm_vec(p),1,rep);
-        for i = 1:rep
-            base(pIndMap,i) = x1(:,i);
-            par{i} = spm_unvec(base(:,i),pOrg);
-        end
-    elseif iflag == 0 && size(parOptBank,2)>(0.25*R.SimAn.minRank) && itry>R.SimAn.copout(2)
-        disp(['No copula available, reverting to normal distribution on best fitting posteriors'])
-        mu = mean(parBank(1:end-1,1:R.SimAn.minRank*2),2);
-        if any(isnan(mu))
-            for jj = 1:repset
-                par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
-            end
-            break
-        end
-        pm = spm_unvec(mu,p);
-        if size(parBank,2)>(0.25*R.SimAn.minRank)
-            sig = cov(parBank(1:end-1,1:R.SimAn.minRank*2)');
-            sig = (sig + sig.') / 2; % Ensures symmetry constraints
-            stdev = mean(diag(sig))*2;
-        else
-            stdev= R.SimAn.jitter;
-        end
-        for jj = 1:repset
-            par{jj} = resampleParameters_240717(R,pm,stdev,m.m); % Draw from prior
-        end
-    else
-        for jj = 1:repset
-            par{jj} = resampleParameters_240717(R,p,stdev,m.m); % Draw from prior
-        end
-    end
+    
     
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
     if size(Ilist,2)>2
@@ -360,14 +268,14 @@ while ii <= searchN
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
-        if exist('base')
-            pmean = spm_unvec(mean(base,2),pOrg);
+        if exist('Mfit')
+            pmean = Mfit.Pfit;
         else
             pmean = p;
         end
-        banksave{ii} = parBank(:,parBank(end,:)>eps);
+        banksave{ii} = parBank(:,parBank(end,:)>eps_act);
         figure(2);    clf
-        optProgPlot(Tm(1:ii),r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,R)
+        optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,R)
         drawnow;shg
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot example time series
@@ -424,15 +332,8 @@ while ii <= searchN
     end
     % Or to workspace
     %     assignin('base','R_out',R)
-    if iflag == 1
-        if tflag == 1
-            Tm(ii+1) = Tm(ii)+ 1;
-        else
-            Tm(ii+1) = Tm(ii);
-        end
-        ii = ii + 1;
-    end
-    if itry>R.SimAn.convterm
+    
+    if delta_act < 1e-3
         disp('Itry Exceeded: Convergence')
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
@@ -441,12 +342,8 @@ while ii <= searchN
         return
     end
     
-    for jj = 1:repset
-        if any(isnan(spm_vec(par{jj})))
-            a = 1;
-        end
-    end
-    
+
+    ii = ii + 1;
     %     uv = whos;
     %     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%

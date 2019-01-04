@@ -6,7 +6,7 @@ end
 parOptBank = R.parOptBank;
 % figure
 % hist(parOptBank(end,:),[-1:.1:1]); xlim([-1 1])
-eps = R.analysis.modEvi.eps;
+eps = R.analysis.modEvi.eps; % temporary (calculated later from whole model family)
 
 % parOptBank = parOptBank(:,parOptBank(end,:)>eps);
 %% Compute KL Divergence
@@ -21,7 +21,7 @@ pInd = parOptInds_110817(R,p,m.m,2); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
 % pIndMap (71 x 1)
 % xf (71 x size(parOptBank,2) )
-R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
+R.SimAn.minRank = ceil(size(pIndMap,1)*2);
 xf = zeros(size(pIndMap,1),size(parOptBank,2));
 for i = 1:size(pIndMap,1)
     x = parOptBank(pIndMap(i),:); % choose row of parameter values

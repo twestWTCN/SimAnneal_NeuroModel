@@ -47,12 +47,12 @@ uc = innovate_timeseries(R,m);
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
 p.A{1}(3,4) = 0; % STN -> GPe
-p.A_s{1} = repmat(0.5,m.m,m.m);
+p.A_s{1} = repmat(1,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
-p.A_s{2} = repmat(0.5,m.m,m.m);
+p.A_s{2} = repmat(1,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -76,9 +76,9 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 2;
+        prec = 1;
     else
-        prec = 1.5;
+        prec = 1;
     end
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
@@ -101,9 +101,9 @@ p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
 
 %% SPECIFIC TO STN/GPe Resonator
 p.A{1}(3,4) = -0.23;
-p.A_s{1}(3,4) = 0.25;
+p.A_s{1}(3,4) = prec;
 p.A{2}(4,3) = -0.026;
-p.A_s{1}(3,4) = 0.25;
+p.A_s{1}(3,4) = prec;
 
 % GPe
 p.int{3}.T = -0.4;

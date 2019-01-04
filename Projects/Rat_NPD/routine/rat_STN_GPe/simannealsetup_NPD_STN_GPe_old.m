@@ -21,9 +21,8 @@ R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'GPE','STN'};
 R.chsim_name = {'GPE','STN'};
 R.condnames = {'OFF'}; % VERIFY!!!
-% Spectral characteristics
-R.obs.csd.df = 0.5;
-R.obs.csd.reps = 32; %96;
+
+
 
 %% INTEGRATION
 % Main dynamics function
@@ -48,8 +47,8 @@ disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 %% OBSERVATION 
 % observation function
 R.obs.obsFx = @observe_data;
-R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
-R.obs.glist =0; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
+R.obs.gainmeth = {'unitvar'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.glist =1; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
 R.obs.brn =2; % 2; % burn in time
 LF = [1 1 1 1]*10; % Fit visually and for normalised data
 R.obs.LF = LF;
@@ -67,6 +66,7 @@ R.obs.trans.logdetrend =1;
 R.obs.trans.norm = 1;
 R.obs.logscale = 0;
 
+
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
@@ -76,14 +76,14 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 200;
-R.SimAn.lr = [3 0.025]; % sigmoid learning scheme
+R.SimAn.lr = [3 0.075]; % sigmoid learning scheme
 
-R.SimAn.Tm = 0; % Initial temperature
-R.SimAn.rep = 256; %512; % Repeats per temperature
+R.SimAn.Tm = -2; % Initial temperature
+R.SimAn.rep = 448; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 R.SimAn.jitter = 1; % Global precision
 R.SimAn.copout = [2 3];
-R.SimAn.convterm = 20; % convergence
+R.SimAn.convterm = 15; % convergence
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

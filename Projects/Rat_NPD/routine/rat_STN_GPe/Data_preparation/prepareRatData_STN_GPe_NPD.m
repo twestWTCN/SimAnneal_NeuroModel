@@ -20,7 +20,7 @@ for C =1:numel(R.condnames)
     %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
     for i = 1:size(chsel,1)
         for j = 1:size(chsel,1)
-            if i==j
+            if i==j % autospectra
                 Ftmp = F_data;
                 Pxy = abs(log10(mean(vertcat(nsPowmat{chsel(i),condsel(C),:}),1)));
                 %                 Pxy = Pxy(Ftmp>=R.frqz(1) & Ftmp<=R.frqz(end));
@@ -40,12 +40,11 @@ for C =1:numel(R.condnames)
                 %                     plot(R.frqz,Pxy); hold on
                 %                     plot(R.frqz,10.^(Pxy));
                 meannpd_data(C,i,j,1,:) = Pxy;
-            else
-                
+            else % cross
                 for k = 1:size(NPDmat,3)
                     Ftmp = F_data;
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
-                    Cxy = Cxy*1.5;
+                    Cxy = Cxy;
                     Cxy(Ftmp>48 & Ftmp<52) = [];
                     Ftmp(Ftmp>48 & Ftmp<52) = [];
                     Cxy = interp1(Ftmp,Cxy,R.frqz);

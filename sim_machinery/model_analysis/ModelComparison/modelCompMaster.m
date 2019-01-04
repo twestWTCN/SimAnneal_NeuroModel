@@ -1,5 +1,5 @@
-function modelCompMaster(R,WML)
-if nargin>1
+function modelCompMaster(R,N,WML)
+if nargin>2
       save([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
 end  
 
@@ -16,7 +16,7 @@ catch
 end
 
 %% Main Loop
-for modID = 12
+for modID = 1:N
     load([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
     permMod = [];
     if ~any(intersect(WML,modID))
@@ -55,7 +55,7 @@ for modID = 12
             R.parOptBank = parOptBank;
             R.obs.gainmeth = R.obs.gainmeth(1);
             figure(modID);
-            R.analysis.modEvi.N = 1000;
+            R.analysis.modEvi.N = 2500;
             permMod = modelProbs(m.x,m,p,R);
         else
             permMod = [];

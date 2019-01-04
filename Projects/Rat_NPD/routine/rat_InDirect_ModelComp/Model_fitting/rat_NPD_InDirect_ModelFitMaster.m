@@ -4,7 +4,7 @@
 % progress and can be accessed by multiple MATLAB realizations.
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
-delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -17,7 +17,7 @@ delete(handles(isMsg));
 
 % Add relevant paths for toolboxes
 % simAnnealAddPaths()
-rng(342346)
+rng(123213)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -35,7 +35,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 12
+for modID = [12 7:11 1:6 13:18]
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
@@ -52,11 +52,9 @@ for modID = 12
         
         %% Run ABC Optimization
         R = setSimTime(R,32);
-         R.obs.logdetrend = 0;
-         R.SimAn.convterm = 15;
         R.Bcond = 0;
         parBank = [];
-        R.SimAn.rep = 256; %448
+        R.SimAn.rep = 512; %448
         [p] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);
     end
 end
