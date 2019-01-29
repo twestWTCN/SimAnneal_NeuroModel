@@ -13,8 +13,8 @@ R = simannealsetup_NPD_STN_GPe;
 R = prepareRatData_STN_GPe_NPD(R,0); 
 
 %% Do the model probability computations
-% modelCompMaster(R,3,[])
-modelCompMaster(R,3)
+% modelCompMaster(R,1:3)
+% modelCompMaster(R,2,[1 3])
 
 %% Plot the modComp results
 R.modcomp.modN = 3;

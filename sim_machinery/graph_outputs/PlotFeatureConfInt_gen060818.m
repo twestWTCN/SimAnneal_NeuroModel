@@ -37,8 +37,8 @@ if ~isempty(list)
     elseif strncmp(R.data.datatype,'NPD',3)
         partlabs ={'Instant','Forward','Backward'}; msr = 'NPD';
         CSD_mean = mean(CSD_bank,5);
-        CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,25,5);
-        CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %prctile(CSD_bank,75,5);
+        CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
+        CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
     end
     % F = repmat(R.frqz',1,3);
     F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));
@@ -89,7 +89,7 @@ if ~isempty(list)
                 ylim([0 5])
                 ylabel('Power')
             else
-                ylim([0 0.4])
+                ylim([0 0.5])
                 ylabel(msr)
             end
             xlim([min(R.frqz) max(R.frqz)])

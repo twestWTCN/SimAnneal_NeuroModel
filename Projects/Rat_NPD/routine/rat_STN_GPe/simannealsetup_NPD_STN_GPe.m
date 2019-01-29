@@ -76,14 +76,10 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 200;
-R.SimAn.lr = [3 0.025]; % sigmoid learning scheme
 
-R.SimAn.Tm = 0; % Initial temperature
 R.SimAn.rep = 256; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 R.SimAn.jitter = 1; % Global precision
-R.SimAn.copout = [2 3];
-R.SimAn.convterm = 20; % convergence
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

@@ -18,7 +18,7 @@ try
     Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);
     Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),pOrg);
     Mfit.Rho = Rho;
-    Mfit_hist = Mfit;
+%     Mfit_hist = Mfit;
     %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
     figure(3)
     clf

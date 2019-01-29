@@ -6,27 +6,38 @@ if nargin<2
     % cmap = linspecer(R.modcomp.modN);
 end
 %% First get probabilities so you can compute model space epsilon
-for modID = 1:R.modcomp.modN
-    dagname = sprintf([R.out.tag '_M%.0f'],modID);
+for modID = 1:numel(R.modcomp.modN)
+    dagname = sprintf([R.out.tag '_M%.0f'],R.modcomp.modN(modID));
     load([R.rootn 'outputs\' R.out.tag '\NPD_' dagname '\modeProbs_' R.out.tag '_NPD_' dagname '.mat'])
     A = varo; %i.e. permMod
-    
     if ~isempty(A)
         r2rep = [A.r2rep{:}];
         r2rep(isnan(r2rep) | isinf(r2rep)) = [];
         r2bank{modID} = r2rep;
     end
 end
-r2bank = horzcat(r2bank{:});
-R.modcomp.modEvi.epspop = prctile(r2bank,50); % threshold becomes median of model fits
+
+prct = 50;
+r2bankcat = horzcat(r2bank{:});
+R.modcomp.modEvi.epspop = prctile(r2bankcat,prct); % threshold becomes median of model fits
+% Adjust the acceptance threshold if any models have no rejections
+exc = ones(1,numel(R.modcomp.modN));
+while any(exc==1)
+    r2bankcat = horzcat(r2bank{:});
+    R.modcomp.modEvi.epspop = prctile(r2bankcat,prct); % threshold becomes median of model fits
+    for modID = 1:numel(R.modcomp.modN)
+        exc(modID) = sum(r2bank{modID}>R.modcomp.modEvi.epspop)/size(r2bank{modID},2);
+    end
+    prct = prct+1;
+end
 
 p = 0;
 mni = 0;
-for modID = 1:R.modcomp.modN
-    dagname = sprintf([R.out.tag '_M%.0f'],modID);
+for modID = 1:numel(R.modcomp.modN)
+    dagname = sprintf([R.out.tag '_M%.0f'],R.modcomp.modN(modID));
     load([R.rootn 'outputs\' R.out.tag '\NPD_' dagname '\modeProbs_' R.out.tag '_NPD_' dagname '.mat'])
     A = varo; %i.e. permMod
-    
+    avStruc = averageCell(A.par_rep);
     if ~isempty(A)
         r2rep = [A.r2rep{:}];
         r2rep(isnan(r2rep) | isinf(r2rep)) = [];
@@ -42,7 +53,7 @@ for modID = 1:R.modcomp.modN
         %         histogram(r2rep,-1:0.1:1);
         hold on
         
-        KL(modID) = sum(A.KL);
+        KL(modID) = sum(A.KL(~isnan(A.KL)));
         DKL(modID) = sum(A.DKL);
         pmod(modID) = sum(r2rep>R.modcomp.modEvi.epspop)/ size(r2rep,2);
         
@@ -50,6 +61,17 @@ for modID = 1:R.modcomp.modN
         R.plot.cmap = cmap(modID,:);
         flag = 0;
         
+        list = find([A.r2rep{:}]>R.modcomp.modEvi.epspop);
+        if numel(list)>2
+            parcat = [];
+            
+            for i = list
+                parcat(:,i) = spm_vec(A.par_rep{i});
+            end
+            parMean{modID} = spm_unvec(mean(parcat,2),A.par_rep{1});
+        else
+            parMean{modID} = A.par_rep{1};
+        end
         if ismember(modID,R.modcompplot.NPDsel)
             p = p +1;
             [hl(p), hp, dl, flag] = PlotFeatureConfInt_gen060818(R,A,h);
@@ -57,27 +79,33 @@ for modID = 1:R.modcomp.modN
         % hl(modID) = plot(1,1);
         if ~flag
             mni = mni +1;
-            longlab{mni} = sprintf('Model %.f',modID);
+            longlab{mni} = sprintf('Model %.f',R.modcomp.modN(modID));
         end
     else
         r2repSave{modID} = nan(size(r2rep));
     end
     
-    shortlab{modID} = sprintf('M%.f',modID);
+    shortlab{modID} = sprintf('M%.f',R.modcomp.modN(modID));
     %     pause(2)
     %     figure(10)
     %     h = findobj(gca,'Type','line');
     %     legend(h([size(h,1):-2:1 1]),longlab)
     
 end
+
+% Save the model parameter average
+save([R.rootn 'outputs\' R.out.tag '\' R.out.tag '_model_parameter_averages'],'parMean')
+
+set(gcf,'Position',[680   112   976   893])
+
 hl(end+1) = dl;
 longlab{end+1} = 'Data';
 figure(2)
 subplot(3,1,1)
 violin(r2repSave,'facecolor',cmap,'medc','k:','xlabel',shortlab)
 hold on
-plot([0 R.modcomp.modN+1],[R.modcomp.modEvi.epspop R.modcomp.modEvi.epspop],'k--') 
-xlabel('Model'); ylabel('NMRSE'); grid on; ylim([-1.5 0.25])
+plot([0 R.modcomp.modN+1],[R.modcomp.modEvi.epspop R.modcomp.modEvi.epspop],'k--')
+xlabel('Model'); ylabel('NMRSE'); grid on; ylim([-2 1])
 a = gca; a.XTick = 1:R.modcomp.modN;
 a.XTickLabel = shortlab;
 
@@ -87,8 +115,12 @@ h = findobj(gca,'Type','line');
 % legend(hl,{longlab{[R.modcompplot.NPDsel end]}})
 
 subplot(3,1,2)
+% TlnK = 2.*log(max(pmod)./pmod);
+TlnK = -log10(1-pmod);
+
 for i = 1:R.modcomp.modN
-    b = bar(i,-log10(1-pmod(i))); hold on
+    %     b = bar(i,-log10(1-pmod(i))); hold on
+    b = bar(i,TlnK(i)); hold on
     b.FaceColor = cmap(i,:);
 end
 a = gca; a.XTick = 1:R.modcomp.modN; grid on
@@ -104,7 +136,20 @@ a = gca; a.XTick = 1:R.modcomp.modN;
 a.XTickLabel = shortlab;
 grid on
 xlabel('Model'); ylabel('KL Divergence')
-
+set(gcf,'Position',[277   109   385   895])
 % subplot(3,1,3)
 % bar(DKL)
 % xlabel('Model'); ylabel('Joint KL Divergence')
+
+
+%% SCRIPT GRAVE
+% Adjust the acceptance threshold if any models have no rejections
+% exc = ones(1,R.modcomp.modN);
+% while any(exc==1)
+%     r2bankcat = horzcat(r2bank{:});
+%     R.modcomp.modEvi.epspop = prctile(r2bankcat,prct); % threshold becomes median of model fits
+%     for modID = 1:R.modcomp.modN
+%         exc(modID) = sum(r2bank{modID}>R.modcomp.modEvi.epspop)/size(r2bank{modID},2);
+%     end
+%     prct = prct+1;
+% end

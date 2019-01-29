@@ -92,30 +92,31 @@ end
 
 % MMC Auto Flat Priors
 prec= 0.25;
-p.int{1}.T = [-0.0416 0.1269 -0.7104 -0.2497];
+p.int{1}.T = [-0.14 0.15 -0.74 0.11];
 p.int{1}.T_s = repmat(prec,size(p.int{1}.T));
-p.int{1}.G =[0.2380 0.5183 0.4816 0.7886 -0.1513 -0.8945 0.4353 0.2208 -0.4308 0.2065 0.7281 0.9148 0.6130 0.0499];
+p.int{1}.G =[0.05 0.31 0.24 0.08 0.66 0.08 -0.15 -0.70 0.01 -0.12 0.60 0.37 0.72 0.09];
 p.int{1}.G_s = repmat(prec,size(p.int{1}.G));
-p.int{1}.S = 0.820;
+p.int{1}.S = 0.98;
 p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
-
+    
 %% SPECIFIC TO STN/GPe Resonator
-p.A{1}(3,4) = -0.23;
+prec = 0.25;
+p.A{1}(3,4) = -2.4;
 p.A_s{1}(3,4) = prec;
-p.A{2}(4,3) = -0.026;
+p.A{2}(4,3) = 2.94;
 p.A_s{1}(3,4) = prec;
 
 % GPe
-p.int{3}.T = -0.4;
+p.int{3}.T = 0.71;
 p.int{3}.T_s = prec;
-p.int{3}.G = -0.015;
+p.int{3}.G = 0.013;
 p.int{3}.G_s = prec;
-p.int{3}.S = -0.19;
+p.int{3}.S = 0.96;
 p.int{3}.S_s = prec;
 % STN
-p.int{4}.T = -0.33;
+p.int{4}.T = -1.61;
 p.int{4}.T_s = prec;
-p.int{4}.G = 0.23;
+p.int{4}.G = 2.33;
 p.int{4}.G_s = prec;
-p.int{4}.S = -0.15;
+p.int{4}.S = -0.55;
 p.int{4}.S_s = prec;

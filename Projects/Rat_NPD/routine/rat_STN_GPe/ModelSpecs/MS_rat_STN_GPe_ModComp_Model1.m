@@ -44,12 +44,16 @@ uc = innovate_timeseries(R,m);
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
+p.A_s{1} = repmat(0,m.m,m.m);
+
 p.A{1}(1,2) = 0; % STN -> GPe
-p.A_s{1} = repmat(1,m.m,m.m);
+p.A_s{1}(1,2) = 1; % STN -> GPe
 
 p.A{2} =  repmat(-32,m.m,m.m);
+p.A_s{2} = repmat(0,m.m,m.m);
+
 p.A{2}(2,1) = 0; % GPe -| STN
-p.A_s{2} = repmat(1,m.m,m.m);
+p.A_s{2}(2,1) = 1; % GPe -| STN
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -64,7 +68,7 @@ p.obs.mixing_s = repmat(0,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.1,size(p.D));
+p.D_s = repmat(0.5,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = [0 0];

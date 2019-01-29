@@ -101,22 +101,22 @@ end
 
 %% SPECIFIC TO STN/GPe Resonator
 prec = 0.25;
-p.A{1}(3,4) = -0.23;
-p.A_s{1}(3,4) = 0.25;
-p.A{2}(4,3) = -0.026;
-p.A_s{1}(3,4) = 0.25;
+p.A{1}(3,4) = -2.4;
+p.A_s{1}(3,4) = prec;
+p.A{2}(4,3) = 2.94;
+p.A_s{1}(3,4) = prec;
 
 % GPe
-p.int{3}.T = -0.4;
+p.int{3}.T = 0.71;
 p.int{3}.T_s = prec;
-p.int{3}.G = -0.015;
+p.int{3}.G = 0.013;
 p.int{3}.G_s = prec;
-p.int{3}.S = -0.19;
+p.int{3}.S = 0.96;
 p.int{3}.S_s = prec;
 % STN
-p.int{4}.T = -0.33;
+p.int{4}.T = -1.61;
 p.int{4}.T_s = prec;
-p.int{4}.G = 0.23;
+p.int{4}.G = 2.33;
 p.int{4}.G_s = prec;
-p.int{4}.S = -0.15;
+p.int{4}.S = -0.55;
 p.int{4}.S_s = prec;

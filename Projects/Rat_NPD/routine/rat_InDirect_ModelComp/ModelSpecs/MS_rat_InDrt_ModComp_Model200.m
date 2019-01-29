@@ -1,16 +1,16 @@
-function [R p m uc] = MS_rat_InDrt_ModComp_Model18(R)
-% Model 18 - NoStriatal/M2 Flat + STN Beta
-m.m = 4; % # of sources
-m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
-m.Gint = [14 1 1 1 1];
-m.Tint = [4 1 1 1 1];
+function [R p m uc] = MS_rat_InDrt_ModComp_Model200(R)
+% THIS IS THE STN/GPE
+m.m = 2; % # of sources
+m.x = {[0 0]  [0 0]}; % Initial states
+m.Gint = [1 1];
+m.Tint = [1 1];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
     m.dipfit.model(i).source = R.chsim_name{i};
 end
 
-m.outstates = {[0 0 0 0 0 0 1 0] [1 0] [1 0] [1 0]};
+m.outstates = {[1 0] [1 0]};
 R.obs.outstates = find([m.outstates{:}]);
 for i=1:numel(R.chloc_name)
     R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
@@ -39,36 +39,36 @@ uc = innovate_timeseries(R,m);
 
 %% Prepare Priors
 % 1 MMC
-% 2 STR
 % 3 GPE
 % 4 STN
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(2,1) = 0; % MMC -> STR
-p.A{1}(3,4) = 0; % STN -> GPe
-p.A{1}(4,1) = 0; % MMC -> STN (hyperdirect)
-p.A_s{1} = repmat(1,m.m,m.m);
+p.A_s{1} = repmat(0,m.m,m.m);
+
+p.A{1}(1,2) = 0; % STN -> GPe
+p.A_s{1}(1,2) = 1; % STN -> GPe
 
 p.A{2} =  repmat(-32,m.m,m.m);
-% p.A{2}(3,2) = 0; % STR -| GPe
-p.A{2}(4,3) = 0; % GPe -| STN
-p.A_s{2} = repmat(1,m.m,m.m);
+p.A_s{2} = repmat(0,m.m,m.m);
+
+p.A{2}(2,1) = 0; % GPe -| STN
+p.A_s{2}(2,1) = 1; % GPe -| STN
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.5,size(p.C));
+p.C_s = repmat(1,size(p.C));
 
 % Leadfield
-p.obs.LF = [1 1 1 1];
-p.obs.LF_s = repmat(0.2,size(p.obs.LF));
+p.obs.LF = [1 1];
+p.obs.LF_s = repmat(1,size(p.obs.LF));
 
 p.obs.mixing = [1]; %zeros(size(R.obs.mixing));
 p.obs.mixing_s = repmat(0,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.25,size(p.D));
+p.D_s = repmat(0.5,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = [0 0];
@@ -76,11 +76,7 @@ p.S_s = [0.2 0.2];
 
 % time constants and gains
 for i = 1:m.m
-    if i == 1
-        prec = 1;
-    else
-        prec = 1;
-    end
+    prec = 1;
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
@@ -90,34 +86,3 @@ for i = 1:m.m
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end
-
-% MMC Auto Flat Priors
-prec= 0.25;
-p.int{1}.T = [-0.14 0.15 -0.74 0.11];
-p.int{1}.T_s = repmat(prec,size(p.int{1}.T));
-p.int{1}.G =[0.05 0.31 0.24 0.08 0.66 0.08 -0.15 -0.70 0.01 -0.12 0.60 0.37 0.72 0.09];
-p.int{1}.G_s = repmat(prec,size(p.int{1}.G));
-p.int{1}.S = 0.98;
-p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));
-
-%% SPECIFIC TO STN/GPe Resonator
-prec = 0.25;
-p.A{1}(3,4) = -2.4;
-p.A_s{1}(3,4) = prec;
-p.A{2}(4,3) = 2.94;
-p.A_s{1}(3,4) = prec;
-
-% GPe
-p.int{3}.T = 0.71;
-p.int{3}.T_s = prec;
-p.int{3}.G = 0.013;
-p.int{3}.G_s = prec;
-p.int{3}.S = 0.96;
-p.int{3}.S_s = prec;
-% STN
-p.int{4}.T = -1.61;
-p.int{4}.T_s = prec;
-p.int{4}.G = 2.33;
-p.int{4}.G_s = prec;
-p.int{4}.S = -0.55;
-p.int{4}.S_s = prec;

@@ -1,4 +1,4 @@
-function R = simannealsetup_InDirect_ModelComp()
+function R = simannealsetup_InDirect_ModelComp_STNGPe()
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'InDrt_ModComp';
@@ -20,8 +20,8 @@ R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
 R.frqz = [6:.2:68];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MMC','STR','GPE','STN'};
-R.chsim_name = {'MMC','STR','GPE','STN'};
+R.chloc_name = {'GPE','STN'};
+R.chsim_name = {'GPE','STN'};
 R.condnames = {'OFF'};
 % Spectral characteristics
 R.obs.csd.df = 0.5;

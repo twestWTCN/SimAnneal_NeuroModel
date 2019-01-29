@@ -14,13 +14,13 @@ R = simannealsetup_InDirect_ModelComp;
 R = prepareRatData_InDirect_Group_NPD(R); 
 
 %% Do the model probability computations
-modelCompMaster(R)
+% modelCompMaster(R,[100 200],[1:18])
 
 %% Plot the modComp results
-R.modcomp.modN = 18;
+R.modcomp.modN = [1:18 100 200];
 R.modcompplot.NPDsel = [6 12 15];
 R.plot.confint = 'yes';
-cmap = linspecer(R.modcomp.modN);
+cmap = linspecer(numel(R.modcomp.modN));
 plotModComp_091118(R,cmap)
 figure(2)
 subplot(3,1,1); ylim([-2 1])

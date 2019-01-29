@@ -1,4 +1,4 @@
-function modelCompMaster(R,N,WML)
+function modelCompMaster(R,modlist,WML)
 if nargin>2
       save([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
 end  
@@ -16,7 +16,7 @@ catch
 end
 
 %% Main Loop
-for modID = 1:N
+for modID = modlist
     load([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
     permMod = [];
     if ~any(intersect(WML,modID))
@@ -25,7 +25,6 @@ for modID = 1:N
         disp('Writing to PermMod List!!')
         fprintf('Now Computing Probabilities for Model %.0f',modID)
         f = msgbox(sprintf('Probabilities for Model %.0f',modID));
-       
         
         dagname = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
         % Load Model
@@ -49,8 +48,8 @@ for modID = 1:N
         
         R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
         R.analysis.BAA.flag = 0; % Turn off BAA flag (time-locked analysis)
-        parOptBank = parBank(1:end-1,1:2^10);
-        
+        parOptBank = parBank(1:end-1,parBank(end,:)>R.analysis.modEvi.eps);
+
         if  size(parOptBank,2)>1
             R.parOptBank = parOptBank;
             R.obs.gainmeth = R.obs.gainmeth(1);

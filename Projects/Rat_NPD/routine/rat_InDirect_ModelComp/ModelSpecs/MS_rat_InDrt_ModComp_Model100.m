@@ -1,4 +1,4 @@
-function [R p m uc] = MS_rat_InDirect_ModelComp_M2_AutoFit(R)
+function [R p m uc] = MS_rat_InDrt_ModComp_Model100(R)
 %M2 AutoFit
 m.m = 1; % # of sources
 m.x = {[0 0 0 0 0 0 0 0]}; % Initial states

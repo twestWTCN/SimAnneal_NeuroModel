@@ -14,35 +14,35 @@ eps = R.analysis.modEvi.eps; % temporary (calculated later from whole model fami
 N = R.analysis.modEvi.N;
 
 if R.analysis.BAA.flag == 0
-
-%% Resample parameters
-% Compute indices of optimised parameter
-pInd = parOptInds_110817(R,p,m.m,2); % in structure form
-pIndMap = spm_vec(pInd); % in flat form
-% pIndMap (71 x 1)
-% xf (71 x size(parOptBank,2) )
-R.SimAn.minRank = ceil(size(pIndMap,1)*2);
-xf = zeros(size(pIndMap,1),size(parOptBank,2));
-for i = 1:size(pIndMap,1)
-    x = parOptBank(pIndMap(i),:); % choose row of parameter values
-    xf(i,:) = x;
-end
-
-disp('Drawing from copula...')
-r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,N);
-clear x1
-for Q = 1:size(xf,1)
-    x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
-end
-% setup pars from base
-clear base
-base = repmat(spm_vec(p),1,N);
-for i = 1:N
-    base(pIndMap,i) = x1(:,i); % Insert changing pars into whole base pars
-    par{i} = spm_unvec(base(:,i),p);
-end
-plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
-
+    
+    %% Resample parameters
+    % Compute indices of optimised parameter
+    pInd = parOptInds_110817(R,p,m.m,2); % in structure form
+    pIndMap = spm_vec(pInd); % in flat form
+    % pIndMap (71 x 1)
+    % xf (71 x size(parOptBank,2) )
+    R.SimAn.minRank = ceil(size(pIndMap,1)*2);
+    xf = zeros(size(pIndMap,1),size(parOptBank,2));
+    for i = 1:size(pIndMap,1)
+        x = parOptBank(pIndMap(i),:); % choose row of parameter values
+        xf(i,:) = x;
+    end
+    
+    disp('Drawing from copula...')
+    r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,N);
+    clear x1
+    for Q = 1:size(xf,1)
+        x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
+    end
+    % setup pars from base
+    clear base
+    base = repmat(spm_vec(p),1,N);
+    for i = 1:N
+        base(pIndMap,i) = x1(:,i); % Insert changing pars into whole base pars
+        par{i} = spm_unvec(base(:,i),p);
+    end
+    plotDistChange_KS(R.Mfit.Rho,R.Mfit.nu,xf,p,pInd,R,1)
+    
     %% Setup Parfor
     % if isempty(gcp)
     %     parpool
@@ -69,25 +69,30 @@ elseif R.analysis.BAA.flag
             %     par = [];
             %     par{1} = spm_unvec(mean(base,2),p);
     end
-
+    
 end
 
 %%Plot Example
+
 figure(5)
 pnew = par{1};
-[r2mean,pnew,feat_sim,wflag] = computeSimData(R,m,pnew,0,1);
+u = innovate_timeseries(R,m);
+u{1} = u{1}.*sqrt(R.IntP.dt);
+[r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(R,m,u,pnew,0);
 wfstr = ones(1,N);
 while wfstr(end)>0
-    parfor (jj = 1:N, parforArg)
-%         for jj = 1:N
+        parfor (jj = 1:N, parforArg)
+%     for jj = 1:N
         
         %     ppm.increment();
         pnew = par{jj};
-        [r2mean,pnew,feat_sim,xsims,wflag] = computeSimData(R,m,pnew,0);
+        u = innovate_timeseries(R,m);
+        u{1} = u{1}.*sqrt(R.IntP.dt);
+        [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(R,m,u,pnew,0);
         
         %     R.plot.outFeatFx({},{feat_sim},R.data.feat_xscale,R,1)
         wfstr(jj) = wflag;
-        r2rep{jj} = r2mean;
+        r2rep{jj} = r2;
         par_rep{jj} = pnew;
         feat_rep{jj} = feat_sim;
         disp(jj); %

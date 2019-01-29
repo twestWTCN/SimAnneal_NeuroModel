@@ -37,7 +37,6 @@ par = cell(1,R.SimAn.rep);
 % Set Fixed Annealing Parameters
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
-Tm(1) =  R.SimAn.Tm;
 ii = 1;
 eps_prior = -3; % prior eps (needed for gradient approximation);
 eps_exp = -2; eps_act = eps_prior;
@@ -45,7 +44,7 @@ cflag = 0; delta_act = 1;
 % Compute indices of parameters to be optimized
 pInd = parOptInds_110817(R,p,m.m); % in structure form
 pIndMap = spm_vec(pInd); % in flat form
-R.SimAn.minRank = ceil(size(pIndMap,1)*2); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     xf = R.Mfit.xf;
@@ -87,71 +86,14 @@ while ii <= searchN
         pnew = par{jj};
         wflag = 0;
         %% Simulate New Data
-        % Integrate in time master fx function
-        try
-            [xsims dum wflag] = R.IntP.intFx(R,x,uc,pnew,m);
-        catch
-            disp('Simulation failed!')
-            xsims{1} = nan(1,3);
-        end
-        if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
-            try
-                % Run Observer function
-                % Subloop is local optimization of the observer gain
-                % Parfor requires parameter initialisation
-                glorg = pnew.obs.LF;
-                gainlist = R.obs.glist;
-                feat_sim = cell(1,length(gainlist));
-                xsims_gl = cell(1,length(gainlist));
-                r2mean = zeros(1,length(gainlist));
-                for gl = 1:length(gainlist)
-                    pnew.obs.LF = glorg+gainlist(gl);
-                    if isfield(R.obs,'obsFx')
-                        xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
-                    else
-                        xsims_gl{gl} =xsims;
-                    end
-                    % Run Data Transform d
-                    if isfield(R.obs,'transFx')
-                        [~, feat_sim{gl}, wflag] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
-                    else
-                        feat_sim{gl} = xsims_gl{gl}; % else take raw time series
-                    end
-                    % Compare Pseudodata with Real
-                    r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
-                end
-                if wflag == 1
-                    error('TransFX could not compute data transform!')
-                end
-                [r2 ir2] = max(r2mean);
-                %                 R.plot.outFeatFx({R.data.feat_emp},feat_sim,R.data.feat_xscale,R,ir2,[])
-                pnew.obs.LF = glorg+gainlist(ir2);
-                %         disp(pnew.obs.LF)
-                %         toc
-                % plot if desired
-                %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
-                % %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
-                % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-                % %                 close all
-            catch
-                disp('Observation/Cost Function Failure!')
-                r2 = -inf;
-                ir2 =1;
-                xsims_gl{1} = NaN;
-                feat_sim{1} = NaN;
-            end
-        else
-            disp('Sim Output contains NaNs!')
-            r2 = -inf;
-            ir2 =1;
-            xsims_gl{1} = NaN;
-            feat_sim{1} = NaN;
-        end
+        u = innovate_timeseries(R,m);
+        u{1} = u{1}.*sqrt(R.IntP.dt);
+        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData(R,m,u,pnew,0,0)
         
         r2rep{jj} = r2;
         par_rep{jj} = pnew;
-        xsims_rep{jj} = xsims_gl{ir2}; % This takes too much memory: !Modified to store last second only!
-        feat_sim_rep{jj} = feat_sim{ir2};
+        xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
+        feat_sim_rep{jj} = feat_sim;
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % End of batch replicates
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,7 +133,10 @@ while ii <= searchN
     
     %% Find error threshold for temperature (epsilon)
     parOptBank = parBank(:,parBank(end,:)>eps_exp);
-    
+    A = parOptBank(pIndMap,:);
+    B = eig(cov(A));
+    C = B/sum(B);
+    fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
     if size(parOptBank,2)> R.SimAn.minRank-1
         if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
         disp('Bank satisfies current eps')
@@ -211,7 +156,7 @@ while ii <= searchN
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry> 1
+    elseif itry > 1
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,1:R.SimAn.minRank);
         eps_act = parOptBank(end,end);
@@ -318,7 +263,7 @@ while ii <= searchN
             %             end
             %             save([R.rootn '\outputs\' R.out.tag '\modelfit_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'R')
             %             save([R.rootn '\outputs\' R.out.tag '\parBank_' R.out.tag '_' sprintf('%d',[R.d(1:3)]) '.mat'],'parBank')
-            disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
+            disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
         end
     end
     %     disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})

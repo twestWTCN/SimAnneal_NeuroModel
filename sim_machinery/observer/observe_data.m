@@ -11,6 +11,11 @@ for condsel = 1:numel(R.condnames)
         warning('Simulation is shorter than burn length!!!')
         return
     end
+    if any(isnan(xsims(:)))
+        xsims_c{condsel} = xsims;
+        warning('Simulation contains NaNs!!!')
+        return
+    end        
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
