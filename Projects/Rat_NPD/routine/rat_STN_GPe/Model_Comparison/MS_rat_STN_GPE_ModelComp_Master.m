@@ -5,7 +5,6 @@ tags = get(handles,'Tag');
 isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
 delete(handles(isMsg));
 
-
 %% Add Paths
 % simAnnealAddPaths()
 %% Set Routine Pars
@@ -14,7 +13,8 @@ R = simannealsetup_NPD_STN_GPe;
 R = prepareRatData_STN_GPe_NPD(R,0); 
 
 %% Do the model probability computations
-modelCompMaster(R)
+% modelCompMaster(R,1:3)
+% modelCompMaster(R,2,[1 3])
 
 %% Plot the modComp results
 R.modcomp.modN = 3;

@@ -11,6 +11,11 @@ for condsel = 1:numel(R.condnames)
         warning('Simulation is shorter than burn length!!!')
         return
     end
+    if any(isnan(xsims(:)))
+        xsims_c{condsel} = xsims;
+        warning('Simulation contains NaNs!!!')
+        return
+    end        
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
@@ -61,25 +66,39 @@ for condsel = 1:numel(R.condnames)
                     xsims(i,:) = filtfilt(R.obs.highpass.fwts,1,x);
                 end
             case 'boring'
-                Xstab = [];
-                %                                 figure
-                %                                 plot(xsims'); shg
+%                                 figure(100)
+%                                 plot(xsims'); shg
+                
+                acfcheck = []; acffft = []; montoncheck = [];
                 for j = 1:size(xsims,1)
-                    %                     swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/12), 0);
-                    %                     swX = swX(:,2:end-1);
-                    %                     Xstab(j,1) = std(abs(mean(swX)));%<0.01;
-                    Xstab(j,1) =std(diff(abs(hilbert(xsims(j,:)))))/std(diff(xsims(j,:)));
-                    A = xsims(j,:);
-                    Xstab(j,2) = std(diff(findpeaks(A)))/std(diff(xsims(j,:)));
-                    %                     autocorr(
+                    swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/3), 0);
+                    for swin = 1:size(swX,2)
+                        A = swX(:,swin);
+                        Env = abs(hilbert(A));
+                        [acf,lags,bounds] = autocorr(Env,200);
+                        acfcheck(j,swin) = any(abs(acf(10:end))>0.85);
+                        Ar = abs(fft(acf));
+                        acffft(j,swin) =  any(Ar(3:end-3)>30);
+                        montoncheck(j,swin) = mean(diff(Env(1:1/R.IntP.dt:end))>0)>0.70;
+                    end
+                    
                     %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
                 end
-                if any(Xstab(:)<0.2)
-                    disp('SimFx is Stable (boring)!')
+                if sum(acffft(:))>4
+                    disp('SimFx has boring envelope!')
                     %                     close all
                     %                     error('SimFx is Stable (boring)!')
                     wflag = 1;
+                elseif sum(montoncheck(:))>4 %any(acfcheck) ||
+                    disp('SimFx seems unstable!')
+                    %                     close all
+                    %                     error('SimFx is Stable (boring)!')
+                    wflag = 1;
+                    %                 elseif any(Xstab(:))
+                    %                     disp('SimFx seems regular!')
+                    %                     wflag = 1;
                 end
+                
                 
         end
     end

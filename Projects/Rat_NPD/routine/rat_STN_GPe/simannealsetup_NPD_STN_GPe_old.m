@@ -1,16 +1,14 @@
-function R = simannealsetup_InDirect_ModelComp()
+function R = simannealsetup_NPD_STN_GPe()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'InDrt_ModComp';
+R.out.tag = 'STN_GPe_ModComp';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
-    R.BBA_path = 'C:\Users\Tim\Documents\Work\GIT\Cortical_Parkinsons_Networks\BetaBursts';
 else
     R.rootn = ['C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\sim_machinery';
-    R.BBA_path = 'C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\BetaBursts';
 end
 % addpath(genpath(R.rootn))
 % addpath(genpath(R.rootm))
@@ -18,14 +16,13 @@ end
 %% DATA SPECIFICATION
 R.filepathn = [R.rootn 'data\storage'];
 R.data.datatype = 'NPD'; %%'NPD'
-R.frqz = [6:.2:68];
+R.frqz = [6:.2:48];
 R.frqzfull = [1:.2:200]; % used for filters
-R.chloc_name = {'MMC','STR','GPE','STN'};
-R.chsim_name = {'MMC','STR','GPE','STN'};
-R.condnames = {'OFF'};
-% Spectral characteristics
-R.obs.csd.df = 0.5;
-R.obs.csd.reps = 32; %96;
+R.chloc_name = {'GPE','STN'};
+R.chsim_name = {'GPE','STN'};
+R.condnames = {'OFF'}; % VERIFY!!!
+
+
 
 %% INTEGRATION
 % Main dynamics function
@@ -50,8 +47,8 @@ disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 %% OBSERVATION 
 % observation function
 R.obs.obsFx = @observe_data;
-R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
-R.obs.glist =0; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
+R.obs.gainmeth = {'unitvar'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
+R.obs.glist =1; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
 R.obs.brn =2; % 2; % burn in time
 LF = [1 1 1 1]*10; % Fit visually and for normalised data
 R.obs.LF = LF;
@@ -79,10 +76,14 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchN = 200;
+R.SimAn.lr = [3 0.075]; % sigmoid learning scheme
 
-R.SimAn.rep = 512; %512; % Repeats per temperature
+R.SimAn.Tm = -2; % Initial temperature
+R.SimAn.rep = 448; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 R.SimAn.jitter = 1; % Global precision
+R.SimAn.copout = [2 3];
+R.SimAn.convterm = 15; % convergence
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';
@@ -94,17 +95,7 @@ R.plot.gif.loops = 2;
 
 
 
-%% OLD PARAMETERS
-% R.obs.transFxArgs = '(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R)';
-% % R.obs.norm = 'False';
-% % R.obs.csd.ztranscsd = 'False'; % z-transform CSDs
-% % R.obs.csd.abovezero = 'False'; % Bring above zero
-% % R.SimAn.starttemp = 2;
-% % R.obs.mixing = [0.005 0.05];
-% % R.obs.lowpass.cutoff = 80;
-% % R.obs.lowpass.order = 80;
-% % R.SimAn.maxdev = 12;
-% % R.SimAn.starttemp = 2;
-% % R.SimAn.alpha = 0.98; % alpha increment
+
+
 
 

@@ -1,6 +1,4 @@
-function [KL DKL] = KLDiv(R,p,m,parBank)
-parOptBank = parBank(1:end-1,parBank(end,:)>R.analysis.modEvi.eps);
-
+function [KL DKL] = KLDiv(R,p,m,parOptBank)
 %% Resample parameters
 % Compute indices of optimised parameter
 pVec = spm_vec(p);

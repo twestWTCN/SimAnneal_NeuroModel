@@ -1,4 +1,7 @@
 function pInd = parOptInds_110817(R,p,MN,set)
+% This function will find the indices of the parameters to be optimized.
+% Parameters will only be added if there expected values are non neglible
+% (i.e. > -32). 
 if nargin<4
     set =2;
 end
@@ -12,7 +15,7 @@ for i = 1:length(plist)
     for src = 1:L
         if isequal(plist{i},'.A') || isequal(plist{i},'.B') % Case for matrices where we loop through
             for Ai = 1:size(eval(['p' plist{i}]),2)
-                X= eval(['p' plist{i} '{Ai}']);
+                X = eval(['p' plist{i} '{Ai}']);
                 x = reshape(X,1,[]);
                 xseq = rand(size(x));
                 eval(['p' plist{i} '{Ai} = xseq;']);

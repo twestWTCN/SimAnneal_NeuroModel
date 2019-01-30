@@ -102,12 +102,12 @@ while ii <= searchN
                 % Subloop is local optimization of the observer gain
                 % Parfor requires parameter initialisation
                 glorg = pnew.obs.LF;
-                gainlist = linspace(R.obs.glist(1),R.obs.glist(2),R.obs.glist(3));
+                gainlist = R.obs.glist;
                 feat_sim = cell(1,length(gainlist));
                 xsims_gl = cell(1,length(gainlist));
                 r2mean = zeros(1,length(gainlist));
                 for gl = 1:length(gainlist)
-                    pnew.obs.LF = glorg + gainlist(gl);
+                    pnew.obs.LF = glorg+gainlist(gl);
                     if isfield(R.obs,'obsFx')
                         xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
                     else
@@ -126,7 +126,8 @@ while ii <= searchN
                     error('TransFX could not compute data transform!')
                 end
                 [r2 ir2] = max(r2mean);
-                pnew.obs.LF = glorg + gainlist(ir2);
+%                 R.plot.outFeatFx({R.data.feat_emp},feat_sim,R.data.feat_xscale,R,ir2,[])
+                pnew.obs.LF = glorg+gainlist(ir2);
                 %         disp(pnew.obs.LF)
                 %         toc
                 % plot if desired
@@ -193,8 +194,7 @@ while ii <= searchN
     % Find error threshold for temperature (epsilon)
     eps = -5;
     if size(parBank,2)>R.SimAn.minRank
-        
-        eps = (Tm(ii)^(1/4))-R.SimAn.starttemp; % 2; 2.5; % temperature based epsilon (arbitrary function)
+        eps = 1-(R.SimAn.lr(1)/(exp(R.SimAn.lr(2)*Tm(ii))));
         %         eps = prctile(r2loop(~isinf(r2loop)),95)*1.05;
         %         epgrad = r2eps-eps_p;
         %         eps = eps_p + epgrad;
@@ -219,7 +219,7 @@ while ii <= searchN
                     parOptBank = A;
                     clear A
                     delta = delta-0.005;
-                    if delta<0.25
+                    if delta<0.30
                         break
                     end
                 end
@@ -281,38 +281,7 @@ while ii <= searchN
         
         %% This is where the multivariate posterior parameter estimate is computed using copulas
         if size(parOptBank,2)> R.SimAn.minRank-1 % Ensure rank is larger than parameters
-            disp('Forming new copula...')
-            clear copU xf ilist
-            % First form kernel density estimates for each optimized
-            % parameter
-            clear copU
-            for i = 1:size(pIndMap,1)
-                x = parOptBank(pIndMap(i),:); % choose row of parameter values
-                copU(i,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
-                xf(i,:) = x;
-            end
-            try
-                [Rho,nu] = copulafit('t',copU','Method','ApproximateML'); % Fit copula
-                % Save outputs that specify the copula
-                Mfit.xf = xf;
-                Mfit.nu = nu;
-                Mfit.tbr2 = parOptBank(end,1); % get best fit
-                Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);
-                Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),pOrg);
-                Mfit.Rho = Rho;
-                Mfit_hist = Mfit;
-                %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
-                figure(3)
-                clf
-                plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R,stdev)
-                %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
-                iflag = 1;
-                % If redraw then increase epsilon
-            catch
-                disp('The estimate of Rho has become rank-deficient.  You may have too few data, or strong dependencies among variables.')
-                p = spm_unvec(mean(parOptBank,2),pOrg);
-                iflag = 0;
-            end
+
         elseif size(parOptBank,2)> (0.75*R.SimAn.minRank)  % If not enough samples - redraw using means from the parOptBank
             %             p = par_rep{Ilist(1)}; % The best par_rep
             p = spm_unvec(mean(parOptBank,2),pOrg);
@@ -457,7 +426,7 @@ while ii <= searchN
     %     assignin('base','R_out',R)
     if iflag == 1
         if tflag == 1
-            Tm(ii+1) = Tm(ii)+ 0.5;
+            Tm(ii+1) = Tm(ii)+ 1;
         else
             Tm(ii+1) = Tm(ii);
         end

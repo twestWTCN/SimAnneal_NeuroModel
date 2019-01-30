@@ -32,7 +32,7 @@ for C =1:numel(R.condnames)
                 Pxy = f(R.frqz)';
 %                 plot(R.frqz,Pxy); hold on
                 Pxy = 10.^Pxy;
-%                 Pxy = (Pxy-mean(Pxy))./std(Pxy);
+                Pxy = (Pxy-mean(Pxy))./std(Pxy);
                 Pxy = Pxy - min(Pxy);
                 %                 Pxy = Pxy.*tukeywin(length(Pxy),0.6)';
                 

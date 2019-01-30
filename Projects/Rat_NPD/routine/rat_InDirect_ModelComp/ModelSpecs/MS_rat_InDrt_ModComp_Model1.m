@@ -46,12 +46,12 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
-p.A_s{1} = repmat(0.5,m.m,m.m);
+p.A_s{1} = repmat(1,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
-p.A_s{2} = repmat(0.5,m.m,m.m);
+p.A_s{2} = repmat(1,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -75,9 +75,9 @@ p.S_s = [0.2 0.2];
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 1.5;
+        prec = 1;
     else
-        prec = 1.5;
+        prec = 1;
     end
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));

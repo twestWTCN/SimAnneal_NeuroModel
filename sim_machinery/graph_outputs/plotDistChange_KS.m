@@ -31,7 +31,7 @@ for i = 1:2
             QL = 5;
         end
         for Q = 1:QL
-            p = normpdf(X,Ma(Q),Ma_s(Q).*stdev);
+            p = normpdf(X,Ma(Q),Ma_s(Q).*R.SimAn.jitter);
             %             [p,type,coefs] = pearspdf(X,Ma(Q),R.SimAn.jitter*R.SimAn.Tm,1,3);
             plot(X,p,ls,'color',cmap(Q,:))
             hold on

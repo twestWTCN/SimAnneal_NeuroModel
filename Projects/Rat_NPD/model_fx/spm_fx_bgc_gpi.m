@@ -74,10 +74,10 @@ end
 
 % intrinsic/extrinsic connections to be optimised
 %--------------------------------------------------------------------------
-j     = 1;
-for i = 1:size(P.G,2)
-    G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
-end
+% j     = 1;
+% for i = 1:size(P.G,2)
+%     G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
+% end
 
 
 % Motion of states: f(x)
@@ -88,7 +88,7 @@ end
 % inhibitory interneurons: Hidden states - error
 %--------------------------------------------------------------------------
 u      =  U; 
-u      =  -G(:,1)*S(:,1) + u;
+u      =  u; %-G(:,1)*S(:,1) +
 f(:,2) =  (u - 2*x(:,2) - x(:,1)./T(1,1))./T(1,1);
 
 % G(1,1) = str -> gpi (-ve ext)
@@ -101,37 +101,37 @@ f(:,1) = x(:,2);
 f      = f'; %spm_vec(f);
 
 
-if nargout < 2; return, end
-
-% Jacobian
-%==========================================================================
-if isfield(M,'x'), x = spm_vec(M.x); else,  x = sparse(M.n,1); end
-if isfield(M,'u'), u = spm_vec(M.u); else,  u = sparse(M.m,1); end
-J  = spm_diff(M.f,x,u,P,M,1);
-
-
-if nargout < 3; return, end
-
-
-% delays
-%==========================================================================
-% Delay differential equations can be integrated efficiently (but
-% approximately) by absorbing the delay operator into the Jacobian
-%
-%    dx(t)/dt     = f(x(t - d))
-%                 = Q(d)f(x(t))
-%
-%    J(d)         = Q(d)df/dx
-%--------------------------------------------------------------------------
-% Implement: dx(t)/dt = f(x(t - d)) = inv(1 + D.*dfdx)*f(x(t))
-%                     = Q*f = Q*J*x(t)
-%--------------------------------------------------------------------------
-Q  = spm_dcm_delay(P,M,J);
- 
-
-return
-
-
+% if nargout < 2; return, end
+% 
+% % Jacobian
+% %==========================================================================
+% if isfield(M,'x'), x = spm_vec(M.x); else,  x = sparse(M.n,1); end
+% if isfield(M,'u'), u = spm_vec(M.u); else,  u = sparse(M.m,1); end
+% J  = spm_diff(M.f,x,u,P,M,1);
+% 
+% 
+% if nargout < 3; return, end
+% 
+% 
+% % delays
+% %==========================================================================
+% % Delay differential equations can be integrated efficiently (but
+% % approximately) by absorbing the delay operator into the Jacobian
+% %
+% %    dx(t)/dt     = f(x(t - d))
+% %                 = Q(d)f(x(t))
+% %
+% %    J(d)         = Q(d)df/dx
+% %--------------------------------------------------------------------------
+% % Implement: dx(t)/dt = f(x(t - d)) = inv(1 + D.*dfdx)*f(x(t))
+% %                     = Q*f = Q*J*x(t)
+% %--------------------------------------------------------------------------
+% Q  = spm_dcm_delay(P,M,J);
+%  
+% 
+% return
+% 
+% 
 
 
 

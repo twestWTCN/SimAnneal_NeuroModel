@@ -1,8 +1,7 @@
 %STN GPE MOD FIT MASTER
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH!
-% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
-%
+%   delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -23,11 +22,11 @@ addpath('C:\spm12')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
 addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
-rng(4342131)
+rng(5353252)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
-R.objfx.specspec = 'auto'; 
+
 %% Prepare the data
 R = prepareRatData_STN_GPe_NPD(R);
 
@@ -40,6 +39,7 @@ catch
     save([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     disp('Making Mod List!!')
 end
+
 %% Prepare Model
 for modID = 1:3
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
@@ -50,15 +50,15 @@ for modID = 1:3
         fprintf('Now Fitting Model %.0f',modID)
         f = msgbox(sprintf('Fitting Model %.0f',modID));
         
-        modelspec = eval(['@MS_rat_STN_GPe_ModelComp_Model' num2str(modID)]);
+        modelspec = eval(['@MS_rat_STN_GPe_ModComp_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        
+        R.SimAn.rep = 512;
         R = setSimTime(R,32);
         R.Bcond = 0;
         parBank = [];
-        [p] = SimAn_ABC_110817(m.x,uc,p,m,R,parBank);
+        [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
     end
 end
