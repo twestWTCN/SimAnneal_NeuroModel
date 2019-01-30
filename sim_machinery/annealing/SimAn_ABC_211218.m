@@ -278,7 +278,7 @@ while ii <= searchN
     % Or to workspace
     %     assignin('base','R_out',R)
     
-    if delta_act < 1e-3
+    if delta_act < 5e-3
         disp('Itry Exceeded: Convergence')
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
