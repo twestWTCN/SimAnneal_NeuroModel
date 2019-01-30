@@ -1,7 +1,7 @@
 function R = simannealsetup_InDirect_ModelComp()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'InDrt_ModComp';
+R.out.tag = 'InDrt_ModCompRed';
 
 if strmatch(getenv('computername'),'SFLAP-2')
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];

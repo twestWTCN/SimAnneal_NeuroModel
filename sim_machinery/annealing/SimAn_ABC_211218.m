@@ -88,7 +88,7 @@ while ii <= searchN
         %% Simulate New Data
         u = innovate_timeseries(R,m);
         u{1} = u{1}.*sqrt(R.IntP.dt);
-        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData(R,m,u,pnew,0,0)
+        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData(R,m,u,pnew,0,0);
         
         r2rep{jj} = r2;
         par_rep{jj} = pnew;

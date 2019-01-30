@@ -38,7 +38,7 @@ catch
 end
 
 for modID = 9:10
-    if modID>9
+    if modID>=9
         LF = [0.8 0.5 0.5 0.5 0.5 0.5].*0.7; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
     end
@@ -54,7 +54,7 @@ for modID = 9:10
         modelspec = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
-        R.out.dag = sprintf('NPD_InDrt_ModComp_M%.0f',modID); % 'All Cross'
+        R.out.dag = sprintf('NPD_InDrt_ModCompRed_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
         R = setSimTime(R,32);
