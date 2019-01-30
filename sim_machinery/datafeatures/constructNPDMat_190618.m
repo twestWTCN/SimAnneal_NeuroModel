@@ -42,8 +42,8 @@ for C = 1:O
                         Pxy(F==0) = [];
                         F(F==0) = [];
                         if R.obs.logdetrend == 1
-                            [xCalc yCalc b Rsq] = linregress(log10(F),Pxy);
-                            Pxy = Pxy-yCalc;
+                            [xCalc yCalc b Rsq] = linregress(log10(F(F>4 & F<98)),Pxy(F>4 & F<98));
+                            Pxy(F>4 & F<98) = Pxy(F>4 & F<98)-yCalc;
                         end
                         if nargin>5
                             Pxy = interp1(F,Pxy,F_scale);

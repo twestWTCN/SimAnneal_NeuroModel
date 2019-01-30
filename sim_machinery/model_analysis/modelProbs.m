@@ -64,12 +64,13 @@ elseif R.analysis.BAA.flag
             par{1} = spm_unvec(mean(base,2),p);
         case 'best'
             par = [];
-            par{1} = spm_unvec(base(:,1),p);
-        case 'quartile'
-            %     par = [];
-            %     par{1} = spm_unvec(mean(base,2),p);
+            par{1} = spm_unvec(base(:,end),p);
+        case 'UQ'
+            nmrse = base(end-1,:);
+            X = base(:,nmrse>prctile(nmrse,75));
+            par = [];
+            par{1} = spm_unvec(mean(X,2),p);
     end
-
 end
 
 %%Plot Example

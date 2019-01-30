@@ -2,21 +2,21 @@ function [R,BB] = compute_BetaBursts_Simulated(R,xsimMod)
 for cond = 1:size(R.condname,2)
     % Setup Data Structure
     if cond == 1
-        vc_clean.trial{1} = xsimMod{1}{1}{1}([1:4],:);
-    elseif cond == 2
-        vc_clean.trial{1} = xsimMod{2}{1}{1}([1:4],:);
-    elseif cond == 3
-        vc_clean.trial{1} = xsimMod{3}{1}{1}([1:4],:);
+        vc_clean.trial{1} = xsimMod{1}{1}{1}{1}([1:4],:);
+    elseif cond > 1
+        vc_clean.trial{1} = xsimMod{cond}{1}([1:4],:);
     end
-    vc_clean.fsample = 2000;
-    vc_clean.time{1} = linspace(0,size(xsimMod{1}{1}{1},2)/2000,size(xsimMod{1}{1}{1},2));
+    vc_clean.fsample = 1/R.IntP.dt;
+    vc_clean.time{1} = linspace(0,size(vc_clean.trial{1},2)/2000,size(vc_clean.trial{1},2));
     vc_clean.label = R.chsim_name;
     
     % Resample to workable resolution
     cfg = [];
     cfg.resamplefs = 200;
     vc_clean = ft_resampledata(cfg,vc_clean);
-    
+    if isequal(R.condname{cond},'Empirical')
+        BB.TEmp = vc_clean.time{1};
+    end
     % Set up some parameters
     R.bandinits = {'\alpha','\beta_1','\beta_2'};
     R.cohband = 2;
@@ -39,24 +39,9 @@ R.fsamp = BB.fsamp;
 BB.T = linspace(0,length([BB.A{1}])/BB.fsamp,length([BB.A{1}]));
 BB.TSw = linspace(0,length([BB.PLV{1}])/BB.fsamp_sw,length([BB.PLV{1}]));
 
+disp('Assumes condition 6 is empirical!!')
+BB.TSwEmp = linspace(0,length([BB.PLV{6}])/BB.fsamp_sw,length([BB.PLV{6}]));
 % % Switch for Surrogates
 surflag = 0; plotop = 1;
 
-% Find the amplitude threshold from the prctile of concatanated data
-if surflag == 0
-    BB.epsAmp = prctile(BB.A{1}(R.BB.pairInd(2),:),80,2);
-    BB.epsPLV = prctile(BB.PLV{1}(1,:),75,2);
-else
-    BORG = load([R.datapathr R.subname{sub} '\ftdata\BetaBursts\BetaBurstAnalysis_' R.siden{side} '_' R.ipsicon  '_' R.bregname{breg} '_org'],'BB');
-    BB.epsAmp = BORG.BB.epsAmp;
-    BB.epsPLV = BORG.BB.epsPLV ;
-    clear BORG
-end
-% Plot Bursting
-if plotop == 1
-    figure(1)
-    plotExampleBurstPLV(R,BB)
-    set(gcf,'Position',[680  358  1048  622])
-end
-
-save([R.rootn '\routine\' R.out.tagOld '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'],'BB','R')
+save([R.rootn '\routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'],'BB','R')

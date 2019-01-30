@@ -18,7 +18,7 @@ for pn = 1:numel(modID)
     
     R.analysis.modEvi.N = 2000;
     R.analysis.BAA.flag = 1;
-    R.analysis.BAA.redmeth = 'best'; % average samples to get parameters
+    R.analysis.BAA.redmeth = 'UQ'; % average samples to get parameters
     R = setSimTime(R,simtime);
        
     % With Hyperdirect
