@@ -49,9 +49,9 @@ uc = innovate_timeseries(R,m);
 p.A{1} = repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % M1 to STR
 p.A{1}(4,1) = 0; % M1 to STN
-p.A{1}(3,4) = -4; % STN to GPe
+p.A{1}(3,4) = 0; % STN to GPe
 p.A{1}(5,4) = 0; % STN to GPi
-p.A{1}(1,6) = -4; % THAL to M1
+p.A{1}(1,6) = -2; % THAL to M1
 p.A_s{1} = repmat(1,m.m,m.m);
 
 % Inhbitory connections

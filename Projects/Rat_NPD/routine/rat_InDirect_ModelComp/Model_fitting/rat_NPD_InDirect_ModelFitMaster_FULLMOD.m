@@ -28,7 +28,7 @@ rng(734221)
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
 % IF FRESH START
-% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
 R = prepareRatData_InDirect_Group_NPD(R);
 
@@ -42,7 +42,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 10:-1:1
+for modID = 8
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -66,9 +66,9 @@ for modID = 10:-1:1
         
         %% Run ABC Optimization
         R = setSimTime(R,32);
-        R.Bcond = 0;
+        R.Bcond = 0;    
         parBank = [];
-        R.SimAn.rep = 448; %448
+        R.SimAn.rep = 32; %448
         [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
     end
 end

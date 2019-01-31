@@ -52,10 +52,10 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         %         disp(pnew.obs.LF)
         %         toc
         % plot if desired
-        %                                                 R.plot.outFeatFx({R.data.feat_emp},{feat_sim{ir2}},R.data.feat_xscale,R,1,[])
-        % %                                                 figure;subplot(2,1,1); plot(xsims_gl{1}{1}')
+%         figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
+%         figure(2);subplot(2,1,1); plot(xsims_gl{1}')
         % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-        % %                 close all
+%                         close all
     catch
         disp('Observation/Cost Function Failure!')
         r2 = -inf;

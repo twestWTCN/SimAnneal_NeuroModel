@@ -33,10 +33,10 @@ for condsel = 1:numel(R.condnames)
     efferent(3,:) = [9 9 9 9];               % sources of BGC connections (thalamus)
     afferent(3,:) = [2 6 2 6];               % targets of BGC connections (striatum & STN)
     
-    %     efferent(4,:) = [3 3 6 7];               % ORIG sources of MMC connections
-    % afferent(4,:) = [2 4 8 0];               % targets of MMC connections
-    efferent(4,:) = [7 7 7 7];               % sources of MMC connections
-    afferent(4,:) = [8 8 8 8];                  % forward deep/middle; back deep/superficial
+    efferent(4,:) = [3 3 6 7];               % ORIG sources of MMC connections
+    afferent(4,:) = [2 4 8 0];               % targets of MMC connections
+%     efferent(4,:) = [7 7 7 7];               % sources of MMC connections
+%     afferent(4,:) = [8 8 8 8];                  % forward deep/middle; back deep/superficial
     efferent(5,:) = [1 1 1 1];               % sources of STR connections
     afferent(5,:) = [2 2 2 2];               % targets of STR connections
     
@@ -68,11 +68,11 @@ for condsel = 1:numel(R.condnames)
     % E(8,:) = [.5 .5 -.5 -.5]*100000;               % GPI connections
     % E(9,:) = [.5 .5 -.5 -.5]*100000;               % THAL connections
     
-    E(5,:) = [.2 .2 -.2 -.2]*10000;             % STR connections
-    E(6,:) = [.2 .2 -.2 -.2]*10000;             % GPE connections
-    E(7,:) = [.2 .2 -.2 -.2]*10000;             % STN connections
-    E(8,:) = [.2 .2 -.2 -.2]*10000;             % GPI connections
-    E(9,:) = [.2 .2 -.2 -.2]*1000;  %500       % THAL connections
+    E(5,:) = [.2 .2 -.2 -.2]*5000;             % STR connections
+    E(6,:) = [.2 .2 -.2 -.2]*5000;             % GPE connections
+    E(7,:) = [.2 .2 -.2 -.2]*5000;             % STN connections
+    E(8,:) = [.2 .2 -.2 -.2]*5000;             % GPI connections
+    E(9,:) = [.2 .2 -.2 -.2]*2000;  %500       % THAL connections
     
     % get the neural mass models {'ERP','CMC'}
     %--------------------------------------------------------------------------
@@ -259,7 +259,7 @@ for condsel = 1:numel(R.condnames)
         xint = xint + (f.*dt);
         xstore = [xstore xint];
         if tstep >R.IntP.buffer*10
-            if any(xint>5e2) || any(isnan(xint))
+            if any(xint>1e3) || any(isnan(xint))
                 wflag= 1;
                 break
             end

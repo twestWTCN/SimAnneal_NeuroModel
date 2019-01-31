@@ -15,7 +15,7 @@ for condsel = 1:numel(R.condnames)
         xsims_c{condsel} = xsims;
         warning('Simulation contains NaNs!!!')
         return
-    end        
+    end
     tvec_obs = R.IntP.tvec;
     tvec_obs(:,1:round(R.obs.brn*(1/R.IntP.dt))) = [];
     R.IntP.tvec_obs = tvec_obs;
@@ -66,28 +66,34 @@ for condsel = 1:numel(R.condnames)
                     xsims(i,:) = filtfilt(R.obs.highpass.fwts,1,x);
                 end
             case 'boring'
-%                                 figure(100)
-%                                 plot(xsims'); shg
+                %                                 figure(100)
+                %                                 plot(xsims'); shg
                 
                 acfcheck = []; acffft = []; montoncheck = [];
                 for j = 1:size(xsims,1)
                     swX = slideWindow(xsims(j,:), floor(size(xsims(j,:),2)/3), 0);
                     for swin = 1:size(swX,2)
                         A = swX(:,swin);
+                        [acf,lags,bounds] = autocorr(A,1000);
+                        acfcheck(j,swin) = any(abs(acf(50:end))>0.90);
                         Env = abs(hilbert(A));
-                        [acf,lags,bounds] = autocorr(Env,200);
-                        acfcheck(j,swin) = any(abs(acf(10:end))>0.85);
+                        [acf,lags,bounds] = autocorr(Env,1000);
+                        acfEnvcheck(j,swin) = any(abs(acf(50:end))>0.90);
                         Ar = abs(fft(acf));
-                        acffft(j,swin) =  any(Ar(3:end-3)>30);
+                        acffft(j,swin) =  any(Ar(5:end-5)>60);
                         montoncheck(j,swin) = mean(diff(Env(1:1/R.IntP.dt:end))>0)>0.70;
                     end
                     
                     %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
                 end
+                
                 if sum(acffft(:))>4
                     disp('SimFx has boring envelope!')
                     %                     close all
                     %                     error('SimFx is Stable (boring)!')
+                    wflag = 1;
+                elseif sum(acfEnvcheck(:))>4
+                    disp('SimFx has periodic envelope!!')
                     wflag = 1;
                 elseif sum(montoncheck(:))>4 %any(acfcheck) ||
                     disp('SimFx seems unstable!')
