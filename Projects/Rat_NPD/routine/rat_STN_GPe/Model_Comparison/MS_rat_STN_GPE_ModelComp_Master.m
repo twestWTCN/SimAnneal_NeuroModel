@@ -13,7 +13,7 @@ R = simannealsetup_NPD_STN_GPe;
 R = prepareRatData_STN_GPe_NPD(R,0); 
 
 %% Do the model probability computations
-% modelCompMaster(R,1:3)
+modelCompMaster(R,1:3,[])
 % modelCompMaster(R,2,[1 3])
 
 %% Plot the modComp results
@@ -24,3 +24,4 @@ cmap = linspecer(R.modcomp.modN);
 plotModComp_091118(R,cmap)
 figure(2)
 subplot(3,1,1); ylim([-2 1])
+

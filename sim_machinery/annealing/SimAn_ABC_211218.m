@@ -47,21 +47,8 @@ pIndMap = spm_vec(pInd); % in flat form
 R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
-    xf = R.Mfit.xf;
     rep = repset;
-    disp('Drawing from copula...')
-    r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,rep);
-    clear x1
-    for Q = 1:size(xf,1)
-        x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
-    end
-    % setup pars from base
-    clear base
-    base = repmat(spm_vec(p),1,rep);
-    for i = 1:rep
-        base(pIndMap,i) = x1(:,i);
-        par{i} = spm_unvec(base(:,i),p);
-    end
+    par = postDrawCopula(R.Mfit,p,pIndMap,rep);
 else
     for jj = 1:repset
         par{jj} = resampleParameters_240717(R,p,p,m.m,1); % Draw from prior
@@ -75,7 +62,7 @@ while ii <= searchN
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    parfor jj = 1:rep % Replicates for each temperature
+    for jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else

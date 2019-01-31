@@ -1,7 +1,7 @@
 function modelCompMaster(R,modlist,WML)
 if nargin>2
-      save([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
-end  
+    save([R.rootn 'outputs\' R.out.tag '\WorkingPermModList'],'WML')
+end
 
 %% Setup for parallelisation (multiple MATLAB sessions)
 try
@@ -37,6 +37,9 @@ for modID = modlist
         % Load Options
         load([R.rootn 'outputs\' R.out.tag '\' dagname '\R_' R.out.tag '_' dagname '.mat'])
         R = varo;
+        R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
+        R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
+        
         R.Mfit = A;
         a = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
         [dum prior] = a(R);
@@ -49,7 +52,7 @@ for modID = modlist
         R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
         R.analysis.BAA.flag = 0; % Turn off BAA flag (time-locked analysis)
         parOptBank = parBank(1:end-1,parBank(end,:)>R.analysis.modEvi.eps);
-
+        
         if  size(parOptBank,2)>1
             R.parOptBank = parOptBank;
             R.obs.gainmeth = R.obs.gainmeth(1);

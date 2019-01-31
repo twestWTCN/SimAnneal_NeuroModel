@@ -4,8 +4,10 @@ if nargin<5
 end
 if simtime ~= 0
     R = setSimTime(R,simtime);
+    uc = innovate_timeseries(R,m);
+    uc{1} = uc{1}.*sqrt(R.IntP.dt);
 end
-
+wflag = 0;
 
 %% Simulate New Data
 % Integrate in time master fx function
@@ -51,11 +53,11 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         pnew.obs.LF = glorg+gainlist(ir2);
         %         disp(pnew.obs.LF)
         %         toc
-        % plot if desired
-%         figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
-%         figure(2);subplot(2,1,1); plot(xsims_gl{1}')
-        % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
-%                         close all
+        if plotop == 1
+                    figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
+                    figure(2);subplot(2,1,1); plot(xsims_gl{1}')
+            % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
+        end
     catch
         disp('Observation/Cost Function Failure!')
         r2 = -inf;
