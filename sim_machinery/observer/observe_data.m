@@ -66,8 +66,8 @@ for condsel = 1:numel(R.condnames)
                     xsims(i,:) = filtfilt(R.obs.highpass.fwts,1,x);
                 end
             case 'boring'
-                %                                 figure(100)
-                %                                 plot(xsims'); shg
+%                 figure(100)
+%                 plot(xsims'); shg
                 
                 acfcheck = []; acffft = []; montoncheck = [];
                 for j = 1:size(xsims,1)
@@ -80,8 +80,8 @@ for condsel = 1:numel(R.condnames)
                         [acf,lags,bounds] = autocorr(Env,1000);
                         acfEnvcheck(j,swin) = any(abs(acf(50:end))>0.90);
                         Ar = abs(fft(acf));
-                        acffft(j,swin) =  any(Ar(5:end-5)>60);
-                        montoncheck(j,swin) = mean(diff(Env(1:1/R.IntP.dt:end))>0)>0.70;
+                        acffft(j,swin) =  any(Ar(5:end-5)>200);
+                        montoncheck(j,swin) = mean(diff(Env(1:0.5/R.IntP.dt:end))>0)>0.70;
                     end
                     
                     %                     Xstab(i) = std(diff(abs(hilbert(xsims(i,:)))))<0.005;
@@ -92,7 +92,10 @@ for condsel = 1:numel(R.condnames)
                     %                     close all
                     %                     error('SimFx is Stable (boring)!')
                     wflag = 1;
-                elseif sum(acfEnvcheck(:))>4
+                elseif sum(acfcheck(:))>8
+                    disp('SimFx is perfectly periodic!!')
+                    wflag = 1;
+                elseif sum(acfEnvcheck(:))>4 
                     disp('SimFx has periodic envelope!!')
                     wflag = 1;
                 elseif sum(montoncheck(:))>4 %any(acfcheck) ||
@@ -104,8 +107,10 @@ for condsel = 1:numel(R.condnames)
                     %                     disp('SimFx seems regular!')
                     %                     wflag = 1;
                 end
-                
-                
+                if wflag == 0
+                    a = 1;
+                end
+%                 pause(2)
         end
     end
     xsims_c{condsel} = xsims;

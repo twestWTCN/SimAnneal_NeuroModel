@@ -68,7 +68,7 @@ for modID = 8
         R = setSimTime(R,32);
         R.Bcond = 0;    
         parBank = [];
-        R.SimAn.rep = 32; %448
+        R.SimAn.rep = 128; %448
         [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
     end
 end

@@ -28,20 +28,20 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         for gl = 1:length(gainlist)
             pnew.obs.LF = glorg+gainlist(gl);
             if isfield(R.obs,'obsFx')
-                xsims_gl{gl} = R.obs.obsFx(xsims,m,pnew,R);
+                [xsims_gl{gl},R,wflag(1)] = R.obs.obsFx(xsims,m,pnew,R);
             else
                 xsims_gl{gl} =xsims;
             end
             % Run Data Transform d
             if isfield(R.obs,'transFx')
-                [~, feat_sim{gl}, wflag] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
+                [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
             else
                 feat_sim{gl} = xsims_gl{gl}; % else take raw time series
             end
             % Compare Pseudodata with Real
             r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
         end
-        if wflag == 1
+        if any(wflag)
             error('TransFX could not compute data transform!')
         end
         [r2 ir2] = max(r2mean);
