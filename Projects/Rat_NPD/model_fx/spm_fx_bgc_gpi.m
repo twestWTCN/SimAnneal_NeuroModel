@@ -74,10 +74,10 @@ end
 
 % intrinsic/extrinsic connections to be optimised
 %--------------------------------------------------------------------------
-% j     = 1;
-% for i = 1:size(P.G,2)
-%     G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
-% end
+j     = 1;
+for i = 1:size(P.G,2)
+    G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
+end
 
 
 % Motion of states: f(x)

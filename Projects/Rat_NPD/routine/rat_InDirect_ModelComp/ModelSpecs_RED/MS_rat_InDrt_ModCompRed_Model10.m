@@ -34,7 +34,7 @@ m.xinds = xinds;
 % setup exogenous noise
 % m.uset.p = DCM.Ep;
 m.uset.p.covar = eye(m.m);
-m.uset.p.scale = 5e1; %.*R.InstP.dt;
+m.uset.p.scale = 3e1; %.*R.InstP.dt;
 uc = innovate_timeseries(R,m);
 
 %% Prepare Priors
@@ -49,9 +49,9 @@ uc = innovate_timeseries(R,m);
 p.A{1} = repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % M1 to STR
 % p.A{1}(4,1) = 0; % M1 to STN
-p.A{1}(3,4) = 0; % STN to GPe
+p.A{1}(3,4) = -4; % STN to GPe
 p.A{1}(5,4) = 0; % STN to GPi
-p.A{1}(1,6) = 0; % THAL to M1
+p.A{1}(1,6) = -4; % THAL to M1
 p.A_s{1} = repmat(1,m.m,m.m);
 
 % Inhbitory connections
@@ -59,14 +59,14 @@ p.A{2} = repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % STR to GPe
 p.A{2}(5,2) = 0; % STR to GPi
 p.A{2}(4,3) = 0; % GPe to STN
-p.A{2}(5,3) = 0; % GPe to GPi
-% p.A{2}(2,3) = 0; % GPe to STR
+% p.A{2}(5,3) = 0; % GPe to GPi
+% % % p.A{2}(2,3) = 0; % GPe to STR
 p.A{2}(6,5) = 0; % GPi to THAL
 p.A_s{2} = repmat(1,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.5,size(p.C));
+p.C_s = repmat(1,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1 1 1 1 1];

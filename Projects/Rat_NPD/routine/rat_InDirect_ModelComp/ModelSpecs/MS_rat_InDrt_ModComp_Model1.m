@@ -88,3 +88,11 @@ for i = 1:m.m
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end
+
+% prec= 0.25;
+% p.int{1}.T = [-0.0416 0.1269 -0.7104 -0.2497];
+% p.int{1}.T_s = repmat(prec,size(p.int{1}.T));
+% p.int{1}.G =[0.2380 0.5183 0.4816 0.7886 -0.1513 -0.8945 0.4353 0.2208 -0.4308 0.2065 0.7281 0.9148 0.6130 0.0499];
+% p.int{1}.G_s = repmat(prec,size(p.int{1}.G));
+% p.int{1}.S = 0.820;
+% p.int{1}.S_s =  repmat(prec,size(p.int{1}.S));

@@ -3,6 +3,11 @@
 % Models are specified in ModelSpecs of project folder. Will batch fit
 % models to the data specified in fx prepareRatData. WML stores batch
 % progress and can be accessed by multiple MATLAB realizations.
+%%%% TO DO
+% 1. You can optimize nodes without self connection by eliminating the
+% sigmoid transform
+% 2. The sigmoid has identical parameters for all nodes - parameterize for
+% n nodes or put within local functions
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
@@ -18,7 +23,7 @@ delete(handles(isMsg));
 
 % Add relevant paths for toolboxes
 % simAnnealAddPaths()
-rng(123213)
+rng(734221)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -37,10 +42,13 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 9:10
-    if modID>=9
-        LF = [0.8 0.5 0.5 0.5 0.5 0.5].*0.7; % Fit visually and for normalised data
+for modID = 10:-1:1
+    if modID>=7
+        R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
+    else
+        R.chsim_name = {'MMC','STR','GPE','STN'};
+        R.obs.LF = [1 1 1 1]*10; % Fit visually and for normalised data
     end
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
@@ -60,7 +68,7 @@ for modID = 9:10
         R = setSimTime(R,32);
         R.Bcond = 0;
         parBank = [];
-        R.SimAn.rep = 512; %448
+        R.SimAn.rep = 448; %448
         [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
     end
 end

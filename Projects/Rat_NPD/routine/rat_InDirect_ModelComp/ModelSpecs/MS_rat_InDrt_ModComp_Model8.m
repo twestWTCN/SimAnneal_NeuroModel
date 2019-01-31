@@ -36,7 +36,6 @@ m.uset.p.covar = eye(m.m);
 m.uset.p.scale = 5e1; %.*R.InstP.dt;
 uc = innovate_timeseries(R,m);
 
-
 %% Prepare Priors
 % 1 MMC
 % 2 STR
@@ -53,7 +52,7 @@ p.A_s{1} = repmat(1,m.m,m.m);
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
-p.A_s{2} = repmat(1,m.m,m.m);
+p.A_s{2} = repmat(1,m.m,m.m); 
 
 % Connection strengths
 p.C = zeros(m.m,1);

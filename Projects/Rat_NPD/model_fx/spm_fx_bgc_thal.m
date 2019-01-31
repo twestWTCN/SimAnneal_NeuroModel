@@ -25,8 +25,8 @@ T  = [8];               % synaptic time constants [str,gpe,stn,gpi,tha];
 R  = 2/3;                       % slope of sigmoid activation function
 % NB for more pronounced state dependent transfer functions use R  = 3/2;
 
-if isfield(M,'BGC_G'); G = M.BGC_G; end
-if isfield(M,'BGC_T'); T = M.BGC_T; end
+% if isfield(M,'BGC_G'); G = M.BGC_G; end
+% if isfield(M,'BGC_T'); T = M.BGC_T; end
 
 
 % [specified] fixed parameters
