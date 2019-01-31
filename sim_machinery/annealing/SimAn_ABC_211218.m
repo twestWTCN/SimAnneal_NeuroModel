@@ -171,7 +171,7 @@ while ii <= searchN
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
         par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
-    elseif cflag == 1 && itry<= 2 % Draw from old copula
+    elseif cflag == 1 && itry<= 1 % Draw from old copula
         par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
     else % Draw from Normal Distribution
         mm = mean(parBank(1:end-1,:),2);
