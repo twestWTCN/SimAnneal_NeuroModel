@@ -44,9 +44,9 @@ function [f,J,Q] = spm_fx_bgc_stn(x,u,P,M)
 
 % pre-synaptic inputs: s(V)
 %--------------------------------------------------------------------------
-R    = R.*exp(P.S);              % gain of activation function
-F    = 1./(1 + exp(-R*x + 0));   % firing rate
-S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
+% R    = R.*exp(P.S);              % gain of activation function
+% F    = 1./(1 + exp(-R*x + 0));   % firing rate
+% S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
 
 % input
 %==========================================================================
