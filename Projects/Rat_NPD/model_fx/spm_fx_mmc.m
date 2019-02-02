@@ -35,27 +35,27 @@ function [f,J,Q] = spm_fx_mmc(x,u,P,M)
 % get dimensions and configure state variables
 %--------------------------------------------------------------------------
 % x  = spm_unvec(x,M.x);            % neuronal states
-n  = size(x,1);                   % number of sources
+% n  = size(x,1);                   % number of sources
 
 
 % [default] fixed parameters
 %--------------------------------------------------------------------------
-G  = [2 4 2 2 2 2 2 2 2 2 4 2 2 2]*200;         % intrinsic connections
-T  = [3 2 12 18];                               % synaptic time constants [mp sp ii dp]
-
-if isfield(M,'MMC_G'); G = M.MMC_G; end
-if isfield(M,'MMC_T'); T = M.MMC_T; end
+% G  = [2 4 2 2 2 2 2 2 2 2 4 2 2 2]*200;         % intrinsic connections
+% T  = [3 2 12 18];                               % synaptic time constants [mp sp ii dp]
+% 
+% if isfield(M,'MMC_G'); G = M.MMC_G; end
+% if isfield(M,'MMC_T'); T = M.MMC_T; end
 
  
 % [specified] fixed parameters
 %--------------------------------------------------------------------------
-if isfield(M,'pF')
-    try, E = M.pF.E; end
-    try, G = M.pF.G; end
-    try, T = M.pF.T; end
-    try, R = M.pF.R; end
-end
- 
+% if isfield(M,'pF')
+%     try, E = M.pF.E; end
+%     try, G = M.pF.G; end
+%     try, T = M.pF.T; end
+%     try, R = M.pF.R; end
+% end
+%  
  
 % Extrinsic connections
 %--------------------------------------------------------------------------
@@ -87,11 +87,14 @@ end
  
 % pre-synaptic inputs: s(V)
 %--------------------------------------------------------------------------
-R    = (2/3);     %0.5.*                  % slope of sigmoid activation function
-B    = 0;                        % bias or background (sigmoid)
-R    = R.*exp(P.S);              % gain of activation function
-F    = 1./(1 + exp(-R*x + B));   % firing rate
-S    = F - 1/(1 + exp(B));       % deviation from baseline firing
+R    = P.Rz;              % gain of activation function
+S = sigmoidin(x,R,0);
+
+% R    = (2/3);     %0.5.*                  % slope of sigmoid activation function
+% B    = 0;                        % bias or background (sigmoid)
+% R    = R.*exp(P.S);              % gain of activation function
+% F    = 1./(1 + exp(-R*x + B));   % firing rate
+% S    = F - 1/(1 + exp(B));       % deviation from baseline firing
 
 % input
 %==========================================================================
@@ -111,9 +114,10 @@ S    = F - 1/(1 + exp(B));       % deviation from baseline firing
  U = u;
 % time constants and intrinsic connections
 %==========================================================================
-T    = ones(n,1)*T/1000;
-G    = ones(n,1)*G;
-
+% T    = ones(n,1)*T/1000;
+% G    = ones(n,1)*G;
+T = P.T;
+G = P.G;
 % extrinsic connections
 %--------------------------------------------------------------------------
 % forward  (i)   2  sp -> mp (+ve)

@@ -1,4 +1,8 @@
 function [xstore_cond,tvec,wflag,J,Es] = spm_fx_compile_180817(R,x,uc,pc,m)
+% To Do:
+% 1)Precompute the expectations of the within source parameters and take
+%   outside of the integration loop.
+%
 cs = 0; % cond counter
 wflag= 0; tvec = [];
 for condsel = 1:numel(R.condnames)
@@ -35,8 +39,8 @@ for condsel = 1:numel(R.condnames)
     
     efferent(4,:) = [3 3 6 7];               % ORIG sources of MMC connections
     afferent(4,:) = [2 4 8 0];               % targets of MMC connections
-%     efferent(4,:) = [7 7 7 7];               % sources of MMC connections
-%     afferent(4,:) = [8 8 8 8];                  % forward deep/middle; back deep/superficial
+    %     efferent(4,:) = [7 7 7 7];               % sources of MMC connections
+    %     afferent(4,:) = [8 8 8 8];                  % forward deep/middle; back deep/superficial
     efferent(5,:) = [1 1 1 1];               % sources of STR connections
     afferent(5,:) = [2 2 2 2];               % targets of STR connections
     
@@ -108,7 +112,7 @@ for condsel = 1:numel(R.condnames)
     
     D(2,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)
     D(4,1) = 2.5/1000;  % M1 to STN (Nakanishi et al. 1987)
-   
+    
     D(3,4) = 2/1000;    % STN to GPe (Kita and Kitai 1991)
     D(5,4) = 5/1000;    % STR to GPi (Kita and Kitai 1991)
     D(1,6) = 10/1000;   % Thal to M1
@@ -129,8 +133,8 @@ for condsel = 1:numel(R.condnames)
         wflag = 1;
         break
     end
-        
-        
+    
+    
     Ds = zeros(size(D));Dt = zeros(size(D));
     % Now find indices of inputs
     % Currently no seperation between inh and excitatory
@@ -147,10 +151,12 @@ for condsel = 1:numel(R.condnames)
     
     % synaptic activation function
     %--------------------------------------------------------------------------
-    Rz     = 2/3;                      % gain of sigmoid activation function
+    Rz_base     = 2/3;                      % gain of sigmoid activation function
     B     = 0;                        % bias or background (sigmoid)
-    Rz     = (Rz).*exp(p.S(1));
-%     S     = @(x,Rz,B)(1./(1 + exp(-Rz*x(:) + B))) - 1/(1 + exp(B));
+    Rz = [];
+    for i = 1:m.m
+        Rz(i)     = Rz_base.*exp(p.int{i}.S);
+    end
     % Now named function
     
     %     % Condition Dependent Modulation of Synaptic gains
@@ -209,15 +215,23 @@ for condsel = 1:numel(R.condnames)
             end
         end
     end
+    
+    
+    %% Precompute parameter expectations
+    % Parameter Priors
+    pQ = getModelPriors(m);
+    
     nbank = cell(1,n); qbank = cell(1,n);
     for i = 1:n
-            N.x  = m.x{i};
-            nbank{i} = N;
-            Q    = p.int{i};
-            Q.C  = p.C(i,:);
-            qbank{i} = Q;
+        N.x  = m.x{i};
+        nbank{i} = N;
+        Q = p.int{i};
+        Q.T = pQ(i).T*exp(Q.T);
+        Q.G = pQ(i).G.*exp(Q.G);
+        Q.Rz = Rz(i);
+        Q.C  = p.C(i,:);
+        qbank{i} = Q;
     end
-    
     
     %% TIME INTEGRATION STARTS HERE ===========================================
     f = zeros(xinds(end),1); dt = R.IntP.dt;
@@ -226,7 +240,11 @@ for condsel = 1:numel(R.condnames)
     else
         xstore = x;
     end
-%     xstore = [xstore nan(size(xstore,1),R.IntP.nt-R.IntP.buffer)];
+    
+    % pad out the rest of xstore with zeros
+%     xstore =    [xstore zeros(m.xinds(end),(R.IntP.nt+1)-size(xstore,2))];
+    
+    %     xstore = [xstore nan(size(xstore,1),R.IntP.nt-R.IntP.buffer)];
     xint = zeros(m.n,1);
     TOL = exp(-4);
     for tstep = R.IntP.buffer:R.IntP.nt
@@ -245,7 +263,7 @@ for condsel = 1:numel(R.condnames)
                         %                 xd = spm_unvec(xback(:,end-D(i,j)),M.x);
                         xD = xstore(Ds(i,j),tstep-D(i,j));
                         %                     fA(Dt(i,j)) = A{k}(i,j)*S(xD,Rz,B);
-                        fA = [fA  A{k}(i,j)*sigmoidin(xD,Rz,B)];
+                        fA = [fA  A{k}(i,j)*sigmoidin(xD,Rz(j),B)];
                     end
                 end
             end
@@ -257,7 +275,7 @@ for condsel = 1:numel(R.condnames)
             %             f(Dt(1,i))  = f(Dt(1,i)) + sum(fA) ;
         end
         xint = xint + (f.*dt);
-        xstore = [xstore xint];
+        xstore = [xstore xint]; % This is done for speed reasons! Actually faster than indexing (?!!)
         if tstep >R.IntP.buffer*10
             if any(xint>1e3) || any(isnan(xint))
                 wflag= 1;

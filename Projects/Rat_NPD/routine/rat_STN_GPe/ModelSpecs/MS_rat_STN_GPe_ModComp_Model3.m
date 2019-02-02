@@ -81,7 +81,7 @@ for i = 1:m.m
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(prec,size(p.int{i}.S));
+    p.int{i}.S_s = repmat(prec/5,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end

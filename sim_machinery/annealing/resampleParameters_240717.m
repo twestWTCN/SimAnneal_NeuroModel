@@ -15,9 +15,9 @@ for i = 1:length(plist) % over parameters
             for Ai = 1:2
                 X_old = eval(['pold' plist{i} '{Ai}']);
                 if initflag % if initializing then use prior precision
-                X_S = eval(['prec' plist{i} '_s{Ai}']);
+                    X_S = eval(['prec' plist{i} '_s{Ai}']);
                 else % else use the newly computed precisions
-                X_S = eval(['prec' plist{i} '{Ai}']);
+                    X_S = eval(['prec' plist{i} '{Ai}']);
                 end
                 Xa = zeros(size(X_old,1),1);
                 for Q = 1:numel(X_old)
@@ -25,7 +25,9 @@ for i = 1:length(plist) % over parameters
                 end
                 Xa(Xa>xMax & Xa>-28) = xMax; Xa(Xa<xMin & Xa>-28) = xMin;
                 X = reshape(Xa,size(X_old));
-                X(X_old<-30) = -32;
+                
+                X(X<-30) = -32;
+                X(X_S(:)==0) = X_old(X_S(:)==0);
                 eval(['pnew' plist{i} '{Ai} = X;']);
                 eval(['pnew' plist{i} '_s{Ai} = X_S;']);
                 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
@@ -44,7 +46,8 @@ for i = 1:length(plist) % over parameters
             end
             Xa(Xa>xMax & Xa>-28) = xMax; Xa(Xa<xMin & Xa>-28) = xMin;
             X = reshape(Xa,size(X_old));
-            X(X_old<-30) = -32;
+            X(X<-30) = -32;
+            X(X_S(:)==0) = X_old(X_S(:)==0);
             eval(['pnew' plist{i} ' = X;']);
             eval(['pnew' plist{i} '_s = X_S;']);
         end

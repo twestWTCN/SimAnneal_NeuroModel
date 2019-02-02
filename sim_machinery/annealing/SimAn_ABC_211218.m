@@ -62,7 +62,7 @@ while ii <= searchN
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    for jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         if ~isempty(R.IntP.Utype)
             uc = innovate_timeseries(R,m);
         else
@@ -126,12 +126,12 @@ while ii <= searchN
     fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
     if size(parOptBank,2)> R.SimAn.minRank-1
         if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
-        disp('Bank satisfies current eps')
+            disp('Bank satisfies current eps')
             eps_act = eps_exp;
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
-        disp('Bank is large taking new subset to form eps')
+            disp('Bank is large taking new subset to form eps')
             parOptBank = parBank(:,1:R.SimAn.minRank);
             eps_act = parOptBank(end,end);
             cflag = 1; % copula flag (enough samples)
@@ -150,7 +150,7 @@ while ii <= searchN
         cflag = 1;
         itry = 0;
     end
-    if itry==0 
+    if itry==0
         % Compute expected gradient for next run
         delta_exp = eps_exp-eps_prior;
         fprintf('Expected gradient was %0.2f \n',delta_exp)
@@ -274,7 +274,7 @@ while ii <= searchN
         return
     end
     
-
+    
     ii = ii + 1;
     %     uv = whos;
     %     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\memDebug_' R.out.tag '_' R.out.dag '.mat'],uv)

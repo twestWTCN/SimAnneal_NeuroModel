@@ -11,18 +11,18 @@ function [f,J,Q] = spm_fx_bgc_stn(x,u,P,M)
 
 % check if intrinsic connections are free parameters
 %--------------------------------------------------------------------------
-try, P.G; catch, P.G = 0; end
+% try, P.G; catch, P.G = 0; end
 
 % get dimensions and configure state variables
 %--------------------------------------------------------------------------
 % x  = spm_unvec(x,M.x);               % neuronal states
-n  = size(x,1);                      % number of sources
+% n  = size(x,1);                      % number of sources
 
 % [default] fixed parameters
 %--------------------------------------------------------------------------
-G  = [2]*200;   % synaptic connection strengths
-T  = [4];               % synaptic time constants [str,gpe,stn,gpi,tha];
-R  = 2/3;                       % slope of sigmoid activation function
+% G  = [2]*200;   % synaptic connection strengths
+% T  = [4];               % synaptic time constants [str,gpe,stn,gpi,tha];
+% R  = 2/3;                       % slope of sigmoid activation function
 % NB for more pronounced state dependent transfer functions use R  = 3/2;
 
 % if isfield(M,'BGC_G'); G = M.BGC_G; end
@@ -31,12 +31,12 @@ R  = 2/3;                       % slope of sigmoid activation function
 
 % [specified] fixed parameters
 %--------------------------------------------------------------------------
-if isfield(M,'pF')
-    try, E = M.pF.E; end
-    try, G = M.pF.G; end
-    try, T = M.pF.T; end
-    try, R = M.pF.R; end
-end
+% if isfield(M,'pF')
+%     try, E = M.pF.E; end
+%     try, G = M.pF.G; end
+%     try, T = M.pF.T; end
+%     try, R = M.pF.R; end
+% end
 
 % input connections
 %--------------------------------------------------------------------------
@@ -65,18 +65,19 @@ S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
 U = u;
 % time constants and intrinsic connections
 %==========================================================================
-T     = T/1000;
-for i = 1:size(P.T,2)
-    T(:,i) = T(:,i).*exp(P.T(:,i));
-end
-
+% T     = T/1000;
+% for i = 1:size(P.T,2)
+%     T(:,i) = T(:,i).*exp(P.T(:,i));
+% end
+T = P.T;
 
 % intrinsic/extrinsic connections to be optimised
 %--------------------------------------------------------------------------
-j     = 1;
-for i = 1:size(P.G,2)
-    G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
-end
+% j     = 1;
+% for i = 1:size(P.G,2)
+%     G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
+% end
+G = P.G;
 
 
 % Motion of states: f(x)

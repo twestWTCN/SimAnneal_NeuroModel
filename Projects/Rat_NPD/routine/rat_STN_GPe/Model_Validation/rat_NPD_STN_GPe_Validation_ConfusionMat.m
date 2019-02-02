@@ -17,7 +17,7 @@ rng(5353252)
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
 
-for modID = 1:3
+for modID = 2
     Rt = []; % Temp R Struc
     %% First Simulate the Data from the Empircally Fitted Models
     % Recover Fitted Parameters
@@ -55,7 +55,7 @@ load([R.rootn 'outputs\' R.out.tag '\ConfData'],'RSimData')
 confmatlist = combvec(1:3,1:3);
 
 % Create List (for parallelization across multiple MATLAB instances)
-delete([R.rootn 'outputs\' R.out.tag '\ConfWorkList'])
+% delete([R.rootn 'outputs\' R.out.tag '\ConfWorkList.mat'])
 
 try
     load([R.rootn 'outputs\' R.out.tag '\ConfWorkList'])
@@ -76,7 +76,7 @@ for i = 1:size(confmatlist,2)
         disp('Writing to Mod List!!')
         
         SimData = confmatlist(1,i)
-        SimMod = confmatlist(1,i)
+        SimMod = confmatlist(2,i)
         
         
         fprintf('Fitting Model %.0f to data %.0f',SimMod,SimData)

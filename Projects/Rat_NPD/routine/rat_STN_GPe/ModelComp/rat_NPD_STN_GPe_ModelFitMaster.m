@@ -41,7 +41,7 @@ catch
 end
 
 %% Prepare Model
-for modID = 1:3
+for modID = 2:3
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
@@ -55,7 +55,7 @@ for modID = 1:3
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        R.SimAn.rep = 512;
+        R.SimAn.rep = 128;
         R = setSimTime(R,32);
         R.Bcond = 0;
         parBank = [];

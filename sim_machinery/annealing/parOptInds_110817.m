@@ -1,7 +1,7 @@
 function pInd = parOptInds_110817(R,p,MN,set)
 % This function will find the indices of the parameters to be optimized.
 % Parameters will only be added if there expected values are non neglible
-% (i.e. > -32). 
+% (i.e. > -32).
 if nargin<4
     set =2;
 end
@@ -17,6 +17,10 @@ for i = 1:length(plist)
             for Ai = 1:size(eval(['p' plist{i}]),2)
                 X = eval(['p' plist{i} '{Ai}']);
                 x = reshape(X,1,[]);
+                
+                S = eval(['p' plist{i} '_s{Ai}']);
+                s = reshape(S,1,[]);
+                
                 xseq = rand(size(x));
                 eval(['p' plist{i} '{Ai} = xseq;']);
                 pvec = full(spm_vec(p));
@@ -24,10 +28,11 @@ for i = 1:length(plist)
                 for pin = 1:size(xseq,2)
                     indK(pin) = strfind(pvec',xseq(pin));
                 end
+                % If variance is zero then do not modify
                 if set == 1
-                    indK(x==-32) = NaN;
+                    indK(s==0 | x<-30) = NaN;
                 elseif set == 2
-                    indK(x==-32) = [];
+                    indK(s==0 | x<-30) = [];
                 end
                 eval(['pInd' plist{i} '{Ai} = indK;']);
                 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
@@ -36,6 +41,10 @@ for i = 1:length(plist)
         else
             X = eval(['p' plist{i}]);
             x = reshape(X,1,[]);
+            
+            S = eval(['p' plist{i} '_s']);
+            s = reshape(S,1,[]);
+            
             xseq = rand(size(x));
             eval(['p' plist{i} '= xseq;']);
             pvec = full(spm_vec(p));
@@ -44,9 +53,9 @@ for i = 1:length(plist)
                 indK(pin) = strfind(pvec',xseq(pin));
             end
             if set == 1
-                indK(x==-32) = NaN;
+                indK(s==0 | x<-30) = NaN;
             elseif set == 2
-                indK(x==-32) = [];
+                indK(s==0 | x<-30) = [];
             end
             eval(['pInd' plist{i} ' = indK;']);
         end
