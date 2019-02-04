@@ -25,7 +25,7 @@ for modID = modlist
         disp('Writing to PermMod List!!')
         fprintf('Now Computing Probabilities for Model %.0f',modID)
         f = msgbox(sprintf('Probabilities for Model %.0f',modID));
-        
+%         dagname = sprintf('NPD_InDrt_ModCompRed_M%.0f',modID);
         dagname = sprintf(['NPD_' R.out.tag '_M%.0f'],modID);
         % Load Model
         load([R.rootn 'outputs\' R.out.tag '\' dagname '\modelspec_' R.out.tag '_' dagname '.mat'])
@@ -37,8 +37,8 @@ for modID = modlist
         % Load Options
         load([R.rootn 'outputs\' R.out.tag '\' dagname '\R_' R.out.tag '_' dagname '.mat'])
         R = varo;
-        R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
-        R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
+%         R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
+%         R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
         
         R.Mfit = A;
         a = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);

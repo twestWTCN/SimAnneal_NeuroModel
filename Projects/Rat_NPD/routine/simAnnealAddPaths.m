@@ -11,7 +11,6 @@ else
     if ~onPath; addpath('C:\spm12'); spm eeg; close all; end
 end
 
-% addpath(['C:\Users\tim\Documents\Work\MATLAB ADDONS\parforprogmon')
 addpath(['C:\Users\' usname '\Documents\' madpath '\aboxplot'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\ATvDFA-package'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\bplot\'])
@@ -22,6 +21,7 @@ addpath(['C:\Users\' usname '\Documents\' madpath '\FMINSEARCHBND'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\linspecer'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\MEG_STN_Project'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\Neurospec\neurospec21'])
+addpath(genpath(['C:\Users\' usname '\Documents\' madpath '\ParforProgMon']))
 addpath(['C:\Users\' usname '\Documents\' madpath '\sigstar-master'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\sort_nat'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\SplitVec'])
@@ -33,3 +33,4 @@ addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\SimAnneal_Neuro
 addpath(genpath(['C:\Users\' usname '\Documents\' madpath '\boundedline-pkg']))
 addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\BrewerMap']))
 addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\BurstToolbox']))
+

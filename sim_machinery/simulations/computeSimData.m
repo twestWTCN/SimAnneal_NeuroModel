@@ -1,5 +1,5 @@
 function [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(R,m,uc,pnew,simtime,plotop)
-if nargin<5
+if nargin<6
     plotop = 0;
 end
 if simtime ~= 0

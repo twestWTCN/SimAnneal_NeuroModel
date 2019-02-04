@@ -48,8 +48,8 @@ function [f,J,Q] = spm_fx_bgc_gpi(x,u,P,M)
 % R    = R.*exp(P.S);              % gain of activation function
 % F    = 1./(1 + exp(-R*x + 0));   % firing rate
 % S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
-R    = P.Rz;              % gain of activation function
-S = sigmoidin(x,R,0);
+% % R    = P.Rz;              % gain of activation function
+% % S = sigmoidin(x,R,0);
 
 % input
 %==========================================================================

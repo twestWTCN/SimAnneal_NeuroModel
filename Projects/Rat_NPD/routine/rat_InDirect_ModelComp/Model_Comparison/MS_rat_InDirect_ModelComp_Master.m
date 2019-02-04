@@ -14,7 +14,7 @@ R = simannealsetup_InDirect_ModelComp;
 R = prepareRatData_InDirect_Group_NPD(R); 
 
 %% Do the model probability computations
-% modelCompMaster(R,[100 200],[1:18])
+modelCompMaster(R,1:10)
 
 %% Plot the modComp results
 R.modcomp.modN = [1:18 100 200];

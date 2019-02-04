@@ -89,7 +89,7 @@ function [f,J,Q] = spm_fx_mmc(x,u,P,M)
 %--------------------------------------------------------------------------
 R    = P.Rz;              % gain of activation function
 S = sigmoidin(x,R,0);
-
+S = S';
 % R    = (2/3);     %0.5.*                  % slope of sigmoid activation function
 % B    = 0;                        % bias or background (sigmoid)
 % R    = R.*exp(P.S);              % gain of activation function
@@ -153,21 +153,21 @@ G = P.G;
 %   S(:,7) - voltage     (deep pyramidal cells)
 %   S(:,8) - conductance (deep pyramidal cells)
 %--------------------------------------------------------------------------
-j     = [1 2 3 4];
-for i = 1:size(P.T,2)
-    T(:,j(i)) = T(:,j(i)).*exp(P.T(:,i));
-end
-
-j = 1:14;
-for i = 1:size(P.G,2)
-    G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
-end
+% j     = [1 2 3 4];
+% for i = 1:size(P.T,2)
+%     T(:,j(i)) = T(:,j(i)).*exp(P.T(:,i));
+% end
+% 
+% j = 1:14;
+% for i = 1:size(P.G,2)
+%     G(:,j(i)) = G(:,j(i)).*exp(P.G(:,i));
+% end
 
 % Modulatory effects of dp depolarisation on intrinsic connection j(1)
 %--------------------------------------------------------------------------
-if isfield(P,'M')
-    G(:,j(1)) = G(:,j(1)).*exp(-P.M*32*S(:,7));
-end
+% if isfield(P,'M')
+%     G(:,j(1)) = G(:,j(1)).*exp(-P.M*32*S(:,7));
+% end
 
  
 % Motion of states: f(x)

@@ -31,12 +31,12 @@ function [f,J,Q] = spm_fx_bgc_thal(x,u,P,M)
 
 % [specified] fixed parameters
 %--------------------------------------------------------------------------
-if isfield(M,'pF')
-    try, E = M.pF.E; end
-    try, G = M.pF.G; end
-    try, T = M.pF.T; end
-    try, R = M.pF.R; end
-end
+% if isfield(M,'pF')
+%     try, E = M.pF.E; end
+%     try, G = M.pF.G; end
+%     try, T = M.pF.T; end
+%     try, R = M.pF.R; end
+% end
 
 % input connections
 %--------------------------------------------------------------------------
@@ -44,9 +44,13 @@ end
 
 % pre-synaptic inputs: s(V)
 %--------------------------------------------------------------------------
-R    = R.*exp(P.S);              % gain of activation function
-F    = 1./(1 + exp(-R*x + 0));   % firing rate
-S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
+R    = P.Rz;              % gain of activation function
+S = sigmoidin(x,R,0);
+S = S';
+
+% R    = R.*exp(P.S);              % gain of activation function
+% F    = 1./(1 + exp(-R*x + 0));   % firing rate
+% S    = F - 1/(1 + exp(0));       % deviation from baseline firing (0)
 
 % input
 %==========================================================================
@@ -86,7 +90,7 @@ G = P.G;
 % pyramidal cells: Hidden causes - error
 %--------------------------------------------------------------------------
 u      =  U; 
-u      =  u; % -G(:,1)*S(:,1) + 
+u      =  G(:,1)*S(:,1) + u;
 f(:,2) =  (u - 2*x(:,2) - x(:,1)./T(1,1))./T(1,1);
 
 % G(1,1) = gpi -> tha (-ve ext
