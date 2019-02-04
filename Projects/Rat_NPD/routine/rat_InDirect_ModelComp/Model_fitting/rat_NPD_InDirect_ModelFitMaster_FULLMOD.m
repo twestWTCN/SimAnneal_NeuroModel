@@ -4,10 +4,7 @@
 % models to the data specified in fx prepareRatData. WML stores batch
 % progress and can be accessed by multiple MATLAB realizations.
 %%%% TO DO
-% 1. You can optimize nodes without self connection by eliminating the
-% sigmoid transform
-% 2. The sigmoid has identical parameters for all nodes - parameterize for
-% n nodes or put within local functions
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
@@ -42,7 +39,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 10:-1:1
+for modID = [1 2 7 8 3:6 9 10]
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
