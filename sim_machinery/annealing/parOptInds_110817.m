@@ -1,4 +1,4 @@
-function pInd = parOptInds_110817(R,p,MN,set)
+function [pInd,parMu,parSig] = parOptInds_110817(R,p,MN,set)
 % This function will find the indices of the parameters to be optimized.
 % Parameters will only be added if there expected values are non neglible
 % (i.e. > -32).
@@ -29,13 +29,20 @@ for i = 1:length(plist)
                     indK(pin) = strfind(pvec',xseq(pin));
                 end
                 % If variance is zero then do not modify
+                parSelInd = find(s==0 | x<-30);
                 if set == 1
-                    indK(s==0 | x<-30) = NaN;
+                    indK(parSelInd) = NaN;
+                    x(parSelInd) = NaN;
+                    s(parSelInd) = NaN;
                 elseif set == 2
-                    indK(s==0 | x<-30) = [];
+                    indK(parSelInd) = [];
+                    x(parSelInd) = [];
+                    s(parSelInd) = [];
                 end
                 eval(['pInd' plist{i} '{Ai} = indK;']);
                 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
+                parMu(indK) = x;
+                parSig(indK) = s;
             end
             
         else
@@ -52,17 +59,22 @@ for i = 1:length(plist)
             for pin = 1:size(xseq,2)
                 indK(pin) = strfind(pvec',xseq(pin));
             end
+            parSelInd = find(s==0 | x<-30);
             if set == 1
-                indK(s==0 | x<-30) = NaN;
+                indK(parSelInd) = NaN;
+                x(parSelInd) = NaN;
+                s(parSelInd) = NaN;
             elseif set == 2
-                indK(s==0 | x<-30) = [];
+                indK(parSelInd) = [];
+                x(parSelInd) = [];
+                s(parSelInd) = [];
             end
             eval(['pInd' plist{i} ' = indK;']);
+            parMu(indK) = x;
+            parSig(indK) = s;
         end
     end
 end
-
-
 
 
 % vX = []

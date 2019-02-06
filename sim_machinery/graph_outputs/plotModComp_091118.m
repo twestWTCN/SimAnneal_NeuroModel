@@ -104,9 +104,9 @@ figure(2)
 subplot(3,1,1)
 violin(r2repSave,'facecolor',cmap,'medc','k:','xlabel',shortlab)
 hold on
-plot([0 R.modcomp.modN+1],[R.modcomp.modEvi.epspop R.modcomp.modEvi.epspop],'k--')
+plot([0 numel(R.modcomp.modN)+1],[R.modcomp.modEvi.epspop R.modcomp.modEvi.epspop],'k--')
 xlabel('Model'); ylabel('NMRSE'); grid on; ylim([-2 1])
-a = gca; a.XTick = 1:R.modcomp.modN;
+a = gca; a.XTick = 1:numel(R.modcomp.modN);
 a.XTickLabel = shortlab;
 
 figure(2)
@@ -118,21 +118,21 @@ subplot(3,1,2)
 % TlnK = 2.*log(max(pmod)./pmod);
 TlnK = -log10(1-pmod);
 
-for i = 1:R.modcomp.modN
+for i = 1:numel(R.modcomp.modN)
     %     b = bar(i,-log10(1-pmod(i))); hold on
     b = bar(i,TlnK(i)); hold on
     b.FaceColor = cmap(i,:);
 end
-a = gca; a.XTick = 1:R.modcomp.modN; grid on
+a = gca; a.XTick = 1:numel(R.modcomp.modN); grid on
 a.XTickLabel = shortlab;
 xlabel('Model'); ylabel('-log_{10} P(M|D)')
 
 subplot(3,1,3)
-for i = 1:R.modcomp.modN
+for i = 1:numel(R.modcomp.modN)
     b = bar(i,KL(i)); hold on
     b.FaceColor = cmap(i,:);
 end
-a = gca; a.XTick = 1:R.modcomp.modN;
+a = gca; a.XTick = 1:numel(R.modcomp.modN);
 a.XTickLabel = shortlab;
 grid on
 xlabel('Model'); ylabel('KL Divergence')
@@ -144,11 +144,11 @@ set(gcf,'Position',[277   109   385   895])
 
 %% SCRIPT GRAVE
 % Adjust the acceptance threshold if any models have no rejections
-% exc = ones(1,R.modcomp.modN);
+% exc = ones(1,numel(R.modcomp.modN));
 % while any(exc==1)
 %     r2bankcat = horzcat(r2bank{:});
 %     R.modcomp.modEvi.epspop = prctile(r2bankcat,prct); % threshold becomes median of model fits
-%     for modID = 1:R.modcomp.modN
+%     for modID = 1:numel(R.modcomp.modN)
 %         exc(modID) = sum(r2bank{modID}>R.modcomp.modEvi.epspop)/size(r2bank{modID},2);
 %     end
 %     prct = prct+1;

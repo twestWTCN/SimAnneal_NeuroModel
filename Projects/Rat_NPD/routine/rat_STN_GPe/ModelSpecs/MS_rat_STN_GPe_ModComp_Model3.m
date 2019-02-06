@@ -46,8 +46,8 @@ uc = innovate_timeseries(R,m);
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A_s{1} = repmat(0,m.m,m.m);
-p.A{1}(1,2) = -6; % STN -> GPe
-p.A_s{1}(1,2) = 0; % STN -> GPe
+% p.A{1}(1,2) = -6; % STN -> GPe
+% p.A_s{1}(1,2) = 0; % STN -> GPe
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A_s{2} = repmat(0,m.m,m.m);
@@ -81,7 +81,7 @@ for i = 1:m.m
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(prec/5,size(p.int{i}.S));
+    p.int{i}.S_s = repmat(prec/4,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end

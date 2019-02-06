@@ -64,8 +64,7 @@ for modID = [1 2 7 8 3:6 9 10]
         %% Run ABC Optimization
         R = setSimTime(R,32);
         R.Bcond = 0;    
-        parBank = [];
         R.SimAn.rep = 448; %448
-        [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
+        [p] = SimAn_ABC_060219(p,m,R);
     end
 end

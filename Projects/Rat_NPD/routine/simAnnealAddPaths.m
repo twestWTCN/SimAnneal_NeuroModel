@@ -10,7 +10,7 @@ else
     usname = 'twest'; gitname = 'GitHub'; madpath = 'Work\MATLAB ADDONS';
     if ~onPath; addpath('C:\spm12'); spm eeg; close all; end
 end
-
+addpath(['C:\Users\' usname '\Documents\' madpath '\ParforProgMon'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\aboxplot'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\ATvDFA-package'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\bplot\'])

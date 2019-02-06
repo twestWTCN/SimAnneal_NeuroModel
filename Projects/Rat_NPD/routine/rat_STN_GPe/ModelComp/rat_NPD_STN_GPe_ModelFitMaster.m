@@ -1,7 +1,7 @@
 %STN GPE MOD FIT MASTER
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH!
-%   delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+ delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -12,16 +12,6 @@ tags = get(handles,'Tag');
 isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
 delete(handles(isMsg));
 
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\sim_machinery'))
-addpath(genpath('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD'))
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\TWtools\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\bplot\')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\MEG_STN_Project')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\Neurospec\neurospec21')
-addpath('C:\spm12')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\export_fig')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\linspecer')
-addpath('C:\Users\twest\Documents\Work\MATLAB ADDONS\sort_nat')
 rng(5353252)
 
 %% Set Routine Pars
@@ -41,7 +31,7 @@ catch
 end
 
 %% Prepare Model
-for modID = 2:3
+for modID = 1:3
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
@@ -51,14 +41,13 @@ for modID = 2:3
         f = msgbox(sprintf('Fitting Model %.0f',modID));
         
         modelspec = eval(['@MS_rat_STN_GPe_ModComp_Model' num2str(modID)]);
-        [R p m uc] = modelspec(R);
+        [R,p,m] = modelspec(R);
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        R.SimAn.rep = 128;
-        R = setSimTime(R,32);
+        R.SimAn.rep = 64;
+        R = setSimTime(R,24);
         R.Bcond = 0;
-        parBank = [];
-        [p] = SimAn_ABC_211218(m.x,uc,p,m,R,parBank);
+        [p] = SimAn_ABC_060219(p,m,R);
     end
 end

@@ -51,8 +51,8 @@ p.A_s{1}(1,2) = 1; % STN -> GPe
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A_s{2} = repmat(0,m.m,m.m);
-p.A{2}(2,1) = -6; % GPe -| STN
-p.A_s{2}(2,1) = 0; % GPe -| STN
+% p.A{2}(2,1) = -6; % GPe -| STN
+% p.A_s{2}(2,1) = 0; % GPe -| STN
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -81,7 +81,7 @@ for i = 1:m.m
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(prec/5,size(p.int{i}.S));
+    p.int{i}.S_s = repmat(prec/4,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end

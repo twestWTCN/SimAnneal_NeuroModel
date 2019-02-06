@@ -1,4 +1,4 @@
-function [R,parBank] = SimAn_ABC_211218(ic,~,p,m,R,parBank)
+function [R,parBank] = SimAn_ABC_211218_TMP(ic,~,p,m,R,parBank)
 %%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION for
 %%%% HIGH DIMENSIONAL DYNAMICAL MODELS
 % ---- 16/08/18---------------------------
@@ -118,28 +118,29 @@ while ii <= searchN
     C = B/sum(B);
     fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
     if size(parOptBank,2)> R.SimAn.minRank-1
-        if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
+        maxsize =  4*(R.SimAn.minRank-1);
+        if size(parOptBank,2) < maxsize
             disp('Bank satisfies current eps')
             eps_act = eps_exp;
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,1:2*R.SimAn.minRank);
-            eps_act = mean(parOptBank(end,:));
+            parOptBank = parOptBank(:,1:maxsize-size(parOptBank,2));
+            eps_act = eps_exp;
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
-    elseif itry < 2
+    elseif itry == 0
         disp('Trying once more with current eps')
-        if exist('Mfit')
-            cflag = 1;
+        if isfield(Mfit,'Rho')
+            cflag = 1; % for copula
         end
         itry = itry + 1;
-    elseif itry > 1
+    elseif itry > 0
         disp('Recomputing eps from parbank')
-        parOptBank = parBank(:,2:R.SimAn.minRank);
-        eps_act = mean(parOptBank(end,:));
+        parOptBank = parBank(:,1:R.SimAn.minRank);
+        eps_act = parOptBank(end,1);
         cflag = 1;
         itry = 0;
     end
@@ -148,11 +149,15 @@ while ii <= searchN
         delta_exp = eps_exp-eps_prior;
         fprintf('Expected gradient was %0.2f \n',delta_exp)
         delta_act = eps_act-eps_prior;
+        if any([delta_exp delta_act]==0)
+            a = 1;
+        end
         fprintf('Actual gradient was %0.2f \n',delta_exp)
         eps_exp = eps_act + delta_act;
         fprintf('Exp-Act gradient was %0.2f \n',delta_exp-delta_act)
         % Save eps history and make actual eps new prior eps
         eps_prior = eps_act;
+        
     end
     eps_rec(ii) = eps_act;
     %% Compute Posterior
@@ -183,7 +188,7 @@ while ii <= searchN
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
-        if exist('Mfit')
+        if isfield(Mfit,'Pfit')
             pmean = Mfit.Pfit;
         else
             pmean = p;
@@ -229,8 +234,6 @@ while ii <= searchN
             disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
         end
     end
-    %     disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
-    %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
     %% Save data
     if rem(ii,10) == 0
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
@@ -241,7 +244,7 @@ while ii <= searchN
     % Or to workspace
     %     assignin('base','R_out',R)
     
-    if delta_act < 5e-3
+    if delta_act<5e-3
         disp('Itry Exceeded: Convergence')
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
@@ -249,7 +252,6 @@ while ii <= searchN
         saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
         return
     end
-    
     
     ii = ii + 1;
     %     uv = whos;

@@ -1,4 +1,4 @@
-function [R,parBank] = SimAn_ABC_211218(ic,~,p,m,R,parBank)
+function [R,parBank] = SimAn_ABC_060219(R,p,m,parBank)
 %%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION for
 %%%% HIGH DIMENSIONAL DYNAMICAL MODELS
 % ---- 16/08/18---------------------------
@@ -24,7 +24,7 @@ function [R,parBank] = SimAn_ABC_211218(ic,~,p,m,R,parBank)
 % / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
 %% Setup for annealing
-if nargin<6
+if nargin<4
     parBank = [];
 end
 if isempty(m)

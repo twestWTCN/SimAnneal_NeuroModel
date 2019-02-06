@@ -41,5 +41,6 @@ eps2 = cov(xf');
 
 mu1 = priorVec(pIndMap);
 mu2 = mean(xf')';
-
-DKL = 0.5*(trace(eps2\eps1) + ((mu2-mu1)'*eps2)'\(mu2-mu1) - size(mu1,1) + log(det(eps2)/det(eps1)));
+DKL = KL;
+disp('Not computing KL properly! Using univariate!')
+% DKL = 0.5*(trace(eps2\eps1) + ((mu2-mu1)'*eps2)'\(mu2-mu1) - size(mu1,1) + log(det(eps2)/det(eps1)));
