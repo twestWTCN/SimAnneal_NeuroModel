@@ -125,21 +125,21 @@ while ii <= searchN
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,1:2*R.SimAn.minRank);
-            eps_act = mean(parOptBank(end,:));
+            parOptBank = parBank(:,1:R.SimAn.minRank);
+            eps_act = min(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
     elseif itry < 2
         disp('Trying once more with current eps')
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
     elseif itry > 1
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,2:R.SimAn.minRank);
-        eps_act = mean(parOptBank(end,:));
+        eps_act = min(parOptBank(end,:));
         cflag = 1;
         itry = 0;
     end
@@ -183,7 +183,7 @@ while ii <= searchN
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             pmean = Mfit.Pfit;
         else
             pmean = p;

@@ -64,13 +64,14 @@ for modID = modlist
             R.parOptBank = parOptBank;
             R.obs.gainmeth = R.obs.gainmeth(1);
             figure(modID);
-            R.analysis.modEvi.N = 500;
+            R.analysis.modEvi.N = 1500;
             permMod = modelProbs(m.x,m,p,R);
         else
             permMod = [];
         end
         saveMkPath([Rorg.rootn 'outputs\' Rorg.out.tag '\' dagname '\modeProbs_' Rorg.out.tag '_' dagname '.mat'],permMod)
         pause(10)
+        closeMessageBoxes
         close all
     end
 end

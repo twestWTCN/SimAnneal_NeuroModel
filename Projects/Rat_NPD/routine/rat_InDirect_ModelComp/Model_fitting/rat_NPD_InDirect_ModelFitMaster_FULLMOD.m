@@ -13,11 +13,7 @@
 clear ; close all
 
 % Close all msgboxes
-handles = allchild(0);
-tags = get(handles,'Tag');
-isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
-delete(handles(isMsg));
-
+closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths()
 rng(734221)
@@ -39,7 +35,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = [1 2 7 8 3:6 9 10]
+for modID = 1:10
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -62,9 +58,10 @@ for modID = [1 2 7 8 3:6 9 10]
         R.out.dag = sprintf('NPD_InDrt_ModCompRed_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
-        R = setSimTime(R,32);
-        R.Bcond = 0;    
-        R.SimAn.rep = 448; %448
-        [p] = SimAn_ABC_060219(p,m,R);
+        R = setSimTime(R,42);
+        R.Bcond = 0;
+        R.SimAn.rep = 512; %448
+        [p] = SimAn_ABC_060219(R,p,m);
+        closeMessageBoxes
     end
 end
