@@ -13,6 +13,7 @@ try
     [Rho,nu] = copulafit('t',copU','Method','ApproximateML'); % Fit copula
     % Save outputs that specify the copula
     Mfit.xf = xf;
+    Mfit.ks = copU;
     Mfit.nu = nu;
     Mfit.tbr2 = parOptBank(end,1); % get best fit
     Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);

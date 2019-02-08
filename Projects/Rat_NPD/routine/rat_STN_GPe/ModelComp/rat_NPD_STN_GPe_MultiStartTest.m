@@ -7,11 +7,7 @@
 clear ; close all
 
 % Close all msgboxes
-handles = allchild(0);
-tags = get(handles,'Tag');
-isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
-delete(handles(isMsg));
-
+closeMessageBoxes
 rng(5353252)
 
 %% Set Routine Pars
@@ -50,5 +46,6 @@ for multiStart = 1:10
         R.Bcond = 0;
         R.plot.flag = 1;
         SimAn_ABC_060219(R,p,m);
+        closeMessageBoxes
     end
 end
