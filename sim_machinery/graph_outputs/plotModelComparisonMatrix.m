@@ -1,11 +1,11 @@
 function plotModelComparisonMatrix(R,compStruc,shortlab,type)
 % TlnK = 2.*log(max(pmod)./pmod);
 if type == 1 % model probs
-    F = -log10(1-compStruc.pmod);
+    F = compStruc.pmod; %-log10(1-compStruc.pmod);
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
     yl = '-log_{10} P(M|D)';
 elseif type == 2 % KL divergences
-    F = compStruc.KL;
+    F = -compStruc.KL;
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
     
     yl = 'KL Divergence';
@@ -24,10 +24,10 @@ end
 imagesc(F)
 [x,y] = meshgrid(1:size(F,1),1:size(F,2));
 text(x(:),y(:),num2str(F(:)),'HorizontalAlignment','center')
-colormap(R.plot.cmap);
-set(gca,'YDir','normal') %'XTick',[],'YTick',[],
+colormap('gray');
+set(gca,'YDir','rev') %'XTick',[],'YTick',[],
 
 a.XTickLabel = shortlab;
-xlabel('Sim Model');
-ylabel('Fit Model');
+xlabel('Model to be Fit');
+ylabel('Model Data');
 title(yl);

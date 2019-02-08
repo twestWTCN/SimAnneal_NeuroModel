@@ -132,7 +132,7 @@ while ii <= searchN
         end
     elseif itry < 2
         disp('Trying once more with current eps')
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
@@ -183,7 +183,7 @@ while ii <= searchN
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             pmean = Mfit.Pfit;
         else
             pmean = p;
