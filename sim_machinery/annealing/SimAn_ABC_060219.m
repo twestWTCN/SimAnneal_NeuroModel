@@ -27,6 +27,9 @@ function [R,parBank] = SimAn_ABC_060219(R,p,m,parBank)
 if nargin<4
     parBank = [];
 end
+if ~isfield(R.plot,'flag')
+    R.plot.flag = 1; % plotting is default behaviour
+end
 if isempty(m)
     m.m = 1;
 end
@@ -126,19 +129,19 @@ while ii <= searchN
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
             parOptBank = parBank(:,1:2*R.SimAn.minRank);
-            eps_act = mean(parOptBank(end,:));
+            eps_act = eps_exp; %mean(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
     elseif itry < 2
         disp('Trying once more with current eps')
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
     elseif itry > 1
         disp('Recomputing eps from parbank')
-        parOptBank = parBank(:,2:R.SimAn.minRank);
+        parOptBank = parBank(:,1:R.SimAn.minRank);
         eps_act = mean(parOptBank(end,:));
         cflag = 1;
         itry = 0;
@@ -159,18 +162,18 @@ while ii <= searchN
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
         par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
-    elseif cflag == 1 && itry<= 1 % Draw from old copula
+    elseif cflag == 1 && itry<= 2 % Draw from old copula
         par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
     else % Draw from Normal Distribution
-        Mfit.Mu = mean(parBank(pIndMap,:),2);
-        Mfit.Sigma = cov(parBank(pIndMap,:)');
+        Mfit.Mu = mean(parOptBank(pIndMap,:),2);
+        Mfit.Sigma = cov(parOptBank(pIndMap,:)');
         par = postDrawMVN(Mfit,pOrg,pIndMap,rep);
     end
-    
+    parHist(ii) = averageCell(par);
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
-    if size(Ilist,2)>2
-        np = round(0.15*size(Ilist,2));
-        if isfield(R.plot,'outFeatFx')
+    if size(Ilist,2)>2 && R.plot.flag ==1
+        if isfield(R.plot,'outFeatFx') 
             %% Plot Data Features Outputs
             figure(1)
             clf
@@ -183,12 +186,13 @@ while ii <= searchN
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot parameters changes and tracking of fit
-        if exist('Mfit')
+        if isfield(Mfit,'Rho')
             pmean = Mfit.Pfit;
         else
             pmean = p;
         end
         banksave{ii} = parBank(:,parBank(end,:)>eps_act);
+
         figure(2);    clf
         optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,R)
         drawnow;shg

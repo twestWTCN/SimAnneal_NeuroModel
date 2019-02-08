@@ -18,11 +18,13 @@ try
     Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);
     Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),pOrg);
     Mfit.Rho = Rho;
-%     Mfit_hist = Mfit;
+    %     Mfit_hist = Mfit;
     %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
-    figure(3)
-    clf
-    plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R)
+    if R.plot.flag == 1
+        figure(3)
+        clf
+        plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R)
+    end
     cflag = 1;
 catch
     disp('The estimate of Rho has become rank-deficient.  You may have too few data, or strong dependencies among variables.')
@@ -33,5 +35,5 @@ end
 
 
 if cflag == 1
-
+    
 end
