@@ -1,4 +1,4 @@
-function [] = optProgPlot(Tm,tbr2,p,r2bank,eps_rec,bestr2,pInd,R)
+function [] = optProgPlot(Tm,tbr2,p,r2bank,eps_rec,bestr2,pInd,pSig,R)
 
     subplot(2,2,1)
     plot(Tm,tbr2)
@@ -15,10 +15,13 @@ function [] = optProgPlot(Tm,tbr2,p,r2bank,eps_rec,bestr2,pInd,R)
     subplot(2,1,2)
 
     par = full(spm_vec(p));
-    par = par(spm_vec(pInd));
-    bar(par)
+    parMu = par(spm_vec(pInd));
+    bar(parMu)
+    hold on
+    parSig = par(spm_vec(pSig));
+    errorbar(1:size(parSig,1),parMu,parSig,'.')
 %     ylim([1.2*min(par) 1.2*max(par)]);
-    xlim([0 length(par)])
-    ylim([R.SimAn.pOptBound.*0.5])
+    xlim([0 length(parMu)])
+    ylim([R.SimAn.pOptBound.*0.25])
     xlabel('parameter')
     ylabel('Posterior')

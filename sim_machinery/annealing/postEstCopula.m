@@ -34,6 +34,9 @@ catch
     cflag = 0;
 end
 
+Mfit.Mu = mean(parOptBank(pIndMap,:),2);
+Mfit.Sigma = cov(parOptBank(pIndMap,:)');
+
 
 if cflag == 1
     

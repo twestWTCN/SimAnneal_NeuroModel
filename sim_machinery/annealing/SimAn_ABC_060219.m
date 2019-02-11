@@ -41,11 +41,13 @@ repset =  R.SimAn.rep(1);
 ii = 1;
 eps_prior = -3; % prior eps (needed for gradient approximation);
 eps_exp = -2; eps_act = eps_prior;
-cflag = 0; delta_act = 1; 
+cflag = 0; delta_act = 1;
 % Compute indices of parameters to be optimized
-[pInd,parMu,parSig] = parOptInds_110817(R,p,m.m); % in structure form
+[pInd,pMu,pSig] = parOptInds_110817(R,p,m.m); % in structure form
 % Form descriptives
 pIndMap = spm_vec(pInd); % in flat form
+pMuMap = spm_vec(pMu);
+pSigMap = spm_vec(pSig);
 R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
@@ -53,9 +55,10 @@ if isfield(R,'Mfit')
     par = postDrawCopula(R.Mfit,p,pIndMap,rep);
 else
     rep = repset;
-        Mfit.Mu = parMu(pIndMap);
-        Mfit.Sigma = diag(parSig(pIndMap));
-        par = postDrawMVN(Mfit,pOrg,pIndMap,rep);
+    ptmp = spm_vec(p);
+    Mfit.Mu = ptmp(pMuMap);
+    Mfit.Sigma = ptmp(pSigMap).*R.SimAn.jitter;
+    par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
 end
 itry = 0;
 %% Main Annealing Loop
@@ -161,19 +164,19 @@ while ii <= searchN
     %% Compute Posterior
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
-        par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
+        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     elseif cflag == 1 && itry<= 2 % Draw from old copula
-        par = postDrawCopula(Mfit,pOrg,pIndMap,rep);
+        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     else % Draw from Normal Distribution
-        Mfit.Mu = mean(parOptBank(pIndMap,:),2);
-        Mfit.Sigma = cov(parOptBank(pIndMap,:)');
-        par = postDrawMVN(Mfit,pOrg,pIndMap,rep);
+        Mfit.Mu = mean(parOptBank(pMuMap,:),2);
+        Mfit.Sigma = cov(parOptBank(pSigMap,:)');
+        par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
     end
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
     if size(Ilist,2)>2 && R.plot.flag ==1
-        if isfield(R.plot,'outFeatFx') 
+        if isfield(R.plot,'outFeatFx')
             %% Plot Data Features Outputs
             figure(1)
             clf
@@ -192,9 +195,9 @@ while ii <= searchN
             pmean = p;
         end
         banksave{ii} = parBank(:,parBank(end,:)>eps_act);
-
+        
         figure(2);    clf
-        optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,R)
+        optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,pSig,R)
         drawnow;shg
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot example time series

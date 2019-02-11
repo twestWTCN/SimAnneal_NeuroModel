@@ -50,7 +50,7 @@ for i = 1:length(plist)
                 end
                 eval(['pInd' plist{i} '{Ai} = indK;']);
                 %                 eval(['pnew' plist{i} '{(Ai*2)-1} = X']);
-                eval(['pMu' plist{i} '{Ai} = x;']);
+                eval(['pMu' plist{i} '{Ai} = indK;']);
                 eval(['pSig' plist{i} '{Ai} = indS;']);
                 %                 parMu(indK) = x;
                 %                 parSig(indK) = s;

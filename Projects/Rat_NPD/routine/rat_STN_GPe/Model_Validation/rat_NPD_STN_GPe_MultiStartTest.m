@@ -27,7 +27,7 @@ catch
 end
 
 %% Prepare Model
-for multiStart = 1:10
+for multiStart = 1:3
     load([R.rootn 'outputs\' R.out.tag '\MultiStartList'],'WML')
     if ~any(intersect(WML,multiStart))
         WML = [WML multiStart];
