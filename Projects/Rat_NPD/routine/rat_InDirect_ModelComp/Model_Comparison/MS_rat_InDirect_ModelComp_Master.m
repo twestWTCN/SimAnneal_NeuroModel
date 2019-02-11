@@ -17,7 +17,7 @@ R = prepareRatData_InDirect_Group_NPD(R);
 modelCompMaster(R,1:10)
 
 %% Plot the modComp results
-R.modcomp.modN = [1:18 100 200];
+R.modcomp.modN = [1:10];
 R.modcompplot.NPDsel = [6 12 15];
 R.plot.confint = 'yes';
 cmap = linspecer(numel(R.modcomp.modN));

@@ -7,7 +7,7 @@
 clear ; close all
 
 % Close all msgboxes
-        closeMessageBoxes
+closeMessageBoxes
 
 
 rng(7564332)
@@ -43,7 +43,7 @@ for modID = 1:3
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        R.SimAn.rep = 256;
+        R.SimAn.rep = 124;
         R = setSimTime(R,48);
         R.Bcond = 0;
         [p] = SimAn_ABC_060219(R,p,m);
