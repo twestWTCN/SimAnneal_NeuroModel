@@ -2,14 +2,19 @@ function simAnnealAddPaths()
 
 pathCell = regexp(path, pathsep, 'split'); onPath = any(strcmpi('C:\spm12', pathCell));
 
-
-if strmatch(getenv('computername'),'SFLAP-2')
-    usname = 'Tim'; gitname = 'GIT'; madpath = 'MATLAB_ADDONS';
-        if ~onPath; addpath('C:\Users\Tim\Documents\spm12'); spm eeg; close all; end
-else
-    usname = 'twest'; gitname = 'GitHub'; madpath = 'Work\MATLAB ADDONS';
-    if ~onPath; addpath('C:\spm12'); spm eeg; close all; end
+switch getenv('computername')
+    case 'SFLAP-2'
+        usname = 'Tim'; gitpath = '\Documents\Work\GIT'; madpath = 'MATLAB_ADDONS';
+        spmpath = 'C:\Users\Tim\Documents\spm12';
+    case 'twest'
+        usname = 'twest'; gitpath = '\Documents\Work\GitHub'; madpath = 'Work\MATLAB ADDONS';
+        spmpath = 'C:\spm12';
+    case 'DESKTOP-94CEG1L'
+        usname = 'timot'; gitpath =  '\Documents\GitHub'; madpath = 'Work\MATLAB ADDONS';
+        spmpath = 'C:\Users\timot\Documents\GitHub\spm12';
 end
+
+if ~onPath; addpath(spmpath); spm eeg; close all; end
 addpath(['C:\Users\' usname '\Documents\' madpath '\ParforProgMon'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\aboxplot'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\ATvDFA-package'])
@@ -28,9 +33,9 @@ addpath(['C:\Users\' usname '\Documents\' madpath '\SplitVec'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\TWtools'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\violin'])
 addpath(genpath(['C:\spm12\toolbox\xjview96\xjview']))
-addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\SimAnneal_NeuroModel\sim_machinery']))
-addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_InDirect_ModelComp']))
+addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\sim_machinery']))
+addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_InDirect_ModelComp']))
 addpath(genpath(['C:\Users\' usname '\Documents\' madpath '\boundedline-pkg']))
-addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\BrewerMap']))
-addpath(genpath(['C:\Users\' usname '\Documents\Work\' gitname '\BurstToolbox']))
+addpath(genpath(['C:\Users\' usname '\' gitpath '\BrewerMap']))
+addpath(genpath(['C:\Users\' usname '\' gitpath '\BurstToolbox']))
 
