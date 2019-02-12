@@ -40,7 +40,7 @@ searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
 ii = 1;
 eps_prior = -3; % prior eps (needed for gradient approximation);
-eps_exp = -2; eps_act = eps_prior;
+eps_exp = -2.8; eps_act = eps_prior;
 cflag = 0; delta_act = 1;
 % Compute indices of parameters to be optimized
 [pInd,pMu,pSig] = parOptInds_110817(R,p,m.m); % in structure form
@@ -48,7 +48,7 @@ cflag = 0; delta_act = 1;
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*4); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     rep = repset;
@@ -131,7 +131,7 @@ while ii <= searchN
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,1:2*R.SimAn.minRank);
+            parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
             eps_act = min(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
@@ -145,7 +145,7 @@ while ii <= searchN
         itry = itry + 1;
     elseif itry >= 2
         disp('Recomputing eps from parbank')
-        parOptBank = parBank(:,1:2*R.SimAn.minRank);
+        parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         eps_act = min(parOptBank(end,:));
         cflag = 1;
         itry = 0;
@@ -170,7 +170,7 @@ while ii <= searchN
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     else % Draw from Normal Distribution
         Mfit.Mu = mean(parOptBank(pMuMap,:),2);
-        Mfit.Sigma = cov(parOptBank(pSigMap,:)');
+        Mfit.Sigma = cov(parOptBank(pMuMap,:)');
         par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
     end
     parHist(ii) = averageCell(par);
