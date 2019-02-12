@@ -1,6 +1,5 @@
 function simAnnealAddPaths()
 
-pathCell = regexp(path, pathsep, 'split'); onPath = any(strcmpi('C:\spm12', pathCell));
 
 switch getenv('computername')
     case 'SFLAP-2'
@@ -14,6 +13,7 @@ switch getenv('computername')
         spmpath = 'C:\Users\timot\Documents\GitHub\spm12';
 end
 
+pathCell = regexp(path, pathsep, 'split'); onPath = any(strcmpi(spmpath, pathCell));
 if ~onPath; addpath(spmpath); spm eeg; close all; end
 addpath(['C:\Users\' usname '\Documents\' madpath '\ParforProgMon'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\aboxplot'])

@@ -3,12 +3,19 @@ function R = simannealsetup_NPD_STN_GPe()
 R.projectn = 'Rat_NPD';
 R.out.tag = 'STN_GPe_ModComp';
 
-if strmatch(getenv('computername'),'SFLAP-2')
+switch getenv('computername')
+    case 'SFLAP-2'
     R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
-else
+    R.BBA_path = 'C:\Users\Tim\Documents\Work\GIT\Cortical_Parkinsons_Networks\BetaBursts';
+    case 'FREE'
     R.rootn = ['C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
     R.rootm = 'C:\Users\twest\Documents\Work\Github\SimAnneal_NeuroModel\sim_machinery';
+    R.BBA_path = 'C:\Users\twest\Documents\Work\GitHub\Cortical_Parkinsons_Networks\BetaBursts';
+    case 'DESKTOP-94CEG1L'
+    R.rootn = ['C:\Users\timot\Documents\GitHub\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
+    R.rootm = 'C:\Users\timot\Documents\Github\SimAnneal_NeuroModel\sim_machinery';
+    R.BBA_path = 'C:\Users\timot\Documents\GitHub\BurstToolbox';
 end
 % addpath(genpath(R.rootn))
 % addpath(genpath(R.rootm))

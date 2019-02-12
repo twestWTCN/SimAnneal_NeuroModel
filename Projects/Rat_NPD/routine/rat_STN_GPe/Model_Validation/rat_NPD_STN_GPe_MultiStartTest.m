@@ -27,7 +27,7 @@ catch
 end
 
 %% Prepare Model
-for multiStart = 1:3
+for multiStart = 1:10
     load([R.rootn 'outputs\' R.out.tag '\MultiStartList'],'WML')
     if ~any(intersect(WML,multiStart))
         WML = [WML multiStart];
@@ -41,10 +41,10 @@ for multiStart = 1:3
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_MultiStart_M%.0f',multiStart); % 'All Cross'
-        R.SimAn.rep = 128;
-        R = setSimTime(R,32);
+        R.SimAn.rep = 256;
+        R = setSimTime(R,42);
         R.Bcond = 0;
-        R.plot.flag = 1;
+        R.plot.flag = 0;
         SimAn_ABC_060219(R,p,m);
         closeMessageBoxes
     end

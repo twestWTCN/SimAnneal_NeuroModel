@@ -142,7 +142,7 @@ while ii <= searchN
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry > 1
+    elseif itry >= 2
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,2:R.SimAn.minRank);
         eps_act = min(parOptBank(end,:));
@@ -165,7 +165,7 @@ while ii <= searchN
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
-    elseif cflag == 1 && itry<= 2 % Draw from old copula
+    elseif cflag == 1 && itry< 2 % Draw from old copula
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     else % Draw from Normal Distribution
         Mfit.Mu = mean(parOptBank(pMuMap,:),2);
