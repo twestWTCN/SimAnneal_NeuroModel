@@ -48,38 +48,38 @@ uc = innovate_timeseries(R,m);
 p.A{1} =  repmat(-32,m.m,m.m);
 p.A{1}(2,1) = 0; % MMC -> STR
 p.A{1}(3,4) = 0; % STN -> GPE
-p.A_s{1} = repmat(1,m.m,m.m);
+p.A_s{1} = repmat(1/4,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(4,3) = 0; % GPe -| STN
-p.A_s{2} = repmat(1,m.m,m.m);
+p.A_s{2} = repmat(1/4,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(0.5,size(p.C));
+p.C_s = repmat(1/4,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1 1 1];
-p.obs.LF_s = repmat(0.2,size(p.obs.LF));
+p.obs.LF_s = repmat(1/4,size(p.obs.LF));
 
 p.obs.mixing = [1]; %zeros(size(R.obs.mixing));
 p.obs.mixing_s = repmat(0,size(p.obs.mixing));
 
 % Delays
 p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
-p.D_s = repmat(0.25,size(p.D));
+p.D_s = repmat(1/16,size(p.D));
 
 % Sigmoid transfer for connections
 p.S = [0 0];
-p.S_s = [0.2 0.2];
+p.S_s = [1/8 1/8];
 
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 1;
+        prec = 1/8;
     else
-        prec = 1;
+        prec = 1/8;
     end
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
