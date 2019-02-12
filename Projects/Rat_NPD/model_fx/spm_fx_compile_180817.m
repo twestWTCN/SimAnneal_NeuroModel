@@ -277,7 +277,7 @@ for condsel = 1:numel(R.condnames)
         xint = xint + (f.*dt);
         xstore = [xstore xint]; % This is done for speed reasons! Actually faster than indexing (?!!)
         if tstep >R.IntP.buffer*10
-            if any(xint>1e3) || any(isnan(xint))
+            if any(xint>1e4) || any(isnan(xint))
                 wflag= 1;
                 break
             end
