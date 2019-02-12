@@ -92,7 +92,7 @@ for condsel = 1:numel(R.condnames)
                     %                     close all
                     %                     error('SimFx is Stable (boring)!')
                     wflag = 1;
-                elseif sum(acfcheck(:))>=(numel(acfcheck)/2)
+                elseif sum(acfcheck(:))>8
                     disp('SimFx is perfectly periodic!!')
                     wflag = 1;
                 elseif sum(acfEnvcheck(:))>4 

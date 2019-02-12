@@ -44,7 +44,7 @@ for multiStart = 1:10
         R.SimAn.rep = 256;
         R = setSimTime(R,42);
         R.Bcond = 0;
-        R.plot.flag = 1;
+        R.plot.flag = 0;
         SimAn_ABC_060219(R,p,m);
         closeMessageBoxes
     end

@@ -86,7 +86,7 @@ R.SimAn.searchN = 200;
 
 R.SimAn.rep = 256; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
-R.SimAn.jitter = 1; % Global precision
+R.SimAn.jitter = 0.5; % Global precision
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';
