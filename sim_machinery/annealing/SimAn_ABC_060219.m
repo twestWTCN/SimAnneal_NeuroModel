@@ -124,19 +124,20 @@ while ii <= searchN
     C = B/sum(B);
     fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
     if size(parOptBank,2)> R.SimAn.minRank-1
-        if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
+        if size(parOptBank,2) < 4*(R.SimAn.minRank-1)
             disp('Bank satisfies current eps')
             eps_act = eps_exp;
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,1:R.SimAn.minRank);
+            parOptBank = parBank(:,1:2*R.SimAn.minRank);
             eps_act = min(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
     elseif itry < 2
+        fprintf('Trying for the %.0f\n time with the current eps \n',itry)
         disp('Trying once more with current eps')
         if isfield(Mfit,'Rho')
             cflag = 1;
@@ -144,7 +145,7 @@ while ii <= searchN
         itry = itry + 1;
     elseif itry >= 2
         disp('Recomputing eps from parbank')
-        parOptBank = parBank(:,2:R.SimAn.minRank);
+        parOptBank = parBank(:,1:2*R.SimAn.minRank);
         eps_act = min(parOptBank(end,:));
         cflag = 1;
         itry = 0;
@@ -165,7 +166,7 @@ while ii <= searchN
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
-    elseif cflag == 1 && itry< 2 % Draw from old copula
+    elseif cflag == 1 && itry <= 2 % Draw from old copula
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     else % Draw from Normal Distribution
         Mfit.Mu = mean(parOptBank(pMuMap,:),2);
