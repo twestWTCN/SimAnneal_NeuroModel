@@ -5,7 +5,7 @@ switch getenv('computername')
     case 'SFLAP-2'
         usname = 'Tim'; gitpath = '\Documents\Work\GIT'; madpath = 'MATLAB_ADDONS';
         spmpath = 'C:\Users\Tim\Documents\spm12';
-    case 'twest'
+    case 'FREE'
         usname = 'twest'; gitpath = '\Documents\Work\GitHub'; madpath = 'Work\MATLAB ADDONS';
         spmpath = 'C:\spm12';
     case 'DESKTOP-94CEG1L'

@@ -66,8 +66,8 @@ for condsel = 1:numel(R.condnames)
                     xsims(i,:) = filtfilt(R.obs.highpass.fwts,1,x);
                 end
             case 'boring'
-%                 figure(100)
-%                 plot(xsims'); shg
+                figure(100)
+                plot(xsims'); shg
                 
                 acfcheck = []; acffft = []; montoncheck = [];
                 for j = 1:size(xsims,1)

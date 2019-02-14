@@ -15,8 +15,9 @@ function [R,parBank] = SimAn_ABC_060219(R,p,m,parBank)
 % R - settings for annealing, plotting, integration etc.
 %
 % This function will output R at each annealing loop (assigned into 'base'
-% workspace. The field R.mfit is appended with the Rho (normalized covariance) and nu
-% (degrees of freedom) of the estimated copula.
+% workspace. The field R.mfit is appended with the Rho (correlation matrix) and nu
+% (degrees of freedom) of the estimated copula. Multivariate Gaussian
+% is also estimated and specified in R.mfit.Mu and R.mfit.Sigma.
 % There are several plotting functions which will track the progress of the
 % annealing.
 %
@@ -49,7 +50,7 @@ cflag = 0; delta_act = 0.05;
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*4); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*2); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     rep = repset;
@@ -227,35 +228,22 @@ while ii <= searchN
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
         if isequal(R.plot.save,'True')
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\feattrack\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',1);
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\r2track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',2);
-            saveallfiguresFIL_n([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\dist_track\bgc_siman_r2track_' num2str(ii) '_'],'-jpg',1,'-r100',3);
-            %     close all
-            pathstr = [R.rootn 'outputs\' R.out.tag '\' R.out.dag '\OptSaves\'];
-            if ~exist(pathstr, 'dir')
-                mkdir(pathstr);
-            end
-            disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
+            saveSimAnFigures(R,ii)
         end
     end
-    %     disp({['Current R2: ' num2str(tbr2(ii))];[' Temperature ' num2str(Tm(ii)) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
+    disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
     %% Save data
     if rem(ii,10) == 0
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'],R)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
+        saveSimABCOutputs(R,Mfit,m,parBank)
     end
     % Or to workspace
     %     assignin('base','R_out',R)
     
     if delta_act < 5e-3
         disp('Itry Exceeded: Convergence')
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'],Mfit)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.out.dag '.mat'],m)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'],R)
-        saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'],parBank)
+        saveSimABCOutputs(R,Mfit,m,parBank)
+        saveSimAnFigures(R,ii)
         return
     end
     
