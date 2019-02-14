@@ -138,14 +138,14 @@ while ii <= searchN
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
-    elseif itry < 2
+    elseif itry < 3
         fprintf('Trying for the %.0f\n time with the current eps \n',itry)
         disp('Trying once more with current eps')
         if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry >= 2
+    elseif itry >= 3
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         eps_act = min(parOptBank(end,:));
@@ -168,7 +168,7 @@ while ii <= searchN
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
-    elseif cflag == 1 && itry <= 2 % Draw from old copula
+    elseif cflag == 1 && itry <= 3 % Draw from old copula
         par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
     else % Draw from Normal Distribution
         Mfit.Mu = mean(parOptBank(pMuMap,:),2);
@@ -240,10 +240,12 @@ while ii <= searchN
     % Or to workspace
     %     assignin('base','R_out',R)
     
-    if delta_act < 5e-3
+    if delta_act < 2.5e-3
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
-        saveSimAnFigures(R,ii)
+        if R.plot.flag == 1
+            saveSimAnFigures(R,ii)
+        end
         return
     end
     
