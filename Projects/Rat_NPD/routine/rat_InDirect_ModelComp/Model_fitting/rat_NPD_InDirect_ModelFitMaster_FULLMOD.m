@@ -16,7 +16,7 @@ clear ; close all
 closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths(
-rng(734221)
+rng(2312)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -58,7 +58,7 @@ for modID = 1:10
         R.out.dag = sprintf('NPD_InDrt_ModCompRev_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
-        R = setSimTime(R,32);
+        R = setSimTime(R,26);
         R.Bcond = 0;
         R.SimAn.rep = 512; %448
         [p] = SimAn_ABC_060219(R,p,m);

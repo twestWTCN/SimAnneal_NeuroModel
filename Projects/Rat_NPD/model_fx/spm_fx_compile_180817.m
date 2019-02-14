@@ -76,7 +76,7 @@ for condsel = 1:numel(R.condnames)
     E(6,:) = [.2 .2 -.2 -.2]*10000;             % GPE connections
     E(7,:) = [.2 .2 -.2 -.2]*10000;             % STN connections
     E(8,:) = [.2 .2 -.2 -.2]*10000;             % GPI connections
-    E(9,:) = [.2 .2 -.2 -.2]*10000;  %500       % THAL connections
+    E(9,:) = [.2 .2 -.2 -.2]*1000;  %500       % THAL connections
     
     % get the neural mass models {'ERP','CMC'}
     %--------------------------------------------------------------------------
