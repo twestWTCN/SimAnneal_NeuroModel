@@ -197,7 +197,7 @@ while ii <= searchN
         else
             pmean = p;
         end
-        banksave{ii} = parBank(:,parBank(end,:)>eps_act);
+        banksave{ii} = parBank(end,parBank(end,:)>eps_act);
         
         figure(2);    clf
         optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,pSig,R)
