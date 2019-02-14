@@ -41,8 +41,8 @@ for multiStart = 1:10
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_MultiStart_M%.0f',multiStart); % 'All Cross'
-        R.SimAn.rep = 256;
-        R = setSimTime(R,42);
+        R.SimAn.rep = 512;
+        R = setSimTime(R,32);
         R.Bcond = 0;
         R.plot.flag = 1;
         SimAn_ABC_060219(R,p,m);

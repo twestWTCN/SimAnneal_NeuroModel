@@ -39,9 +39,10 @@ pOrg = p; % Record prior parameters.
 searchN = R.SimAn.searchN;
 repset =  R.SimAn.rep(1);
 ii = 1;
-eps_prior = -3; % prior eps (needed for gradient approximation);
-eps_exp = -2.8; eps_act = eps_prior;
-cflag = 0; delta_act = 1;
+eps_prior = -4; % prior eps (needed for gradient approximation);
+eps_exp = -3.9;
+eps_act = eps_prior;
+cflag = 0; delta_act = 0.05;
 % Compute indices of parameters to be optimized
 [pInd,pMu,pSig] = parOptInds_110817(R,p,m.m); % in structure form
 % Form descriptives

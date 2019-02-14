@@ -47,7 +47,7 @@ format short g
 % Check Real Positive
 A = [eigvals eigvals/max(abs(eigvals))];
 
-convMods = find(R2ms>0);
+convMods = find(R2ms>-1);
 cmap = linspecer(10);
 i = 0;
 for multiStart = convMods
@@ -55,13 +55,13 @@ for multiStart = convMods
     inds = Inds(multiStart:multiStart+1);
     inds = inds(1):inds(2);
     szvec = 1:diff([inds(1) inds(end)])+1;
-        scatter3(Y(inds,1),Y(inds,2),Y(inds,3),szvec*10,cmap(i,:),'.');
-    hold on
-    plot3(Y(inds(2:end),1),Y(inds(2:end),2),Y(inds(2:end),3),'color',cmap(i,:))
-    
-%     sc(i) = scatter(Y(inds,1),Y(inds,2),szvec*10,cmap(i,:),'.');
+%     sc(i) = scatter3(Y(inds,1),Y(inds,2),Y(inds,3),szvec*10,cmap(i,:),'.');
 %     hold on
-%     p =     plot(Y(inds(2:end),1),Y(inds(2:end),2),'color',cmap(i,:));
+%     plot3(Y(inds(2:end),1),Y(inds(2:end),2),Y(inds(2:end),3),'color',cmap(i,:))
+    
+    sc(i) = scatter(Y(inds,1),Y(inds,2),szvec*10,cmap(i,:),'.');
+    hold on
+    p =     plot(Y(inds(2:end),1),Y(inds(2:end),2),'color',cmap(i,:));
 end
 legend(sc)
 
