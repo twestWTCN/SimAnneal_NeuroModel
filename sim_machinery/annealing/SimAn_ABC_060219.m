@@ -37,35 +37,32 @@ end
 pOrg = p; % Record prior parameters.
 
 % Set Fixed Annealing Parameters
-searchN = R.SimAn.searchN;
-repset =  R.SimAn.rep(1);
-ii = 1;
 eps_prior = -4; % prior eps (needed for gradient approximation);
 eps_exp = -3.9;
 eps_act = eps_prior;
-cflag = 0; delta_act = 0.05;
+delta_act = 0.05;
 % Compute indices of parameters to be optimized
 [pInd,pMu,pSig] = parOptInds_110817(R,p,m.m); % in structure form
 % Form descriptives
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*2); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
-    rep = repset;
+    rep =  R.SimAn.rep(1);
     par = postDrawCopula(R.Mfit,p,pIndMap,rep);
 else
-    rep = repset;
+    rep = R.SimAn.rep(1);
     ptmp = spm_vec(p);
     Mfit.Mu = ptmp(pMuMap);
     Mfit.Sigma = ptmp(pSigMap).*R.SimAn.jitter;
     par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
 end
-itry = 0;
+itry = 0; cflag = 0;
+ii = 1;
 %% Main Annealing Loop
-while ii <= searchN
-    rep = repset;
+while ii <= R.SimAn.searchMax
     %% Batch Loop for Replicates for Generation of Pseudodata
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
@@ -133,7 +130,7 @@ while ii <= searchN
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
+            parOptBank = parBank(:,intersect(1:4*R.SimAn.minRank,1:size(parBank,2)));
             eps_act = min(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
@@ -177,6 +174,8 @@ while ii <= searchN
     end
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
+    banksave{ii} = parBank(end,parBank(end,:)>eps_act);
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\bankSave_' R.out.tag '_' R.out.dag '.mat'],parHist)
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
     if size(Ilist,2)>2 && R.plot.flag ==1
         if isfield(R.plot,'outFeatFx')
@@ -197,7 +196,6 @@ while ii <= searchN
         else
             pmean = p;
         end
-        banksave{ii} = parBank(end,parBank(end,:)>eps_act);
         
         figure(2);    clf
         optProgPlot(1:ii,r2loop(Ilist(1)),pmean,banksave,eps_rec,bestr2,pInd,pSig,R)

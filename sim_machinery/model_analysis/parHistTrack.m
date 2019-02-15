@@ -8,15 +8,29 @@ load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelspec_' R.out.tag '_' R.o
 m = varo;
 
 [pInd,parMu,parSig] = parOptInds_110817(R,p,m.m); % in structure form
-
+% [pInd] = createParNameField(R,p,m.m); % in structure form
+% Set Par Names
+parNames = {'GPe \tau';
+    'GPe \gamma';
+    'STN \tau';
+    'STN \gamma';
+    'GPe C';
+    'STN C';
+    'STN \rightarrow GPe';
+    'GPe \rightarrow STN';
+    'GPe \sigma';
+    'STN \sigma';
+    'STN D\rightarrow GPe';
+    'GPe D\rightarrow STN';
+    };
 % Form descriptives
 pIndMap = spm_vec(pInd); % in flat form
-pIndMap = pIndMap(5:end);
+% pIndMap = pIndMap(5:end);
 pSigMap = spm_vec(parSig); % in flat form
-pSigMap = pSigMap(5:end);
+% pSigMap = pSigMap(5:end);
 
 Inds = 1;
-for multiStart = 1:10
+for multiStart = 1:9
     R.out.dag = sprintf('NPD_STN_GPe_MultiStart_M%.0f',multiStart); % 'All Cross'
     load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
     Mfit = varo;
@@ -50,6 +64,8 @@ A = [eigvals eigvals/max(abs(eigvals))];
 convMods = find(R2ms>-1);
 cmap = linspecer(10);
 i = 0;
+figure
+subplot(1,2,2)
 for multiStart = convMods
     i = i +1;
     inds = Inds(multiStart:multiStart+1);
@@ -62,10 +78,35 @@ for multiStart = convMods
     sc(i) = scatter(Y(inds,1),Y(inds,2),szvec*10,cmap(i,:),'.');
     hold on
     p =     plot(Y(inds(2:end),1),Y(inds(2:end),2),'color',cmap(i,:));
+    legnames{i} = sprintf('Model %.0f',multiStart);
 end
-legend(sc)
+xlabel('MDS Dimension 1'); ylabel('MDS Dimension 2');
+grid on
+title('Multi-start Posteriors on Projected Coordinates')
 
-figure
-bar(pIndMap,mean(parConv,2))
+% legend(sc)
+
+subplot(1,2,1)
+% b = bar(1:numel(pIndMap),mean(parConv,2));
+% b.FaceAlpha = 0;
+c = bar(1:numel(pIndMap),parConv);
+for i = 1:size(c,2)
+    c(i).FaceColor = cmap(i,:);
+end
 hold on
-errorbar(pIndMap,mean(parConv,2),std(parConv,[],2),'.')
+b = plot(1:numel(pIndMap),mean(parConv,2),' ko');
+ b.MarkerFaceColor = 'k';
+e = errorbar(1:numel(pIndMap),mean(parConv,2),std(parConv,[],2),'.');
+e.Color = [0 0 0];
+e.LineWidth = 1.5;
+g = gca;
+g.XTickLabel = parNames;
+g.XTickLabelRotation = -45;
+grid on
+ylabel('Precision Weighted Posteior Means')
+title('Multi-start Posterior Means')
+
+leg = legend(c,legnames,'Orientation','vertical');
+leg.Box = 'off';
+set(leg,'Position',[0.9131 0.1209 0.0803 0.2472]);
+set(gcf,'Position',[259         207        1361         615])

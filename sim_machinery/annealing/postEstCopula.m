@@ -28,6 +28,7 @@ try
     end
     cflag = 1;
 catch
+    disp('Copula estimation is broken, its probably the following:')
     disp('The estimate of Rho has become rank-deficient.  You may have too few data, or strong dependencies among variables.')
     p = spm_unvec(mean(parOptBank,2),pOrg);
     par = [];
