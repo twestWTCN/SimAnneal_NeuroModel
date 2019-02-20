@@ -20,7 +20,10 @@ function [R,parBank] = SimAn_ABC_060219(R,p,m,parBank)
 % is also estimated and specified in R.mfit.Mu and R.mfit.Sigma.
 % There are several plotting functions which will track the progress of the
 % annealing.
-%
+% TO DO:
+% Change convergence parameters upon the inference of parameter precision.
+% In this way the convergence depends upon the inference and not on the
+% outcome (accuracy). 
 % Timothy West (2018) - UCL CoMPLEX
 % / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%
@@ -175,7 +178,7 @@ while ii <= R.SimAn.searchMax
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
     banksave{ii} = parBank(end,parBank(end,:)>eps_act);
-    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\bankSave_' R.out.tag '_' R.out.dag '.mat'],parHist)
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\bankSave_' R.out.tag '_' R.out.dag '.mat'],banksave)
     %%%%%%%%%%%%%%% SAVE PROGRESS, PLOTTING ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%
     if size(Ilist,2)>2 && R.plot.flag ==1
         if isfield(R.plot,'outFeatFx')

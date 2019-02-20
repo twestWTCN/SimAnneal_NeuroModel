@@ -52,6 +52,7 @@ p.A{1}(4,1) = 0; % MMC -> STN (hd pathway)
 p.A{1}(3,4) = 0; % STN -> GPE
 p.A{1}(5,4) = 0; % STN -> GPi
 p.A{1}(1,6) = 0; % Thal -> MMC (Thalcort pathway)
+p.A{1}(6,1) = 0; % MMC -> Thal (Thalcort pathway)
 p.A_s{1} = repmat(1/4,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
