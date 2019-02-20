@@ -56,7 +56,7 @@ p.A_s{2}(2,1) = 1/4; % GPe -| STN
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(1/4,size(p.C));
+p.C_s = repmat(1/16,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1];
@@ -79,7 +79,7 @@ for i = 1:m.m
     p.int{i}.T = zeros(1,m.Tint(i));
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
-    p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
+    p.int{i}.G_s = repmat(prec/2,size(p.int{i}.G));
     p.int{i}.S = zeros(1);
     p.int{i}.S_s = repmat(prec/4,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
