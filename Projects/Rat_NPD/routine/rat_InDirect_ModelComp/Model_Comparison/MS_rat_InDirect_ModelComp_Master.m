@@ -1,10 +1,6 @@
 % COMPUTE MODEL RELATIVE PROBABILITIES AND PLOT RESULTS
 clear; close all
-handles = allchild(0);
-tags = get(handles,'Tag');
-isMsg = strncmp(tags,'Msgbox_',7); % all message boxes have the tags in the format of Msgbox_*
-delete(handles(isMsg));
-
+closeMessageBoxes
 
 %% Add Paths
 % simAnnealAddPaths()
@@ -14,11 +10,12 @@ R = simannealsetup_InDirect_ModelComp;
 R = prepareRatData_InDirect_Group_NPD(R); 
 
 %% Do the model probability computations
-modelCompMaster(R,1:10)
+R.comptype = 1;
+% modelCompMaster(R,[2 3 5:10])
 
 %% Plot the modComp results
 R.modcomp.modN = [1:10];
-R.modcompplot.NPDsel = [6 12 15];
+R.modcompplot.NPDsel = 1:10; %[6 9 10];
 R.plot.confint = 'yes';
 cmap = linspecer(numel(R.modcomp.modN));
 plotModComp_091118(R,cmap)
