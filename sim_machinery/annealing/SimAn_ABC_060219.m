@@ -241,7 +241,7 @@ while ii <= R.SimAn.searchMax
     % Or to workspace
     %     assignin('base','R_out',R)
     
-    if delta_act < 2.5e-3
+    if delta_act < R.SimAn.convIt
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.flag == 1

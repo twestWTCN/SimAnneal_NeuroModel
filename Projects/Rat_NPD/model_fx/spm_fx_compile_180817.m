@@ -19,8 +19,9 @@ for condsel = 1:numel(R.condnames)
     fx{1} = @spm_fx_erp;                                    % ERP model
     fx{2} = @spm_fx_cmc_local;                                    % CMC model
     fx{3} = @spm_fx_bgc;                                    % basal ganglia circuit
-    fx{4} = @spm_fx_mmc;                                    % motor micro circuit
+%     fx{4} = @spm_fx_mmc;                                    % motor micro circuit (SPM version)
     
+    fx{4} = @spm_fx_bgc_mmc;                                    % motor micro circuit
     fx{5} = @spm_fx_bgc_str;
     fx{6} = @spm_fx_bgc_gpe;
     fx{7} = @spm_fx_bgc_stn;
@@ -267,7 +268,7 @@ for condsel = 1:numel(R.condnames)
                     end
                 end
             end
-            % intrinsic flow
+            % intrinsic flow at target
             %----------------------------------------------------------------------
             ui   = u(tstep,i)+ sum(fA);
             xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
@@ -276,6 +277,9 @@ for condsel = 1:numel(R.condnames)
         end
         xint = xint + (f.*dt);
         xstore = [xstore xint]; % This is done for speed reasons! Actually faster than indexing (?!!)
+        if any(isnan(xint))
+            a = 1;
+        end
         if tstep >R.IntP.buffer*10
             if any(xint>1e4) || any(isnan(xint))
                 wflag= 1;

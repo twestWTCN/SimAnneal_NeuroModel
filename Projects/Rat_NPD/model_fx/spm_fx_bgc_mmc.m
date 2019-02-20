@@ -1,4 +1,4 @@
-function [f,J,Q] = spm_fx_mmc(x,u,P,M)
+function [f,J,Q] = spm_fx_bgc_mmc(x,u,P,M)
 % state equations for a neural mass model of motor cortex
 % Bhatt et al. 2016 Neuroimage
 %
