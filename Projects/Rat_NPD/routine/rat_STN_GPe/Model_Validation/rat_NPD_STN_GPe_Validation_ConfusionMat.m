@@ -28,15 +28,15 @@ R = simannealsetup_NPD_STN_GPe;
 %     Rt.root = R.rootn; %Overwrite root with current
 %     
 %     % Retrieve structure map
-%     pInd = parOptInds_110817(Rt,p,m.m); % in structure form
+%      [pInd,pMu,pSig] = parOptInds_110817(Rt,p,m.m); % in structure form
 %     pIndMap = spm_vec(pInd); % in flat form
-%     
+%     pSigMap = spm_vec(pSig); % in flat form
 %     % Draw copula and average
-%     par = postDrawCopula(Mfit,p,pIndMap,1000);
+%     par = postDrawCopula(Mfit,p,pIndMap,pSigMap,1000);
 %     avPar = averageCell(par);
 %     
 %     % Now Simulate Fitted Model
-%     pnew = avPar;
+%     pnew = avPar.mu;
 %     [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(Rt,m,[],pnew,512,1);
 %     
 %     Rt.data.feat_emp = feat_sim;
@@ -83,10 +83,10 @@ for i = 1:size(confmatlist,2)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.data = RSimData(SimData).data;
         R.out.dag = sprintf('NPD_STN_GPe_ConfMat_DataM%.0f_ParM%.0f',SimData,SimMod); % 'All Cross'
-        R.SimAn.rep = 64;
+        R.SimAn.rep = 128;
         R = setSimTime(R,32);
         R.Bcond = 0;
-        [p] = SimAn_ABC_060219(R,p,m);
+        [p] = SimAn_ABC_220219(R,p,m);
         closeMessageBoxes
     end
 end

@@ -1,4 +1,4 @@
-function [R,parBank] = SimAn_ABC_060219(R,p,m,parBank)
+function [R,parBank] = SimAn_ABC_220219(R,p,m,parBank)
 %%%% SIMULATED ANNEALING for APROXIMATE BAYESIAN COMPUTATION for
 %%%% HIGH DIMENSIONAL DYNAMICAL MODELS
 % ---- 16/08/18---------------------------
@@ -59,9 +59,10 @@ else
     rep = R.SimAn.rep(1);
     ptmp = spm_vec(p);
     Mfit.Mu = ptmp(pMuMap);
-    Mfit.Sigma = ptmp(pSigMap).*R.SimAn.jitter;
+    Mfit.Sigma = diag(ptmp(pSigMap).*R.SimAn.jitter);
     par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
 end
+parPrec(:,1) = diag(Mfit.Sigma);
 itry = 0; cflag = 0;
 ii = 1;
 %% Main Annealing Loop
@@ -180,6 +181,7 @@ while ii <= R.SimAn.searchMax
         end
         par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
     end
+    parPrec(:,ii+1) = diag(Mfit.Sigma);
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
     banksave{ii} = parBank(end,parBank(end,:)>eps_act);
@@ -245,8 +247,9 @@ while ii <= R.SimAn.searchMax
     end
     % Or to workspace
     %     assignin('base','R_out',R)
+    deltaPrec(ii) = mean(diff(parPrec(:,[ii ii+1]),[],2)); 
     
-    if delta_act < R.SimAn.convIt
+    if delta_act < R.SimAn.convIt 
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.flag == 1

@@ -11,7 +11,7 @@ R = prepareRatData_STN_GPe_NPD(R,0);
 
 %% Do the model probability computations
 R.comptype = 1;
-modelCompMaster(R,1,[])
+modelCompMaster(R,1:3,[])
 
 %% Plot the modComp results
 R.modcomp.modN = 1:3;
