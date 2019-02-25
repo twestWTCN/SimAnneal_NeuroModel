@@ -8,7 +8,7 @@ clear ; close all
 
 % Close all msgboxes
 closeMessageBoxes
-rng(5353252)
+rng(7657456)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
@@ -47,7 +47,7 @@ for multiStart = N+1
         R = setSimTime(R,36);
         R.Bcond = 0;
         R.plot.flag = 1;
-        SimAn_ABC_060219(R,p,m);
+        SimAn_ABC_220219(R,p,m);
         closeMessageBoxes
     end
 end

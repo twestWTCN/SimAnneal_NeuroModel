@@ -100,7 +100,7 @@ switch R.data.datatype
                                     
                                     yfxx = [yfxx yfx];
                                     ffxx  = [ffxx ffx];
-                                    r(k) = goodnessOfFit(10.*yfx',10.*ffx','NRMSE');
+                                    r(k) = goodnessOfFit(yfx',ffx','NRMSE');
                                 end
                                 r2loop(C,i,j) = mean(r(r~=0));
                             end

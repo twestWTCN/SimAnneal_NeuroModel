@@ -38,10 +38,10 @@ for L = 1:length(NPD_sim)
                     %                     xlabel('Hz'); ylabel(labelna);
                     if i<j
                         a(1) = plot(F,squeeze(NPD_sim_n(C,i,j,2,:)),'r--','linewidth',lwid); hold on
-                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'r','linewidth',2)
+                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'r','linewidth',2);
                     elseif i>=j
                         a(2) = plot(F,squeeze(NPD_sim_n(C,i,j,2,:)),'b--','linewidth',lwid); hold on
-                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'b','linewidth',2)
+                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'b','linewidth',2);
                     end
                     xlabel('Hz'); ylabel(labelna); %title(sprintf('Ch %1.f -> Ch %1.f NPD',i,j));
                     %                 legend(a,{'Forward','Reverse'})

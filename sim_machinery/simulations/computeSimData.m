@@ -54,8 +54,8 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         %         disp(pnew.obs.LF)
         %         toc
         if plotop == 1
-                    figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
-                    figure(2);subplot(2,1,1); plot(xsims_gl{1}')
+                    figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim{1}},R.data.feat_xscale,R,1,[])
+                    figure(2);subplot(2,1,1); plot(xsims_gl{1}{1}')
             % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
         end
     catch
