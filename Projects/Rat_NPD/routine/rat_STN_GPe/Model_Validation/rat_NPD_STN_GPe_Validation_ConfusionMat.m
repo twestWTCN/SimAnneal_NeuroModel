@@ -26,7 +26,7 @@ R = simannealsetup_NPD_STN_GPe;
 %     load([R.rootn 'outputs\' R.out.tag '\NPD_' dagname '\R_' R.out.tag '_NPD_' dagname '.mat'])
 %     Rt = varo; %i.e. permMod
 %     Rt.root = R.rootn; %Overwrite root with current
-%     
+%
 %     % Retrieve structure map
 %      [pInd,pMu,pSig] = parOptInds_110817(Rt,p,m.m); % in structure form
 %     pIndMap = spm_vec(pInd); % in flat form
@@ -34,11 +34,11 @@ R = simannealsetup_NPD_STN_GPe;
 %     % Draw copula and average
 %     par = postDrawCopula(Mfit,p,pIndMap,pSigMap,1000);
 %     avPar = averageCell(par);
-%     
+%
 %     % Now Simulate Fitted Model
 %     pnew = avPar.mu;
 %     [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(Rt,m,[],pnew,512,1);
-%     
+%
 %     Rt.data.feat_emp = feat_sim;
 %     % squeeze(meannpd_data(1,1,1,1,:))
 %     Rt.data.feat_xscale = R.frqz;
@@ -86,6 +86,7 @@ for i = 1:size(confmatlist,2)
         R.SimAn.rep = 128;
         R = setSimTime(R,32);
         R.Bcond = 0;
+        R.plot.flag = 0;
         [p] = SimAn_ABC_220219(R,p,m);
         closeMessageBoxes
     end

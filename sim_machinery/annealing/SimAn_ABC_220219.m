@@ -120,21 +120,21 @@ while ii <= R.SimAn.searchMax
         parBank = parBank(:,V);
     end
     
-    %% Find error threshold for temperature (epsilon)
+    %% Find error threshold for temperature (epsilon) and do rejection sampling
     parOptBank = parBank(:,parBank(end,:)>eps_exp);
     A = parOptBank(pIndMap,:);
     B = eig(cov(A));
     C = B/sum(B);
     fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
     if size(parOptBank,2)> R.SimAn.minRank-1
-        if size(parOptBank,2) < 4*(R.SimAn.minRank-1)
+        if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
             disp('Bank satisfies current eps')
             eps_act = eps_exp;
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         else % if the bank is very large than take subset
             disp('Bank is large taking new subset to form eps')
-            parOptBank = parBank(:,intersect(1:4*R.SimAn.minRank,1:size(parBank,2)));
+            parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
             eps_act = min(parOptBank(end,:));
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
@@ -165,22 +165,28 @@ while ii <= R.SimAn.searchMax
         eps_prior = eps_act;
     end
     eps_rec(ii) = eps_act;
-    %% Compute Posterior
+    
+    %% Compute Proposal Distribution
     if cflag == 1 && itry == 0 % estimate new copula
         [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
-        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
-    elseif cflag == 1 && itry <= 3 % Draw from old copula
-        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
-    else % Draw from Normal Distribution
-        if ~isempty(parOptBank)
+    end
+    if cflag == 0 % Draw from Normal Distribution
+        if size(parOptBank,2)>2
             Mfit.Mu = mean(parOptBank(pMuMap,:),2);
             Mfit.Sigma = cov(parOptBank(pMuMap,:)');
         else
             Mfit.Mu = mean(parBank(pMuMap,intersect(1:2*R.SimAn.minRank,1:size(parBank,2))),2);
             Mfit.Sigma = cov(parBank(pMuMap,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)))');
         end
+    end
+    
+    %% Draw from Proposal Distribution
+    if cflag == 1
+        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
+    elseif cflag == 0
         par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
     end
+    
     parPrec(:,ii+1) = diag(Mfit.Sigma);
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
@@ -247,9 +253,9 @@ while ii <= R.SimAn.searchMax
     end
     % Or to workspace
     %     assignin('base','R_out',R)
-    deltaPrec(ii) = mean(diff(parPrec(:,[ii ii+1]),[],2)); 
+    deltaPrec(ii) = mean(diff(parPrec(:,[ii ii+1]),[],2));
     
-    if delta_act < R.SimAn.convIt 
+    if delta_act < R.SimAn.convIt
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.flag == 1

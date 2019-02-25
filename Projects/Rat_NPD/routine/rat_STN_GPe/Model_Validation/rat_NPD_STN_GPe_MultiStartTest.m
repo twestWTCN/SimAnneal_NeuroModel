@@ -25,9 +25,9 @@ catch
     save([R.rootn 'outputs\' R.out.tag '\MultiStartList'],'WML')
     disp('Making Mod List!!')
 end
-
+N = 10; % number of starts
 %% Prepare Model
-for multiStart = 1:10
+for multiStart = N+1
     load([R.rootn 'outputs\' R.out.tag '\MultiStartList'],'WML')
     if ~any(intersect(WML,multiStart))
         WML = [WML multiStart];
@@ -35,6 +35,7 @@ for multiStart = 1:10
         disp('Writing to Mod List!!')
         fprintf('Now Fitting Mulitstart %.0f',multiStart)
         f = msgbox(sprintf('Fitting Multistart %.0f',multiStart));
+        if multiStart == N+1; R = prepareRatData_STN_GPe_NPD(R,1,1); end
         modelspec = eval(['@MS_rat_STN_GPe_ModComp_Model' num2str(1)]);
         [R,p,m] = modelspec(R);
         pause(5)
