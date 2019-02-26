@@ -49,6 +49,7 @@ for C =1:numel(R.condnames)
                 % Normalize and zero-base
                 Pxy = (Pxy-mean(Pxy))./std(Pxy);
                 Pxy = Pxy-min(Pxy);
+                meannpd_data(C,i,j,1,:) = Pxy;
             else
                 
                 for k = 1:size(NPDmat,3)
