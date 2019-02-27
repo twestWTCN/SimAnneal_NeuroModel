@@ -159,7 +159,7 @@ while ii <= R.SimAn.searchMax
         delta_exp = eps_exp-eps_prior;
         fprintf('Expected gradient was %0.2f \n',delta_exp)
         delta_act = eps_act-eps_prior;
-        fprintf('Actual gradient was %0.2f \n',delta_exp)
+        fprintf('Actual gradient was %0.2f \n',delta_act)
         eps_exp = eps_act + delta_act;
         fprintf('Exp-Act gradient was %0.2f \n',delta_exp-delta_act)
         % Save eps history and make actual eps new prior eps
@@ -259,7 +259,7 @@ while ii <= R.SimAn.searchMax
     %     assignin('base','R_out',R)
     deltaPrec(ii) = mean(diff(parPrec(:,[ii ii+1]),[],2));
     
-    if delta_act < R.SimAn.convIt
+    if abs(delta_act) < R.SimAn.convIt
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.flag == 1

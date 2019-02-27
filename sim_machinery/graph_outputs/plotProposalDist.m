@@ -37,7 +37,9 @@ title('Approximate Posterior Distribution')
 
 subplot(2,2,2)
 if cflag == 0
-    Rho = Mfit.Sigma./diag(Mfit.Sigma);
+    S = Mfit.Sigma; % covariance matrix
+    D = sqrt(diag(Mfit.Sigma)); %standard deviations
+    Rho = S./(D*D');
 else
     Rho = Mfit.Rho;
 end

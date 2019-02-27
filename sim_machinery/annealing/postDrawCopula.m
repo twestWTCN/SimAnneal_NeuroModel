@@ -19,5 +19,6 @@ if R.plot.flag == 1
     figure(3)
     clf
     cflag= 1;
-    plotProposalDist(R,Mfit,r',pIndMap,cflag)
+    pardraw = base(pIndMap,:);
+    plotProposalDist(R,Mfit,pardraw,pIndMap,cflag)
 end
