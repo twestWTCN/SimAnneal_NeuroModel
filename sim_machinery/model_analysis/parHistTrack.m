@@ -75,15 +75,15 @@ for multiStart = convMods
     i = i +1;
     inds = Inds(multiStart:multiStart+1);
     inds = inds(1):inds(2);
-    inds = inds(end-10:end);
-    szvec = R2track{multiStart}(end-10:end); %1:diff([inds(1) inds(end)])+1;
+    inds = inds(end-20:end);
+    szvec = R2track{multiStart}(end-20:end); %1:diff([inds(1) inds(end)])+1;
     %     sc(i) = scatter3(Y(inds,1),Y(inds,2),Y(inds,3),szvec*10,cmap(i,:),'.');
     %     hold on
     %     plot3(Y(inds(2:end),1),Y(inds(2:end),2),Y(inds(2:end),3),'color',cmap(i,:))
     
     sc(i) = scatter(Y(inds,1),Y(inds,2),(20.^szvec)*1000,cmap(i,:),'.');
     hold on
-    p =     plot(Y(inds(2:end),1),Y(inds(2:end),2),'color',cmap(i,:));
+    p =     plot(Y(inds(1:end),1),Y(inds(1:end),2),'color',cmap(i,:));
     legnames{i} = sprintf('Model %.0f',multiStart);
 end
 xlabel('MDS Dimension 1'); ylabel('MDS Dimension 2');
