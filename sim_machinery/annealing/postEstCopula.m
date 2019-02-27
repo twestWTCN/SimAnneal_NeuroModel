@@ -1,4 +1,4 @@
-function [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg)
+function [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg)
 disp('Forming new copula...')
 clear copU xf ilist
 % First form kernel density estimates for each optimized
@@ -21,11 +21,11 @@ try
     Mfit.Rho = Rho;
     %     Mfit_hist = Mfit;
     %%% Plot posterior, Rho, and example 2D/3D random draws from copulas
-    if R.plot.flag == 1
-        figure(3)
-        clf
-        plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R)
-    end
+%     if R.plot.flag == 1
+%         figure(3)
+%         clf
+%         plotDistChange_KS(Rho,nu,xf,pOrg,pInd,R)
+%     end
     cflag = 1;
 catch
     disp('Copula estimation is broken, its probably the following:')

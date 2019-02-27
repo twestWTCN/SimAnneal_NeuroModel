@@ -8,7 +8,7 @@ clear ; close all
 
 % Close all msgboxes
 closeMessageBoxes
-rng(7657456)
+rng(76646)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
@@ -27,7 +27,7 @@ catch
 end
 N = 10; % number of starts
 %% Prepare Model
-for multiStart = N+1
+for multiStart = 1:N+1
     load([R.rootn 'outputs\' R.out.tag '\MultiStartList'],'WML')
     if ~any(intersect(WML,multiStart))
         WML = [WML multiStart];
@@ -35,7 +35,12 @@ for multiStart = N+1
         disp('Writing to Mod List!!')
         fprintf('Now Fitting Mulitstart %.0f',multiStart)
         f = msgbox(sprintf('Fitting Multistart %.0f',multiStart));
-        if multiStart == N+1; R = prepareRatData_STN_GPe_NPD(R,1,1); end
+
+        if multiStart == N+1
+            load([R.rootn 'outputs\' R.out.tag '\ConfData'],'RSimData')
+            R.data = RSimData(3).data;
+            figure(1);  R.plot.outFeatFx({R.data.feat_emp},{},R.data.feat_xscale,R,1,[])
+        end
         modelspec = eval(['@MS_rat_STN_GPe_ModComp_Model' num2str(1)]);
         [R,p,m] = modelspec(R);
         pause(5)
@@ -44,9 +49,9 @@ for multiStart = N+1
         % Delete Previous Saves
         delete([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\*'])
         R.SimAn.rep = 300;
-        R = setSimTime(R,36);
+        R = setSimTime(R,26);
         R.Bcond = 0;
-        R.plot.flag = 1;
+        R.plot.flag = 0;
         SimAn_ABC_220219(R,p,m);
         closeMessageBoxes
     end

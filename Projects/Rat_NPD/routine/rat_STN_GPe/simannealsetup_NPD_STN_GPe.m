@@ -70,7 +70,7 @@ R.obs.LF = LF;
 % fx to construct data features
 R.obs.transFx = @constructNPDMat_190618;
 % These are options for transformation (NPD)
-R.obs.trans.logdetrend =1;
+R.obs.trans.logdetrend =0;
 R.obs.trans.norm = 1;
 R.obs.logscale = 0;
 
@@ -83,10 +83,10 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.S','.C','.A','.D'}; %,'.S','.int{sr
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
-R.SimAn.convIt = 1e-3;
+R.SimAn.convIt = 1e-4;
 R.SimAn.rep = 256; %512; % Repeats per temperature
 % R.SimAn.saveout = 'xobs1';
-R.SimAn.jitter = 1; % Global precision
+R.SimAn.jitter = 1.5; % Global precision
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

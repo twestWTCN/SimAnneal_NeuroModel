@@ -1,18 +1,17 @@
 % COMPUTE MODEL RELATIVE PROBABILITIES AND PLOT RESULTS
 clear; close all
-        closeMessageBoxes
+closeMessageBoxes
 
 %% Add Paths
 % simAnnealAddPaths()
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
 % Get empirical data
-R = prepareRatData_STN_GPe_NPD(R,0); 
+R = prepareRatData_STN_GPe_NPD(R,0);
 
 %% Do the model probability computations
 R.comptype = 1;
 modelCompMaster(R,1:3,[])
-
 %% Plot the modComp results
 R.modcomp.modN = 1:3;
 R.modcompplot.NPDsel = [1:3];

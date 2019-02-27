@@ -8,8 +8,6 @@ clear ; close all
 
 % Close all msgboxes
 closeMessageBoxes
-
-
 rng(7564332)
 
 %% Set Routine Pars
@@ -29,7 +27,7 @@ catch
 end
 
 %% Prepare Model
-for modID = 1:3
+for modID = 2
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];
@@ -43,10 +41,11 @@ for modID = 1:3
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        R.SimAn.rep = 512;
-        R = setSimTime(R,48);
+        R.SimAn.rep = 300;
+        R = setSimTime(R,24);
         R.Bcond = 0;
-        [p] = SimAn_ABC_060219(R,p,m);
+        R.plot.flag = 1;
+        [p] = SimAn_ABC_220219(R,p,m);
         closeMessageBoxes()
     end
 end
