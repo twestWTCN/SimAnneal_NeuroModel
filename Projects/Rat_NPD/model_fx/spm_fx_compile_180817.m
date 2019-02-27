@@ -295,7 +295,7 @@ for condsel = 1:numel(R.condnames)
     end
     xstore_cond{condsel} = xstore;
     if nargout>3
-        [J{condsel} Es{condsel}] = findJacobian(R,xstore(:,end-R.IntP.buffer:end),uc,p,m);
+        [J{condsel},Es{condsel}] = findJacobian(R,xstore(:,end-R.IntP.buffer:end),uc,p,m);
     end    % tvec = linspace(R.IntP.buffer*R.IntP.dt,R.IntP.nt*R.IntP.dt,R.IntP.nt);
     a = 1;
 end

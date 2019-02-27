@@ -60,7 +60,8 @@ else
     ptmp = spm_vec(p);
     Mfit.Mu = ptmp(pMuMap);
     Mfit.Sigma = diag(ptmp(pSigMap).*R.SimAn.jitter);
-    par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
+    Mfit.prior = Mfit;
+    par = postDrawMVN(R,Mfit,pOrg,pIndMap,pSigMap,rep);
 end
 parPrec(:,1) = diag(Mfit.Sigma);
 itry = 0; cflag = 0;
@@ -158,7 +159,7 @@ while ii <= R.SimAn.searchMax
         delta_exp = eps_exp-eps_prior;
         fprintf('Expected gradient was %0.2f \n',delta_exp)
         delta_act = eps_act-eps_prior;
-        fprintf('Actual gradient was %0.2f \n',delta_exp)
+        fprintf('Actual gradient was %0.2f \n',delta_act)
         eps_exp = eps_act + delta_act;
         fprintf('Exp-Act gradient was %0.2f \n',delta_exp-delta_act)
         % Save eps history and make actual eps new prior eps
@@ -168,7 +169,7 @@ while ii <= R.SimAn.searchMax
     
     %% Compute Proposal Distribution
     if cflag == 1 && itry == 0 % estimate new copula
-        [Mfit,cflag] = postEstCopula(R,parOptBank,pInd,pIndMap,pOrg);
+        [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg);
     end
     if cflag == 0 % Draw from Normal Distribution
         if size(parOptBank,2)>2
@@ -182,9 +183,9 @@ while ii <= R.SimAn.searchMax
     
     %% Draw from Proposal Distribution
     if cflag == 1
-        par = postDrawCopula(Mfit,pOrg,pIndMap,pSigMap,rep);
+        par = postDrawCopula(R,Mfit,pOrg,pIndMap,pSigMap,rep);
     elseif cflag == 0
-        par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
+        par = postDrawMVN(R,Mfit,pOrg,pIndMap,pSigMap,rep);
     end
     
     parPrec(:,ii+1) = diag(Mfit.Sigma);
@@ -241,21 +242,24 @@ while ii <= R.SimAn.searchMax
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
-        if isequal(R.plot.save,'True')
-            saveSimAnFigures(R,ii)
-        end
+%         if isequal(R.plot.save,'True')
+%             saveSimAnFigures(R,ii)
+%         end
     end
     disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
     %% Save data
-    if rem(ii,10) == 0
+    if rem(ii,10) == 0 || ii == 1
         saveSimABCOutputs(R,Mfit,m,parBank)
+        if R.plot.save == 1
+            saveSimAnFigures(R,ii)
+        end        
     end
     % Or to workspace
     %     assignin('base','R_out',R)
     deltaPrec(ii) = mean(diff(parPrec(:,[ii ii+1]),[],2));
     
-    if delta_act < R.SimAn.convIt
+    if abs(delta_act) < R.SimAn.convIt
         disp('Itry Exceeded: Convergence')
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.flag == 1

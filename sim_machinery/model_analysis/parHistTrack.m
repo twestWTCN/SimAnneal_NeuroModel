@@ -28,15 +28,19 @@ pSigMap = spm_vec(parSigMap); % in flat form
 % pSigMap = pSigMap(5:end);
 
 Inds = 1;
-for multiStart = 1:10
+for multiStart = 1:11
     R.out.dag = sprintf('NPD_STN_GPe_MultiStart_M%.0f',multiStart); % 'All Cross'
     load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
     Mfit = varo;
     load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'])
     parHist = varo;
-    parTT = [];
+        load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\bankSave_' R.out.tag '_' R.out.dag '.mat'])
+    bankSave = varo;
+
+    parTT = []; r2 = [];
     for i = 1:size(parHist,2)
         parTT(:,i) = spm_vec(parHist(i));
+        r2(i) = mean(bankSave{i});
     end
     parT = parTT(pIndMap,:);
     parSig{multiStart} = parTT(pSigMap,:);
@@ -49,7 +53,8 @@ for multiStart = 1:10
     parMS{multiStart} = parT;
     parConv(:,multiStart) = wParT(:,end);
     Inds(multiStart+1) = Inds(multiStart) + (size(parT,2)-1);
-    R2ms(multiStart) = Mfit.tbr2;
+    R2ms(multiStart) = r2(end);
+    R2track{multiStart} = r2;
 end
 
 T = [parWeighted{:}];
@@ -62,6 +67,7 @@ A = [eigvals eigvals/max(abs(eigvals))];
 
 convMods = find(R2ms>-1);
 cmap = linspecer(10);
+cmap(11,:) = [1 0 0];
 i = 0;
 figure
 subplot(1,2,2)
@@ -69,15 +75,15 @@ for multiStart = convMods
     i = i +1;
     inds = Inds(multiStart:multiStart+1);
     inds = inds(1):inds(2);
-    inds = inds(end-10:end);
-    szvec = 1:diff([inds(1) inds(end)])+1;
+    inds = inds(end-20:end);
+    szvec = R2track{multiStart}(end-20:end); %1:diff([inds(1) inds(end)])+1;
     %     sc(i) = scatter3(Y(inds,1),Y(inds,2),Y(inds,3),szvec*10,cmap(i,:),'.');
     %     hold on
     %     plot3(Y(inds(2:end),1),Y(inds(2:end),2),Y(inds(2:end),3),'color',cmap(i,:))
     
-    sc(i) = scatter(Y(inds,1),Y(inds,2),szvec*10,cmap(i,:),'.');
+    sc(i) = scatter(Y(inds,1),Y(inds,2),(20.^szvec)*1000,cmap(i,:),'.');
     hold on
-    p =     plot(Y(inds(2:end),1),Y(inds(2:end),2),'color',cmap(i,:));
+    p =     plot(Y(inds(1:end),1),Y(inds(1:end),2),'color',cmap(i,:));
     legnames{i} = sprintf('Model %.0f',multiStart);
 end
 xlabel('MDS Dimension 1'); ylabel('MDS Dimension 2');

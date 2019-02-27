@@ -63,6 +63,7 @@ for C =1:numel(R.condnames)
                     F_model = R.frqz;
                     % Log transform of group average
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
+                    Cxy = Cxy.*2;
                     % Put in the same frequency space as the models
                     Cxy = interp1(F_data,Cxy,F_model);
                     

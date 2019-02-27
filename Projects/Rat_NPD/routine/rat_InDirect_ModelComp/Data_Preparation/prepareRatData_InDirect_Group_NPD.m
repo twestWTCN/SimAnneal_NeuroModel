@@ -11,7 +11,6 @@ NPDmat = fyA;
 load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
 nsPowmat = fyA;
 load([R.filepathn '\frq_paper_RatNPD_150618.mat']);
-F_data = fxA(:,1);
 meannpd_data = [];
 % condsel = [1 2];
 R.condnames = {'OFF'};
@@ -24,14 +23,16 @@ for C =1:numel(R.condnames)
     for i = 1:size(chsel,1)
         for j = 1:size(chsel,1)
             if i==j
+                F_data = fxA(:,1);
                 F_model = R.frqz;
                 % Log transform of group average
                 Pxy = abs(log10(mean(vertcat(nsPowmat{chsel(i),condsel(C),:}),1)));
+                % Remove the powerline frequency
+                Pxy(F_data>48 & F_data<52) = [];
+                F_data(F_data>48 & F_data<52) = [];
                 % Put in the same frequency space as the models
                 Pxy = interp1(F_data,Pxy,F_model);
-                % Remove the powerline frequency
-                Pxy(F_model>48 & F_model<52) = NaN;
-                F_model(F_model>48 & F_model<52) = NaN;
+                
                 % Regress out the 1/f background
                 [xCalc yCalc b Rsq] = linregress(log10(F_model)',Pxy');
                 if nulldat == 1
@@ -53,18 +54,19 @@ for C =1:numel(R.condnames)
             else
                 
                 for k = 1:size(NPDmat,3)
+                    F_data = fxA(:,1);
                     F_model = R.frqz;
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
+                    % Remove the powerline frequency
+                    Cxy(F_data>48 & F_data<52) = [];
+                    F_data(F_data>48 & F_data<52) = [];
                     % Put in the same frequency space as the models
                     Cxy = interp1(F_data,Cxy,F_model);
                     if nulldat == 1
                         Cxy = zeros(size(Cxy));
                     else
-                        % Remove the powerline frequency
-                        Cxy(F_model>48 & F_model<52) = NaN;
-                        F_model(F_model>48 & F_model<52) = NaN;
                         % Fit 3rd order Gaussian
-                        f = fit(F_model',Cxy','gauss3');
+                        [f g] = fit(F_model',Cxy','gauss2');
                         Cxy = f(F_model)';
                         %                     plot(R.frqz,Cxy)
                     end

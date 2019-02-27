@@ -16,10 +16,11 @@ clear ; close all
 closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths(
-rng(2312)
+rng(7532)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
+R.SimAn.convIt = 1e-3;
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
@@ -35,7 +36,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 7:12
+for modID = [8 9]
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -61,7 +62,7 @@ for modID = 7:12
         R = setSimTime(R,26);
         R.Bcond = 0;
         R.SimAn.rep = 512; %448
-        [p] = SimAn_ABC_060219(R,p,m);
+        [p] = SimAn_ABC_220219(R,p,m);
         closeMessageBoxes
     end
 end

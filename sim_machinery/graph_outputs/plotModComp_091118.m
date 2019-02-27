@@ -116,7 +116,9 @@ h = findobj(gca,'Type','line');
 
 subplot(3,1,2)
 % TlnK = 2.*log(max(pmod)./pmod);
-TlnK = -log10(1-pmod);
+%  TlnK = log10(pmod); % smallest (closest to zero) is the best
+TlnK = -log10(1-pmod); % largest is the best
+% TlnK = log10(pmod)-log10(KL) % Like a free energy
 
 for i = 1:numel(R.modcomp.modN)
     %     b = bar(i,-log10(1-pmod(i))); hold on
