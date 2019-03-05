@@ -1,7 +1,7 @@
 function R = simannealsetup_InDirect_ModelComp()
 % 
 R.projectn = 'Rat_NPD';
-R.out.tag = 'InDrt_ModCompRev';
+R.out.tag = 'InDrt_ModCompRev2';
 
 switch getenv('computername')
     case 'SFLAP-2'
@@ -70,8 +70,9 @@ R.obs.LF = LF;
 % fx to construct data features
 R.obs.transFx = @constructNPDMat_190618;
 % These are options for transformation (NPD)
-R.obs.trans.logdetrend =1;
+R.obs.trans.logdetrend =0;
 R.obs.trans.norm = 1;
+R.obs.trans.gauss = 0;
 R.obs.logscale = 0;
 
 

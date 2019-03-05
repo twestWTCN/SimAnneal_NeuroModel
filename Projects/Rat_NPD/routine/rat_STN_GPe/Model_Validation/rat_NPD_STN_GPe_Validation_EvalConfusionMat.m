@@ -1,12 +1,12 @@
 %STN GPE CONFUSION MATRIX EVALUATION
 %%%%%%%%%%%%%%%%%%%%%%%%
-rat_NPD_STN_GPe_ModelFitMaster
+% rat_NPD_STN_GPe_Validation_ConfusionMat
 % simAnnealAddPaths()
 clear ; close all
 
 % Close all msgboxes
 closeMessageBoxes
-rng(5353252)
+rng(3213)
 
 %% Set Routine Pars
 R = simannealsetup_NPD_STN_GPe;
@@ -16,7 +16,7 @@ R.tmp.confmat = confmatlist;
 R.comptype = 2;
 R.data = RSimData.data;
 %% Do the model probability computations
-modelCompMaster(R,1:9,[])
+% modelCompMaster(R,1:9)
 % modelCompMaster(R,2,[1 3])
 
 %% Plot the modComp results

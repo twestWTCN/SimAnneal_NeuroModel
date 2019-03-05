@@ -43,7 +43,7 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
             % Compare Pseudodata with Real
             r2mean(gl)  = R.IntP.compFx(R,feat_sim{gl});
         end
-        if any(wflag)
+        if any(wflag(2))
             error('TransFX could not compute data transform!')
         end
         [r2 ir2] = max(r2mean);
@@ -56,7 +56,7 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         if plotop == 1
                     figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
                     figure(2);subplot(2,1,1); plot(xsims_gl{1}')
-            % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{2}')
+            % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{1}')
         end
     catch
         disp('Observation/Cost Function Failure!')

@@ -7,7 +7,7 @@ for C=1:numel(R.condnames)
 end
 
 if ~isfield(R.obs,'logscale')
-R.obs.logscale = 1;
+    R.obs.logscale = 1;
 end
 wflag = 0;
 % N = R.obs.csd.pow2;
@@ -41,7 +41,7 @@ for C = 1:O
                         else
                             Pxy =  Pxy(F>4);
                         end
-    
+                        
                         if R.obs.logscale == 1
                             Pxy = Pxy;
                         else
@@ -51,11 +51,16 @@ for C = 1:O
                             Pxy = (Pxy-nanmean(Pxy))./nanstd(Pxy);
                             Pxy = Pxy - min(Pxy);
                         end
+                        if R.obs.trans.gauss == 1
+%                             Pxy = smoothdata(Pxy,'gaussian');
+                            f = fit(F_scale',Pxy','gauss3');
+                            Pxy = f(F_scale)';
+                        end
                         Pxy(isnan(Pxy)) = 0;
                         Pxy = Pxy; %.*tukeywin(length(Pxy),0.25)';
                         xcsd(p,r,1:3,:) = repmat(Pxy,3,1);
                         xconf(p,r,1:3) = [0 0 0];
-
+                        
                     else
                         [f13,t,cl]=sp2a2_R2(squeeze(data(C,chindsP(p),:)),squeeze(data(C,chindsR(r),:)),fsamp,N);
                         if any(any(isnan(f13(:,12))))
@@ -74,9 +79,14 @@ for C = 1:O
                             else
                                 Pxy =  Pxy(F>4);
                             end
-                            %                         Pxy = Pxy./max(nPxy);
-%                             Pxy = Pxy; %.*welchwin(length(Pxy))';
-%                             Pxy = Pxy.*tukeywin(length(Pxy),0.1)';
+                            
+                            if R.obs.trans.gauss == 1
+%                             Pxy = smoothdata(Pxy,'gaussian');
+                                f = fit(F_scale',Pxy','gauss3');
+                                Pxy = f(F_scale)';
+                            end                            %                         Pxy = Pxy./max(nPxy);
+                            %                             Pxy = Pxy; %.*welchwin(length(Pxy))';
+                            %                             Pxy = Pxy.*tukeywin(length(Pxy),0.1)';
                             xcsd(p,r,z,:) = Pxy;
                             xconf(p,r,z) = cl.ch_c95;
                         end

@@ -27,7 +27,7 @@ catch
 end
 
 %% Prepare Model
-for modID = 2
+for modID = 1:3
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
     if ~any(intersect(WML,modID))
         WML = [WML modID];

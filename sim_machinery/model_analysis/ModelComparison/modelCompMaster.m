@@ -44,6 +44,7 @@ for modID = modlist
         % Load Options
         load([Rorg.rootn 'outputs\' Rorg.out.tag '\' dagname '\R_' Rorg.out.tag '_' dagname '.mat'])
         R = varo;
+
         %         R.rootn = ['C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\' R.projectn '\'];
         %         R.rootm = 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\sim_machinery';
         
@@ -63,6 +64,7 @@ for modID = modlist
         if  size(parOptBank,2)>1
             R.parOptBank = parOptBank;
             R.obs.gainmeth = R.obs.gainmeth(1);
+            R.obs.trans.gauss = 0;
             figure(modID);
             R.analysis.modEvi.N = 1500;
             permMod = modelProbs(m.x,m,p,R);

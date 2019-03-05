@@ -44,6 +44,7 @@ R.IntP.buffer = ceil(0.050*(1/R.IntP.dt)); % buffer for delays
 N = R.obs.csd.reps; % Number of epochs of desired frequency res
 fsamp = 1/R.IntP.dt;
 R.obs.SimOrd = floor(log2(fsamp/(2*R.obs.csd.df))); % order of NPD for simulated data
+R.obs.SimOrd = 8;
 R.IntP.tend = (N*(2^(R.obs.SimOrd)))/fsamp;
 R.IntP.nt = R.IntP.tend/R.IntP.dt;
 R.IntP.tvec = linspace(0,R.IntP.tend,R.IntP.nt);
@@ -73,7 +74,7 @@ R.obs.transFx = @constructNPDMat_190618;
 R.obs.trans.logdetrend =0;
 R.obs.trans.norm = 1;
 R.obs.logscale = 0;
-
+R.obs.trans.gauss = 0;
 %% OBJECTIVE FUNCTION
 R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
@@ -83,7 +84,7 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.S','.C','.A','.D'}; %,'.S','.int{sr
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
-R.SimAn.convIt = 5e-3;
+R.SimAn.convIt = 1e-3;
 R.SimAn.rep = 256; %512; % Repeats per temperature
 % R.SimAn.saveout = 'xobs1';
 R.SimAn.jitter = 1.5; % Global precision

@@ -85,7 +85,10 @@ switch R.data.datatype
                                 if size(ffx,1)>size(ffx,2);ffx = ffx'; end
                                 yfxx = [yfxx yfx];
                                 ffxx  = [ffxx ffx];
-                                r(2) = goodnessOfFit(yfx',ffx','NRMSE');
+                                yfx = yfx+1; ffx = ffx+1;
+                                %                                 r(2) = goodnessOfFit(yfx',ffx','NRMSE');
+%                                 r(2) =  1-(RMSE(yfx',ffx')./std(ffx));
+                                    r(2) = rsquare(yfx',ffx');
                                 r2loop(C,i,j) = r(2);
                             elseif j>i
                                 for k = 2:3 % 1 is zerolag
@@ -99,8 +102,11 @@ switch R.data.datatype
                                     yfx(isnan(ffx)) = [];ffx(isnan(ffx)) = [];
                                     
                                     yfxx = [yfxx yfx];
-                                    ffxx  = [ffxx ffx];
-                                    r(k) = goodnessOfFit(yfx',ffx','NRMSE');
+                                    %                                     ffxx  = [ffxx ffx];
+                                    yfx = yfx+1; ffx = ffx+1;
+                                    %                                     r(k) = goodnessOfFit(yfx',ffx','NRMSE');
+%                                     r(k) =  1-(RMSE(yfx',ffx')./std(ffx));
+                                    r(k) = rsquare(yfx',ffx');
                                 end
                                 r2loop(C,i,j) = mean(r(r~=0));
                             end

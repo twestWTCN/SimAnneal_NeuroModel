@@ -16,7 +16,7 @@ clear ; close all
 closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths(
-rng(7532)
+rng(897)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -36,7 +36,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = [8 9]
+for modID = 1:12
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -56,7 +56,7 @@ for modID = [8 9]
         modelspec = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
         [R p m uc] = modelspec(R);
         pause(5)
-        R.out.dag = sprintf('NPD_InDrt_ModCompRev_M%.0f',modID); % 'All Cross'
+        R.out.dag = sprintf('NPD_InDrt_ModCompRev2_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
         R = setSimTime(R,26);

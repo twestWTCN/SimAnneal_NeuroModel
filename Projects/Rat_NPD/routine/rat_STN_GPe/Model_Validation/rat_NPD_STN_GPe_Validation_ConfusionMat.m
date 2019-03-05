@@ -39,9 +39,10 @@ R = simannealsetup_NPD_STN_GPe;
 %     % Now Simulate Fitted Model
 %     %     pnew = avPar.mu;
 %     pnew = Mfit.BPfit; % use best draw!
-%     R.obs.SimOrd = 8;
+%     Rt.obs.SimOrd = 8;
+%     Rt.obs.trans.gauss = 1;
 %     [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(Rt,m,[],pnew,512,1);
-%     
+%     Rt.obs.trans.gauss =0;
 %     Rt.data.feat_emp = feat_sim;
 %     % squeeze(meannpd_data(1,1,1,1,:))
 %     Rt.data.feat_xscale = R.frqz;
@@ -67,7 +68,7 @@ catch
 end
 
 %% Prepare Model
-for i =1:size(confmatlist,2)
+for i =5:size(confmatlist,2)
     load([R.rootn 'outputs\' R.out.tag '\ConfWorkList'],'WML')
     if ~any(intersect(WML,i))
         WML = [WML i];
@@ -86,7 +87,7 @@ for i =1:size(confmatlist,2)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.data = RSimData(SimData).data;
         R.out.dag = sprintf('NPD_STN_GPe_ConfMat_DataM%.0f_ParM%.0f',SimData,SimMod); % 'All Cross'
-        R.SimAn.rep = 300;
+        R.SimAn.rep = 128;
         R = setSimTime(R,24);
         R.Bcond = 0;
         R.plot.flag = 1;

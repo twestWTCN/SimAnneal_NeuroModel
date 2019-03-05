@@ -73,15 +73,15 @@ plotModelComparisonBars(R,compStruc,shortlab,2)
 
 figure
 R.plot.cmap = brewermap(100,'RdYlBu');
-subplot(3,1,1)
+subplot(1,3,1)
 plotModelComparisonMatrix(R,compStruc,shortlab,1)
-subplot(3,1,2)
+subplot(1,3,2)
 plotModelComparisonMatrix(R,compStruc,shortlab,2)
-subplot(3,1,3)
+subplot(1,3,3)
 plotModelComparisonMatrix(R,compStruc,shortlab,3)
 
 % Set figure size
-set(gcf,'Position',[277   109   385   895])
+set(gcf,'Position',[294         461        1510         377])
 
 
 %% SCRIPT GRAVE
