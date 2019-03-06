@@ -180,6 +180,8 @@ while ii <= R.SimAn.searchMax
         end
         par = postDrawMVN(Mfit,pOrg,pIndMap,pSigMap,rep);
     end
+    kldHist(ii)= KLDiv(R,p,m,parOptBank);
+
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
     banksave{ii} = parBank(end,parBank(end,:)>eps_act);
