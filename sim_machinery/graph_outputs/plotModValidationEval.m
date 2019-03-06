@@ -72,7 +72,7 @@ subplot(3,1,3)
 plotModelComparisonBars(R,compStruc,shortlab,2)
 
 figure
-R.plot.cmap = brewermap(100,'RdYlBu');
+R.plot.cmap = brewermap(100,'*RdYlBu');
 subplot(1,3,1)
 plotModelComparisonMatrix(R,compStruc,shortlab,1)
 subplot(1,3,2)

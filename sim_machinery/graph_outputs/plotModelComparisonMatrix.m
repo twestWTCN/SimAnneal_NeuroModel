@@ -3,12 +3,13 @@ function h = plotModelComparisonMatrix(R,compStruc,shortlab,type)
 if type == 1 % model probs
     F = compStruc.pmod; %-log10(1-compStruc.pmod);
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
+   Flab = 1-F;
     F = -log10(1-F);
     yl = 'Posterior Model Probability';
 elseif type == 2 % KL divergences
     F = compStruc.KL;
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
-    
+    Flab = F;
     yl = 'KL Divergence';
 elseif type == 3 % Score
     F1 = compStruc.KL;
@@ -21,16 +22,18 @@ elseif type == 3 % Score
     F2 = reshape(F2,sqrt(numel(F2)),sqrt(numel(F2)));
     F2 = -log10(1-F2);
     F = F2-F1;
+    Flab = F;
     yl = 'Accuracy-Divergence';
 end
 
-h = imagesc(F)
+h = imagesc(F);
 [x,y] = meshgrid(1:size(F,1),1:size(F,2));
-text(x(:),y(:),num2str(F(:),'%0.2f'),'HorizontalAlignment','center')
+text(x(:),y(:),num2str(Flab(:),'%0.3f'),'HorizontalAlignment','center')
 cmap = brewermap(128,'*RdYlBu');
 colormap(cmap);
 a = gca;
-set(a,'YDir','rev') %'XTick',[],'YTick',[],
+% set(a,'YDir','rev') %'XTick',[],'YTick',[],
+set(a,'YDir','normal')
 a.XTick = 1:size(x,1);
 a.YTick = 1:size(x,1);
 xlabel('Model to be Fit');
