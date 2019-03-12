@@ -187,7 +187,13 @@ while ii <= R.SimAn.searchMax
     elseif cflag == 0
         par = postDrawMVN(R,Mfit,pOrg,pIndMap,pSigMap,rep);
     end
-    
+    try
+        Rtmp = R; Rtmp.Mfit = Mfit; Rtmp.analysis.modEvi.N = 1000;
+        kldHist(ii) = nansum(KLDiv(Rtmp,p,m,parOptBank));
+    catch
+        kldHist(ii) = NaN;
+    end
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\klHist_' R.out.tag '_' R.out.dag '.mat'],kldHist)
     parPrec(:,ii+1) = diag(Mfit.Sigma);
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
@@ -242,9 +248,9 @@ while ii <= R.SimAn.searchMax
         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
-%         if isequal(R.plot.save,'True')
-%             saveSimAnFigures(R,ii)
-%         end
+        %         if isequal(R.plot.save,'True')
+        %             saveSimAnFigures(R,ii)
+        %         end
     end
     disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
@@ -253,7 +259,7 @@ while ii <= R.SimAn.searchMax
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.save == 1
             saveSimAnFigures(R,ii)
-        end        
+        end
     end
     % Or to workspace
     %     assignin('base','R_out',R)

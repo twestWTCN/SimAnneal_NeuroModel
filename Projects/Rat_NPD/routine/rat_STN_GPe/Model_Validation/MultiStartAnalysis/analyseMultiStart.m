@@ -37,6 +37,8 @@ for multiStart = 1:20
     parHist = varo;
     load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\bankSave_' R.out.tag '_' R.out.dag '.mat'])
     bankSave = varo;
+    load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\klHist_' R.out.tag '_' R.out.dag '.mat'])
+    kldHist = varo;
     
     parTT = []; r2 = [];
     for i = 1:size(parHist,2)
@@ -60,6 +62,7 @@ for multiStart = 1:20
     R2ms(multiStart) = r2(end);
     R2track{multiStart} = r2;
     Its(multiStart) = size(parT,2);
+    kldTrack{multiStart} = kldHist;
 end
 Inds(:,1) = [];
 T = [parWeighted{:}];
@@ -72,4 +75,4 @@ T = [parWeighted{:}];
 D = pdist(T','euclidean');
 [Y,eigvals] = cmdscale(squareform(D));
 
-save('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave.mat')
+save('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave2.mat')
