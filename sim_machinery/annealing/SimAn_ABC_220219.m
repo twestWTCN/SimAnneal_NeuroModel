@@ -50,7 +50,7 @@ delta_act = 0.05;
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*4); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     rep =  R.SimAn.rep(1);
@@ -72,7 +72,7 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    parfor jj = 1:rep % Replicates for each temperature
+   parfor jj = 1:rep % Replicates for each temperature
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data
@@ -140,18 +140,19 @@ while ii <= R.SimAn.searchMax
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
-    elseif itry < 3
+    elseif itry < 2
         fprintf('Trying for the %.0f\n time with the current eps \n',itry)
         disp('Trying once more with current eps')
         if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry >= 3
+    elseif itry >= 2
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
-        eps_act = min(parOptBank(end,:));
-        cflag = 1;
+%         eps_act = min(parOptBank(end,:));
+        eps_act = prctile(parBank(end,1:R.SimAn.minRank),15);
+                cflag = 1;
         itry = 0;
     end
     if itry==0

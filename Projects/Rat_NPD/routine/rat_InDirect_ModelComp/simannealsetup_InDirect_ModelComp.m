@@ -34,7 +34,7 @@ R.obs.csd.reps = 32; %96;
 
 %% INTEGRATION
 % Main dynamics function
-R.IntP.intFx = @spm_fx_compile_180817;
+R.IntP.intFx = @spm_fx_compile_120319;
 R.IntP.compFx= @compareData_100717;
 
 R.IntP.dt = .001;
@@ -57,7 +57,7 @@ disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 R.obs.obsFx = @observe_data;
 R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 R.obs.glist =0; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
-R.obs.brn =2; % 2; % burn in time
+R.obs.brn =4; % 2; % burn in time
 LF = [1 1 1 1]*10; % Fit visually and for normalised data
 R.obs.LF = LF;
 % % (precompute filter)
@@ -81,7 +81,7 @@ R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.S','.D'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A'}; %,'.D','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
