@@ -78,11 +78,11 @@ while ii <= R.SimAn.searchMax
         %% Simulate New Data
         u = innovate_timeseries(R,m);
         u{1} = u{1}.*sqrt(R.IntP.dt);
-        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData(R,m,u,pnew,0,0);
+        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,pnew,0,0);
         
         r2rep{jj} = r2;
         par_rep{jj} = pnew;
-        xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
+%         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
         feat_sim_rep{jj} = feat_sim;
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % End of batch replicates
@@ -140,14 +140,14 @@ while ii <= R.SimAn.searchMax
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
-    elseif itry < 3
+    elseif itry < 2
         fprintf('Trying for the %.0f\n time with the current eps \n',itry)
         disp('Trying once more with current eps')
         if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry >= 3
+    elseif itry >= 2
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         eps_act = min(parOptBank(end,:));
@@ -202,7 +202,7 @@ while ii <= R.SimAn.searchMax
             fx = R.plot.outFeatFx;
             if size(Ilist,2)<12; xn = size(Ilist,2); else; xn = 12; end
             try
-                fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},R.data.feat_xscale,R,1,[])
+                fx(R,{R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},Ilist(1))
                 drawnow; shg
             end
         end
@@ -219,27 +219,27 @@ while ii <= R.SimAn.searchMax
         drawnow;shg
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot example time series
-        figure(4)
-        tvec_obs = R.IntP.tvec;
-        tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
-        R.IntP.tvec_obs = tvec_obs;
-        ptr(1) = subplot(2,1,1);
-        try
-            plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-            xlabel('Time (s)'); ylabel('Amplitude')
-            if numel(xsims_rep{Ilist(1)})>1
-                ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
-                linkaxes(ptr,'x'); %xlim([10 20])
-            else
-                ptr(2) = subplot(2,1,2);
-                plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-                xlim  ([8 10])
-            end
-            xlabel('Time (s)'); ylabel('Amplitude')
-            legend(R.chsim_name)
-            drawnow;shg
-        end
+%         figure(4)
+%         tvec_obs = R.IntP.tvec;
+%         tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
+%         R.IntP.tvec_obs = tvec_obs;
+%         ptr(1) = subplot(2,1,1);
+%         try
+%             plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+%             xlabel('Time (s)'); ylabel('Amplitude')
+%             if numel(xsims_rep{Ilist(1)})>1
+%                 ptr(2) = subplot(2,1,2);
+%                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
+%                 linkaxes(ptr,'x'); %xlim([10 20])
+%             else
+%                 ptr(2) = subplot(2,1,2);
+%                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+%                 xlim  ([8 10])
+%             end
+%             xlabel('Time (s)'); ylabel('Amplitude')
+%             legend(R.chsim_name)
+%             drawnow;shg
+%         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
 %         if isequal(R.plot.save,'True')
