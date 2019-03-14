@@ -50,7 +50,7 @@ delta_act = 0.05;
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*4); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     rep =  R.SimAn.rep(1);
@@ -72,7 +72,7 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    parfor jj = 1:rep % Replicates for each temperature
+   parfor jj = 1:rep % Replicates for each temperature
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data
@@ -150,8 +150,9 @@ while ii <= R.SimAn.searchMax
     elseif itry >= 2
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
-        eps_act = min(parOptBank(end,:));
-        cflag = 1;
+%         eps_act = min(parOptBank(end,:));
+        eps_act = prctile(parBank(end,1:R.SimAn.minRank),15);
+                cflag = 1;
         itry = 0;
     end
     if itry==0
@@ -187,7 +188,13 @@ while ii <= R.SimAn.searchMax
     elseif cflag == 0
         par = postDrawMVN(R,Mfit,pOrg,pIndMap,pSigMap,rep);
     end
-    
+    try
+        Rtmp = R; Rtmp.Mfit = Mfit; Rtmp.analysis.modEvi.N = 1000;
+        kldHist(ii) = nansum(KLDiv(Rtmp,p,m,parOptBank));
+    catch
+        kldHist(ii) = NaN;
+    end
+    saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\klHist_' R.out.tag '_' R.out.dag '.mat'],kldHist)
     parPrec(:,ii+1) = diag(Mfit.Sigma);
     parHist(ii) = averageCell(par);
     saveMkPath([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parHist_' R.out.tag '_' R.out.dag '.mat'],parHist)
@@ -242,9 +249,9 @@ while ii <= R.SimAn.searchMax
 %         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
-%         if isequal(R.plot.save,'True')
-%             saveSimAnFigures(R,ii)
-%         end
+        %         if isequal(R.plot.save,'True')
+        %             saveSimAnFigures(R,ii)
+        %         end
     end
     disp({['Current R2: ' num2str(r2loop(Ilist(1)))];[' Temperature ' num2str(ii) ' K']; R.out.tag; ['Eps ' num2str(eps)]})
     %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
@@ -253,7 +260,7 @@ while ii <= R.SimAn.searchMax
         saveSimABCOutputs(R,Mfit,m,parBank)
         if R.plot.save == 1
             saveSimAnFigures(R,ii)
-        end        
+        end
     end
     % Or to workspace
     %     assignin('base','R_out',R)

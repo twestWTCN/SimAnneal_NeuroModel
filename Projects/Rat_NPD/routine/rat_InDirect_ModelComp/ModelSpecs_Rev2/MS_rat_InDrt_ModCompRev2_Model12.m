@@ -6,7 +6,9 @@ m.m = 6; % # of sources
 m.x = {[0 0 0 0 0 0 0 0]  [0 0]  [0 0]  [0 0]  [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1 1];
 m.Tint = [4 1 1 1 1 1];
+m.Sint = [9 2 2 1 2 2];
 m.n =  size([m.x{:}],2); % Number of states
+
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
     m.dipfit.model(i).source = R.chsim_name{i};
@@ -77,9 +79,9 @@ p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
 p.D_s = repmat(1/16,size(p.D));
 
 % Sigmoid transfer for connections
-p.S = [0 0];
-p.S_s = [1/8 1/8];
-
+% p.S = [0 0];
+% p.S_s = [1/8 1/8];
+ 
 % time constants and gains
 for i = 1:m.m
     if i == 1
@@ -91,7 +93,7 @@ for i = 1:m.m
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
-    p.int{i}.S = zeros(1);
+    p.int{i}.S = zeros(1,m.Sint(i));
     p.int{i}.S_s = repmat(prec,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));

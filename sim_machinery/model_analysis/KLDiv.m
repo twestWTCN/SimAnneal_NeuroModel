@@ -10,10 +10,11 @@ precIndMap = spm_vec(precInd);
 p = pVec(pIndMap);
 
 R.SimAn.minRank = ceil(size(pIndMap,1)*1.1);
-xf = zeros(size(pIndMap,1),size(parOptBank,2));
-for i = 1:size(pIndMap,1)
-    xf(i,:) = parOptBank(pIndMap(i),:); % choose row of parameter values
-end
+% xf = zeros(size(pIndMap,1),size(parOptBank,2));
+% for i = 1:size(pIndMap,1)
+%     xf(i,:) = parOptBank(pIndMap(i),:); % choose row of parameter values
+% end
+xf = R.Mfit.xf;
 
 priorVec = spm_vec(R.Mfit.prior);
 r = copularnd('t',R.Mfit.Rho,R.Mfit.nu,R.analysis.modEvi.N );

@@ -51,6 +51,7 @@ for multiStart = 1:2*N
         R.SimAn.rep = 128;
         R = setSimTime(R,32);
         R.Bcond = 0;
+         R.plot.save = 1;
         R.plot.flag = 1;
         R.SimAn.convIt = 1e-3;
         R.SimAn.jitter = 1;

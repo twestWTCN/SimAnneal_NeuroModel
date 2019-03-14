@@ -1,7 +1,7 @@
 close all
 % NEEDS: https://github.com/raaperrotta/symlog
 addpath('C:\Users\twest\Documents\Work\GitHub\symlog')
-load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave.mat')
+load('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave2.mat')
 format short g
 % Check Real Positive
 A = [eigvals eigvals/max(abs(eigvals))];
@@ -89,7 +89,11 @@ for multiStart = convModSel
 %     x = ;
 %      t = sign(x).*log(1+abs(x)./10^10);
 %     plotVarWidth(1:size(R2track{multiStart},2),mean(R2track{multiStart}',2),2.5.*(15.^szvec),cmap(multiStart,:),5)
-    plot(1:size(R2track{multiStart},2),mean(R2track{multiStart}',2),'color',cmap(multiStart,:),'LineWidth',2);
+%     plot(1:size(R2track{multiStart},2),mean(R2track{multiStart}',2),'color',cmap(multiStart,:),'LineWidth',2);
+%     hold on
+%     
+%     yyaxis right 
+    plot(1:size(kldTrack{multiStart},2),mean(kldTrack{multiStart}',2),'color',cmap(multiStart,:),'LineWidth',2);
     hold on
 %     hold on
 %     szvec = mean(parSig{multiStart}',2); %
