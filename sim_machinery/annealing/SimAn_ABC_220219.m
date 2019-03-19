@@ -72,7 +72,7 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    parfor jj = 1:rep % Replicates for each temperature
+    for jj = 1:rep % Replicates for each temperature
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data

@@ -20,11 +20,11 @@ binStatsRS_phizLag = circshift(binStats_phizLag(:,3),K,1);
 
 [binStats_phiAmp] = binDatabyRange(xsims.TMS_phase,R.trans.pirange,xsims.MEP_amp);
 binStats_phiAmp(end,:) = [];
-binStatsRS_phiAmpCoV = circshift(binStats_phiAmp(:,4),K,1);
+binStatsRS_phiAmpCoV = circshift(binStats_phiAmp(:,4),K,1).*10;
 
 [binStats_phiLag] = binDatabyRange(xsims.TMS_phase,R.trans.pirange,xsims.MEP_onset);
 binStats_phiLag(end,:) = [];
-binStatsRS_phiLagCoV = circshift(binStats_phiLag(:,4),K,1);
+binStatsRS_phiLagCoV = circshift(binStats_phiLag(:,4),K,1).*10;
 
 % Amp by mean corrected lag
 [binStats_ampLag] = binDatabyRange(xsims.zMEP_amp,R.trans.amprange,xsims.MEP_mconset);
