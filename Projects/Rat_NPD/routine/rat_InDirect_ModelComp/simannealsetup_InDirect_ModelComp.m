@@ -30,7 +30,7 @@ R.chsim_name = {'MMC','STR','GPE','STN'};
 R.condnames = {'OFF'};
 % Spectral characteristics
 R.obs.csd.df = 0.5;
-R.obs.csd.reps = 32; %96;
+R.obs.csd.reps = 36; %96;
 
 %% INTEGRATION
 % Main dynamics function
@@ -57,7 +57,7 @@ disp(sprintf('The actual simulation df is %.2f Hz',dfact));
 R.obs.obsFx = @observe_data;
 R.obs.gainmeth = {'unitvar','boring'}; %,'submixing'}; %,'lowpass'}; ,'leadfield' %unitvar'mixing'
 R.obs.glist =0; %linspace(-5,5,12);  % gain sweep optimization range [min max listn] (log scaling)
-R.obs.brn =4; % 2; % burn in time
+R.obs.brn =3; % 2; % burn in time
 LF = [1 1 1 1]*10; % Fit visually and for normalised data
 R.obs.LF = LF;
 % % (precompute filter)

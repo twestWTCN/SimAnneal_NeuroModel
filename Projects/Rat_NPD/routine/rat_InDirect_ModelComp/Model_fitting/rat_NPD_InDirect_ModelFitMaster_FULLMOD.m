@@ -36,7 +36,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 12
+for modID = 10
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -59,7 +59,7 @@ for modID = 12
         R.out.dag = sprintf('NPD_InDrt_ModCompRev2_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
-        R = setSimTime(R,26);
+        R = setSimTime(R,32);
         R.Bcond = 0;
         R.SimAn.rep = 128; %448
         [p] = SimAn_ABC_220219(R,p,m);

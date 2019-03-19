@@ -72,17 +72,19 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-   parfor jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data
-        u = innovate_timeseries(R,m);
-        u{1} = u{1}.*sqrt(R.IntP.dt);
-        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,pnew,0,0);
+        varo = load([R.rootn 'ABC_PBSchema\Inputs\betaSig\betaSignal_' num2str(randi(25))]);
+        m_in = varo.varo;
+        varo = load([R.rootn 'ABC_PBSchema\Inputs\TMSsig\TMSsignal_' num2str(randi(25))]);
+        u = varo.varo;
+        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m_in,u,pnew,0,0);
         
         r2rep{jj} = r2;
         par_rep{jj} = pnew;
-%         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
+        %         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
         feat_sim_rep{jj} = feat_sim;
         disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
     end % End of batch replicates
@@ -150,9 +152,9 @@ while ii <= R.SimAn.searchMax
     elseif itry >= 2
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
-%         eps_act = min(parOptBank(end,:));
+        %         eps_act = min(parOptBank(end,:));
         eps_act = prctile(parBank(end,1:R.SimAn.minRank),15);
-                cflag = 1;
+        cflag = 1;
         itry = 0;
     end
     if itry==0
@@ -226,27 +228,27 @@ while ii <= R.SimAn.searchMax
         drawnow;shg
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Plot example time series
-%         figure(4)
-%         tvec_obs = R.IntP.tvec;
-%         tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
-%         R.IntP.tvec_obs = tvec_obs;
-%         ptr(1) = subplot(2,1,1);
-%         try
-%             plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-%             xlabel('Time (s)'); ylabel('Amplitude')
-%             if numel(xsims_rep{Ilist(1)})>1
-%                 ptr(2) = subplot(2,1,2);
-%                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
-%                 linkaxes(ptr,'x'); %xlim([10 20])
-%             else
-%                 ptr(2) = subplot(2,1,2);
-%                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
-%                 xlim  ([8 10])
-%             end
-%             xlabel('Time (s)'); ylabel('Amplitude')
-%             legend(R.chsim_name)
-%             drawnow;shg
-%         end
+        %         figure(4)
+        %         tvec_obs = R.IntP.tvec;
+        %         tvec_obs(:,2:round(R.obs.brn*(1/R.IntP.dt))) = [];
+        %         R.IntP.tvec_obs = tvec_obs;
+        %         ptr(1) = subplot(2,1,1);
+        %         try
+        %             plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+        %             xlabel('Time (s)'); ylabel('Amplitude')
+        %             if numel(xsims_rep{Ilist(1)})>1
+        %                 ptr(2) = subplot(2,1,2);
+        %                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{2},1),1)',xsims_rep{Ilist(1)}{2}'); %xlim([15 20])
+        %                 linkaxes(ptr,'x'); %xlim([10 20])
+        %             else
+        %                 ptr(2) = subplot(2,1,2);
+        %                 plot(repmat(R.IntP.tvec_obs,size(xsims_rep{Ilist(1)}{1},1),1)',xsims_rep{Ilist(1)}{1}');
+        %                 xlim  ([8 10])
+        %             end
+        %             xlabel('Time (s)'); ylabel('Amplitude')
+        %             legend(R.chsim_name)
+        %             drawnow;shg
+        %         end
         %%%     %%%     %%%     %%%     %%%     %%%     %%%     %%%
         %% Export Plots
         %         if isequal(R.plot.save,'True')
