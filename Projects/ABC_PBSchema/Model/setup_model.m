@@ -19,9 +19,14 @@ p.EPSP_Tdecay_s = [1/8 1/8 1/8];
 p.EPSP_amp = [0 0 0];
 p.EPSP_amp_s = [1/4 1/4 1/4];
 
+% EPSP Jitter
+p.EPSP_ampJit = [0 0 0];
+p.EPSP_ampJit_s = [1/16 1/16 1/16];
+
+
 % Spiking thresholds
-p.SP_eps = [0 0];
-p.SP_eps_s = [1/6 1/6];
+% p.SP_eps = [0 0];
+% p.SP_eps_s = [1/6 1/6];
 
 p.obs.LF = 1;
 

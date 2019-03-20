@@ -13,7 +13,7 @@ PB_PlotOutputs(R,{R.data.feat_emp},[],NaN);
 
 % Precompute Beta Table
 % precomputeBetaSig(R,m)
-% precomputeTMS(R,m)
+precomputeTMS(R,m)
 
 R.plot.flag = 1;
 R.plot.save = 0;

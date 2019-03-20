@@ -20,8 +20,8 @@ R.condnames = 'STIM';
 
 % Optimization
 R.SimAn.searchMax = 200;
-R.SimAn.rep = 128;
-R.SimAn.pOptList = {'.IWS','.EPSP_Tdecay','.EPSP_amp','.SP_eps'};
+R.SimAn.rep = 156;
+R.SimAn.pOptList = {'.IWS','.EPSP_Tdecay','.EPSP_amp','.EPSP_ampJit'};
 R.SimAn.jitter = 2;
 R.SimAn.pOptBound = [-8 8];
 R.SimAn.pOptRange = -3:.01:3;
@@ -35,11 +35,11 @@ R.IntP.dt = 0.0001; % Not needed!!
 R.frqzfull = 500; % Not needed!!
 R.IntP.nt = 1e3; % Not needed!!
 % Setup Setup
-R.model.nPulses = 1000;
+R.model.nPulses = 5000;
 
 % Time Scale
 R.model.fsamp = 4048;
-R.model.tend = 250;
+R.model.tend = 500;
 R.model.t_in = linspace(0,R.model.tend,(R.model.fsamp*R.model.tend));
 
 % Data tranform

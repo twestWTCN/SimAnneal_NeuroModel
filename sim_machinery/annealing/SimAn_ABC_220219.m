@@ -76,9 +76,9 @@ while ii <= R.SimAn.searchMax
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data
-        varo = load([R.rootn 'ABC_PBSchema\Inputs\betaSig\betaSignal_' num2str(randi(25))]);
+        varo = load([R.rootn '\Inputs\betaSig\betaSignal_' num2str(randi(25))]);
         m_in = varo.varo;
-        varo = load([R.rootn 'ABC_PBSchema\Inputs\TMSsig\TMSsignal_' num2str(randi(25))]);
+        varo = load([R.rootn '\Inputs\TMSsig\TMSsignal_' num2str(randi(25))]);
         u = varo.varo;
         [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m_in,u,pnew,0,0);
         

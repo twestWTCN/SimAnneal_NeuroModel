@@ -6,7 +6,9 @@ Qp = get_priors();
 p.IWS = Qp.IWS .*exp(p.IWS);
 p.EPSP_Tdecay = Qp.EPSP_Tdecay .*exp(p.EPSP_Tdecay);
 p.EPSP_amp = Qp.EPSP_amp .*exp(p.EPSP_amp);
-p.SP_eps = Qp.SP_eps .*exp(p.SP_eps);
+p.EPSP_ampJit = Qp.EPSP_ampJit .*exp(p.EPSP_ampJit);
+
+% p.SP_eps = Qp.SP_eps .*exp(p.SP_eps);
 
 %% Make Beta Signal (common to all CSNs)
 % [t,tx_beta,px_beta] = makeBetaSignal(R.model.t_in);
@@ -76,7 +78,7 @@ end
 % Now convolve the spike times with the EPSP kernel
 tx_csn = nan(size(t,2),CSN_n);
 for cn = 1:CSN_n
-    csn_P = convSpikePSP(in_spT{cn},epsp_csn,t); %tx_iws(:,cn));
+    csn_P = convSpikePSP(in_spT{cn},epsp_csn,p.EPSP_ampJit(1),t); %tx_iws(:,cn));
     tx_csn(:,cn) = (tx_beta + csn_P + randn(size(t)))'; % beta plus noise
 end
 
@@ -103,7 +105,7 @@ end
 % Now convolve the spike times with the EPSP kernel
 tx_amn = nan(size(t,2),AMN_n);
 for cn = 1:AMN_n
-    amn_P = convSpikePSP(in_spT{an},epsp_amn,t);
+    amn_P = convSpikePSP(in_spT{an},epsp_amn,p.EPSP_ampJit(2),t);
     tx_amn(:,cn) = amn_P' + randn(size(t))'; % beta plus noise
 end
 
@@ -121,7 +123,7 @@ while (srate < 50  || srate > 75) && amn_thresh<max(tx_amn(:))
 end
 
 % Now convolve!
-emg_P = convSpikePSP(in_spT,epsp_EMG,t);
+emg_P = convSpikePSP(in_spT,epsp_EMG,p.EPSP_ampJit(3),t);
 tx_EMG = emg_P + randn(size(t));
 tx_EMG = tx_EMG';
 % Now loop through TMS pulse and measure MEP + delay
@@ -154,6 +156,13 @@ TMS_phase(MEP_onset<10) = [];
 MEP_max(MEP_onset<10) = [];
 MEP_amp(MEP_onset<10) = [];
 MEP_onset(MEP_onset<10) = [];
+
+
+TMS_phase(MEP_onset>60) = [];
+MEP_max(MEP_onset>60) = [];
+MEP_amp(MEP_onset>60) = [];
+MEP_onset(MEP_onset>60) = [];
+
 
 MEP_max = MEP_max;
 MEP_onset = MEP_onset;

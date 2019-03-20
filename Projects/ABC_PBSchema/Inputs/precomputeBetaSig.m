@@ -5,5 +5,5 @@ parfor i = 1:25
     m_in.t = t;
     m_in.tx_beta = tx_beta;
     m_in.px_beta = px_beta;
-    saveMkPath([R.rootn 'ABC_PBSchema\Inputs\betaSig\betaSignal_' num2str(i)],m_in)
+    saveMkPath([R.rootn '\Inputs\betaSig\betaSignal_' num2str(i)],m_in)
 end

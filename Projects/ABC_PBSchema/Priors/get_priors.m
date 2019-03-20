@@ -8,7 +8,8 @@ Qp.IWS(2,1) = 1; Qp.IWS(2,2) = 0.05;
 Qp.EPSP_Tdecay = [0.005 0.005 0.005];
 % EPSP sizes
 Qp.EPSP_amp = [50 50 50];
-
+% EPSP jitter
+Qp.EPSP_ampJit = [0.05 0.05 0.05];
 % Spiking thresholds
 Qp.SP_eps = [15 8];
 
