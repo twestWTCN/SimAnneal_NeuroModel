@@ -13,3 +13,4 @@ Qp.EPSP_ampJit = [0.05 0.05 0.05];
 % Spiking thresholds
 Qp.SP_eps = [15 8];
 
+Qp.SCRate = [65 85 75];

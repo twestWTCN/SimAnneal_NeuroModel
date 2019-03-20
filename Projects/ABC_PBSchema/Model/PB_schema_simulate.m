@@ -8,6 +8,8 @@ p.EPSP_Tdecay = Qp.EPSP_Tdecay .*exp(p.EPSP_Tdecay);
 p.EPSP_amp = Qp.EPSP_amp .*exp(p.EPSP_amp);
 p.EPSP_ampJit = Qp.EPSP_ampJit .*exp(p.EPSP_ampJit);
 
+p.SCRate = Qp.SCRate .*exp(p.SCRate);
+
 % p.SP_eps = Qp.SP_eps .*exp(p.SP_eps);
 
 %% Make Beta Signal (common to all CSNs)
@@ -15,7 +17,7 @@ p.EPSP_ampJit = Qp.EPSP_ampJit .*exp(p.EPSP_ampJit);
 % save('betaSignal','t','tx_beta','px_beta')
 % load('betaSignal')
 t = m.t;
-tx_beta = m.tx_beta;
+tx_beta = 5.*m.tx_beta;
 px_beta = m.px_beta;
 %% Setup Kernels
 % Make I waves
@@ -48,7 +50,7 @@ IWS_n = 10;
 winInds = TMS_onsets(1):TMS_onsets(1)+length(Iwave_win)-1;
 tx_iws = nan(size(t,2),IWS_n);
 for cn = 1:IWS_n
-    tx_iws(:,cn) = 1.5*randn(size(t));
+    tx_iws(:,cn) = tx_beta + 1.5*randn(size(t));
     for i = 1:size(TMS_onsets,2)
     winInds = TMS_onsets(i):TMS_onsets(i)+length(Iwave_win)-1;
         if max(winInds)<size(tx_iws,1)
@@ -64,7 +66,7 @@ srate = 0;
 iws_thresh = 0.5.*max(tx_iws(:)); % I wave thresh
 i = 0;
 % Find Spiking Threshold for Level 1
-while (srate < 40  || srate > 75) && iws_thresh < max(tx_iws(:))
+while (srate < 30  || srate > p.SCRate(1)) && iws_thresh < max(tx_iws(:))
     i = i + 1;
     iws_thresh = iws_thresh + (iws_thresh./50); % find upper-bound!
     in_spT = []; csn_scsrate = [];
@@ -79,7 +81,7 @@ end
 tx_csn = nan(size(t,2),CSN_n);
 for cn = 1:CSN_n
     csn_P = convSpikePSP(in_spT{cn},epsp_csn,p.EPSP_ampJit(1),t); %tx_iws(:,cn));
-    tx_csn(:,cn) = (tx_beta + csn_P + randn(size(t)))'; % beta plus noise
+    tx_csn(:,cn) = (csn_P + randn(size(t)))'; % beta plus noise
 end
 
 %% LEVEL 2: Make alpha motor neuron pool with noise
@@ -88,13 +90,13 @@ srate = 0;
 csn_thresh = 0.5.*max(tx_csn(:)); % I wave thresh
 i = 0;
 % Find level 2 spiking threshold
-while (srate < 55  || srate > 85) && csn_thresh < max(tx_csn(:))
+while (srate < 55  || srate > p.SCRate(2)) && csn_thresh < max(tx_csn(:))
     i = i + 1;
     csn_thresh = csn_thresh + (csn_thresh./50);
     in_spT = []; amn_scsrate = [];
     for an = 1:AMN_n
         % Random selection of layer above
-        csn2amn = randperm(10,3);
+        csn2amn = randperm(10,randi(10));
         % spatial summation
         [in_spT{an},nspike,nspike_inWin] = findSpike(tx_csn(:,csn2amn),csn_thresh,0.075*fsamp,TMS_win);
         amn_scsrate(an) = 100.*(nspike_inWin/nTMS);
@@ -114,10 +116,10 @@ end
 amn_thresh = 0.5.*max(tx_amn(:));  % AMN threshold
 srate = 0;
 i = 0;
-while (srate < 50  || srate > 75) && amn_thresh<max(tx_amn(:))
+while (srate < 50  || srate > p.SCRate(3)) && amn_thresh<max(tx_amn(:))
     i = i + 1;
     amn_thresh = amn_thresh + (amn_thresh./50);
-    [in_spT,nspike,nspike_inWin] = findSpike(tx_amn,amn_thresh,0.075*fsamp,TMS_win);
+    [in_spT,nspike,nspike_inWin] = findSpike(tx_amn,amn_thresh,0,TMS_win); %refractory period is ZERO!
     EMG_scsrate = nspike_inWin/nTMS;
     srate = EMG_scsrate*100;
 end
@@ -188,4 +190,5 @@ xsims.MEP_amp = MEP_amp;
 xsims.zMEP_max = zMEP_max;
 xsims.zMEP_onset = zMEP_onset;
 xsims.zMEP_amp = zMEP_amp;
+p.SP_eps(2) = csn_thresh;
 % plotTimeOutput(xsims,p)

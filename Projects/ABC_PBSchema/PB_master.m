@@ -1,4 +1,4 @@
-clear; close all
+ clear; close all
 % MASTER FOR PB SCHEMA
 R = PB_scheme_setup();
 % R = addPaths_PBSchema(R)
@@ -9,11 +9,11 @@ R = PB_scheme_setup();
 [R] = getFlaviesData(R);
 
 PB_PlotOutputs(R,{R.data.feat_emp},[],NaN);
-[R p m uc] = setup_model(R);
+[R p m uc] = setup_model_testing(R);
 
 % Precompute Beta Table
 % precomputeBetaSig(R,m)
-precomputeTMS(R,m)
+% precomputeTMS(R,m)
 
 R.plot.flag = 1;
 R.plot.save = 0;

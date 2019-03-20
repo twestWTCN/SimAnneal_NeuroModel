@@ -20,8 +20,8 @@ R.condnames = 'STIM';
 
 % Optimization
 R.SimAn.searchMax = 200;
-R.SimAn.rep = 156;
-R.SimAn.pOptList = {'.IWS','.EPSP_Tdecay','.EPSP_amp','.EPSP_ampJit'};
+R.SimAn.rep = 132;
+R.SimAn.pOptList = {'.IWS','.SCRate','.EPSP_amp','.EPSP_ampJit'}; %'.EPSP_Tdecay'
 R.SimAn.jitter = 2;
 R.SimAn.pOptBound = [-8 8];
 R.SimAn.pOptRange = -3:.01:3;

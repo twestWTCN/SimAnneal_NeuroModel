@@ -5,7 +5,7 @@ onset1 = 0.020 + 0.0001*randn;
 onset2 = 0.022 + 0.0001*randn;
 
 amp1 = IwaveStat(1,1)*Iwave_amp + IwaveStat(1,2)*randn;
-amp2 = IwaveStat(2,1)*Iwave_amp + IwaveStat(2,2)*randn;
+amp2 = IwaveStat(1,1)*Iwave_amp + IwaveStat(2,2)*randn;
 
 
 [x,i1] = gaussfx(Iwave_win,onset1,0.0005);
