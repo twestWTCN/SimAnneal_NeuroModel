@@ -90,7 +90,7 @@ srate = 0;
 csn_thresh = 0.5.*max(tx_csn(:)); % I wave thresh
 i = 0;
 % Find level 2 spiking threshold
-while (srate < 55  || srate > p.SCRate(2)) && csn_thresh < max(tx_csn(:))
+while (srate < 15  || srate > 65) && csn_thresh < max(tx_csn(:))
     i = i + 1;
     csn_thresh = csn_thresh + (csn_thresh./50);
     in_spT = []; amn_scsrate = [];
@@ -101,7 +101,7 @@ while (srate < 55  || srate > p.SCRate(2)) && csn_thresh < max(tx_csn(:))
         [in_spT{an},nspike,nspike_inWin] = findSpike(tx_csn(:,csn2amn),csn_thresh,0.075*fsamp,TMS_win);
         amn_scsrate(an) = 100.*(nspike_inWin/nTMS);
     end
-    srate = mean(amn_scsrate);
+    srate = max(amn_scsrate);
 end
 
 % Now convolve the spike times with the EPSP kernel
@@ -178,6 +178,7 @@ zMEP_amp = (MEP_amp-nanmean(MEP_amp))./nanstd(MEP_amp);
 xsims.t = t;
 xsims.TMS_phase = TMS_phase;
 xsims.TMS_ind = TMS_ind;
+xsims.tx_iws = tx_iws;
 xsims.tx_csn = tx_csn;
 xsims.tx_amn = tx_amn;
 xsims.tx_EMG = tx_EMG;
@@ -190,5 +191,9 @@ xsims.MEP_amp = MEP_amp;
 xsims.zMEP_max = zMEP_max;
 xsims.zMEP_onset = zMEP_onset;
 xsims.zMEP_amp = zMEP_amp;
-p.SP_eps(2) = csn_thresh;
-% plotTimeOutput(xsims,p)
+xsims.iws_thresh = iws_thresh;
+xsims.csn_thresh = csn_thresh;
+xsims.amn_thresh = amn_thresh;
+
+
+plotTimeOutput(xsims,p)
