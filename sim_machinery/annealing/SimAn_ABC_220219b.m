@@ -72,7 +72,7 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    for jj = 1:rep % Replicates for each temperature
+    parfor jj = 1:rep % Replicates for each temperature
         % Get sample Parameters
         pnew = par{jj};
         %% Simulate New Data
@@ -209,7 +209,8 @@ while ii <= R.SimAn.searchMax
             fx = R.plot.outFeatFx;
             if size(Ilist,2)<12; xn = size(Ilist,2); else; xn = 12; end
             try
-                fx(R,{R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},Ilist(1))
+                fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},R.data.feat_xscale,R,1,[])
+%                 fx(R,{R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},Ilist(1))
                 drawnow; shg
             end
         end

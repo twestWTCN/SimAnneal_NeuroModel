@@ -1,5 +1,6 @@
 function [R p m uc] = MS_rat_InDrt_ModCompRev2_Model6(R)
 %% Revised Model Space (12 MODELS) %%
+% Model 3.2
 %% MODEL 6 %%%
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
@@ -86,7 +87,7 @@ for i = 1:m.m
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
-    p.int{i}.S = zeros(1);
+    p.int{i}.S = zeros(1,m.Sint(i));
     p.int{i}.S_s = repmat(prec,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));

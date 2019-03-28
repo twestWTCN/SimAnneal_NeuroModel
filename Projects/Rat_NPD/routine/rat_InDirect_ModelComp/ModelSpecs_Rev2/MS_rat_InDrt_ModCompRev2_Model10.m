@@ -1,5 +1,6 @@
 function [R p m uc] = MS_rat_InDrt_ModCompRev2_Model10(R)
 %% Revised Model Space (12 MODELS) %%
+% Model 5.2
 %% MODEL 10 %%%
 %% Prepare Model
 m.m = 6; % # of sources

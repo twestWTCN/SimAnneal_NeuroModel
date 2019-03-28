@@ -9,7 +9,7 @@
 % IF FRESH START
 delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
-simAnnealAddPaths()
+% simAnnealAddPaths()
 clear ; close all
 
 % Close all msgboxes
