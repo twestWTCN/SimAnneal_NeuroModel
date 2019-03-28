@@ -30,7 +30,7 @@ R.chsim_name = {'MMC','STR','GPE','STN'};
 R.condnames = {'OFF'};
 % Spectral characteristics
 R.obs.csd.df = 0.5;
-R.obs.csd.reps = 36; %96;
+R.obs.csd.reps = 32; %36; %96;
 
 %% INTEGRATION
 % Main dynamics function
@@ -86,9 +86,9 @@ R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
 R.SimAn.convIt = 2.5e-3;
-R.SimAn.rep = 128; %512; % Repeats per temperature
+R.SimAn.rep = 256; %128; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
-R.SimAn.jitter = 2; % Global precision
+R.SimAn.jitter = 1; % Global precision
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';
