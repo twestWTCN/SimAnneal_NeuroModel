@@ -1,10 +1,12 @@
 function [R p m uc] = MS_rat_InDrt_ModCompRev2_Model1(R)
 %% Revised Model Space %%
+% Model 1.1
 %% MODEL 1 %%%
 m.m = 4; % # of sources
 m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1];
 m.Tint = [4 1 1 1 1];
+m.Sint = [9 2 2 1 2];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
@@ -84,7 +86,7 @@ for i = 1:m.m
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec,size(p.int{i}.G));
-    p.int{i}.S = zeros(1);
+    p.int{i}.S = zeros(1,m.Sint(i));
     p.int{i}.S_s = repmat(prec,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));

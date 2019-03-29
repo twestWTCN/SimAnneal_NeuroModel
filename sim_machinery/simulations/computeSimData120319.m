@@ -37,8 +37,8 @@ if wflag == 0
             end
             % Run Data Transform d
             if isfield(R.obs,'transFx')
-%                 [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
-                [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(R,xsims_gl{gl});
+                [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
+%                 [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(R,xsims_gl{gl});
             else
                 feat_sim{gl} = xsims_gl{gl}; % else take raw time series
             end
@@ -56,8 +56,8 @@ if wflag == 0
         %         disp(pnew.obs.LF)
         %         toc
         if plotop == 1
-%                     figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
-                    figure(1);  R.plot.outFeatFx(R,{R.data.feat_emp},{feat_sim},ir2)
+                    figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
+%                     figure(1);  R.plot.outFeatFx(R,{R.data.feat_emp},{feat_sim},ir2)
 %                     figure(2);subplot(2,1,1); plot(xsims_gl{1}')
             % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{1}')
         end

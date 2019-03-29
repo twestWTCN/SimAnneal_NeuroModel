@@ -1,5 +1,6 @@
 function [R p m uc] = MS_rat_InDrt_ModCompRev2_Model10(R)
 %% Revised Model Space (12 MODELS) %%
+% Model 5.2
 %% MODEL 10 %%%
 %% Prepare Model
 m.m = 6; % # of sources
@@ -66,7 +67,7 @@ p.A_s{2} = repmat(1/4,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(1/4,size(p.C));
+p.C_s = repmat(1/2,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1 1 1];

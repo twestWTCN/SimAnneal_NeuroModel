@@ -7,7 +7,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
-% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -62,7 +62,7 @@ for modID = 10
         R = setSimTime(R,32);
         R.Bcond = 0;
         R.SimAn.rep = 128; %448
-        [p] = SimAn_ABC_220219(R,p,m);
+        [p] = SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes
     end
 end

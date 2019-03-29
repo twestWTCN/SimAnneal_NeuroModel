@@ -8,5 +8,5 @@ u = varo.varo;
 % [xsims dum wflag] = R.IntP.intFx(R,m.x,u,p,m);
 
 
-[r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m_in,u,p,0,1);
+[r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,p,0,1);
 

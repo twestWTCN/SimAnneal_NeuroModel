@@ -30,6 +30,9 @@ p.SCRate_s = [1/8 1/8 1/8];
 p.SNRs = [0 0 0];
 p.SNRs_s = [1/8 1/8 1/8];
 
+p.csn2amnN = 0;
+p.csn2amnN_s = 1/16;
+
 % Spiking thresholds
 % p.SP_eps = [0 0];
 % p.SP_eps_s = [1/6 1/6];
