@@ -39,15 +39,15 @@ subplot(4,1,2)
 yyaxis left
 p = plot(feat{2}(1,:),feat{2}(2,:),'LineWidth',lwid,'color',cmap,'LineStyle','-');
 hold on
-yyaxis right
-p = plot(feat{4}(1,:),feat{4}(2,:),'LineWidth',lwid,'color',cmap,'LineStyle','--'); 
+% yyaxis right
+% p = plot(feat{4}(1,:),feat{4}(2,:),'LineWidth',lwid,'color',cmap,'LineStyle','--'); 
 
 grid on
 xlabel('EEG Phase at TMS onset')
 yyaxis left
 ylabel('MEP Amplitude CoV ');
-yyaxis right
-ylabel('MEP Latency CoV')
+% yyaxis right
+% ylabel('MEP Latency CoV')
 
 subplot(4,1,3)
 % a(3) = scatter(MEP_amp(1:10:end),MEP_onset(1:10:end));

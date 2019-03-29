@@ -2,7 +2,7 @@ function Qp = get_priors();
 % setup priors
 % I wave parameters
 Qp.IWS(1,1) = 1; Qp.IWS(1,2) = 0.05; % Mean and std of Iwave Amp
-Qp.IWS(2,1) = 1; Qp.IWS(2,2) = 0.05;
+Qp.IWS(2,1) = 0.8; Qp.IWS(2,2) = 0.05;
 
 % EPSP decay parameters
 Qp.EPSP_Tdecay = [0.015 0.008 0.008];
@@ -15,5 +15,6 @@ Qp.SP_eps = [15 8];
 
 Qp.SCRate = [65 60 75];
 
+Qp.SNRs = [5 2 2]; % beta; CSN; AMN
 
 % MASON 1991 - EPSP variability 

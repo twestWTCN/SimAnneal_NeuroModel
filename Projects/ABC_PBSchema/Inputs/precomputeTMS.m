@@ -9,7 +9,7 @@ TMS_winL= floor(200*fsamp/1000);          % durations of TMS pulse window (# tim
 TMS_amp = 35;   % this matters only for plotting!
 nPulses = R.model.nPulses;
 
-parfor i = 1:25
+for i = 1:25
     [TMS_onsets,TMS_ind,TMS_win] = makeTMSSeries(t,nPulses,TMS_amp,TMS_dur,TMS_winL,fsamp);
     nTMS = numel(TMS_onsets);
     u = [];
