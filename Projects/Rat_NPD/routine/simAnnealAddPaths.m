@@ -38,4 +38,6 @@ addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\
 addpath(genpath(['C:\Users\' usname '\Documents\' madpath '\boundedline-pkg']))
 addpath(genpath(['C:\Users\' usname '\' gitpath '\BrewerMap']))
 addpath(genpath(['C:\Users\' usname '\' gitpath '\BurstToolbox']))
-
+addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\data']));
+addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\model_fx']));
+addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\priors']));

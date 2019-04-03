@@ -64,7 +64,7 @@ for condsel = 1:numel(R.condnames)
     E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
     E(3,:) = [1.8 1.2 1.8 1.2]*10000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
     %     E(4,:) = [.2 .2 -.2 -.2]*(200);  %500           % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
-    E(4,:) = [.9 .9 -.9 -.9]*3000;
+    E(4,:) = [.9 .9 -.9 -.9]*2000;
     %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
     % E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
     % E(6,:) = [.5 .5 -.5 -.5]*100000;             % GPE connections
@@ -76,7 +76,7 @@ for condsel = 1:numel(R.condnames)
     E(6,:) = [.2 .2 -.2 -.2]*3000;             % GPE connections
     E(7,:) = [.2 .2 -.2 -.2]*3000;             % STN connections
     E(8,:) = [.2 .2 -.2 -.2]*3000;             % GPI connections
-    E(9,:) = [.2 .2 -.2 -.2]*3000;  %500       % THAL connections
+    E(9,:) = [.2 .2 -.2 -.2]*1500;  %500       % THAL connections
     
     % get the neural mass models {'ERP','CMC'}
     %--------------------------------------------------------------------------
