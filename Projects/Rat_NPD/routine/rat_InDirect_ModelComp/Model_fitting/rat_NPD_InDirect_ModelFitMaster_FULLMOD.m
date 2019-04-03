@@ -7,7 +7,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
-delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
+% delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 
 % simAnnealAddPaths()
 clear ; close all
@@ -16,11 +16,10 @@ clear ; close all
 closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths(
-rng(897)
+rng(123123)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
-R.SimAn.convIt = 1e-3;
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
@@ -36,7 +35,7 @@ catch
     disp('Making Mod List!!')
 end
 
-for modID = 10
+for modID = 12:-1:1
     if modID>=7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
@@ -61,7 +60,6 @@ for modID = 10
         %% Run ABC Optimization
         R = setSimTime(R,32);
         R.Bcond = 0;
-        R.SimAn.rep = 128; %448
         [p] = SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes
     end

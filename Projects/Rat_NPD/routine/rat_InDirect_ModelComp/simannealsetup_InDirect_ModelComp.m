@@ -85,8 +85,8 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.C','.A','.D'}; %,'.int{src}.S'
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
-R.SimAn.convIt = 2.5e-3;
-R.SimAn.rep = 256; %128; %512; % Repeats per temperature
+R.SimAn.convIt = 2e-3;
+R.SimAn.rep = 512; %128; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
 R.SimAn.jitter = 1; % Global precision
 %% PLOTTING

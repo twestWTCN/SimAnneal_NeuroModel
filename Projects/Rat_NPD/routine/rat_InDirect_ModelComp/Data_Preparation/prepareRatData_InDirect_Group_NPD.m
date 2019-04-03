@@ -42,8 +42,13 @@ for C =1:numel(R.condnames)
                     % Bring to zero-base
                     Pxy = Pxy-min(Pxy);
                     % Fit 3rd order Gaussian
-                    f = fit(F_model',Pxy','gauss3');
-                    Pxy = f(F_model)';
+                    [ft(1).f gt(1).g] = fit(F_model',Pxy','gauss1');
+                    [ft(2).f gt(2).g] = fit(F_model',Pxy','gauss2');
+                    [ft(3).f gt(3).g] = fit(F_model',Pxy','gauss3');
+                    [dum qi] = max([gt(1).g.adjrsquare gt(2).g.adjrsquare gt(3).g.adjrsquare]);
+                    
+                    Pxy = ft(qi).f(F_model)';
+                    clear ft gt
                     % Bring back to non-log space
                     Pxy = 10.^Pxy;
                 end
@@ -66,9 +71,13 @@ for C =1:numel(R.condnames)
                         Cxy = zeros(size(Cxy));
                     else
                         % Fit 3rd order Gaussian
-                        [f g] = fit(F_model',Cxy','gauss2');
-                        Cxy = f(F_model)';
-                        %                     plot(R.frqz,Cxy)
+                        [ft(1).f gt(1).g] = fit(F_model',Cxy','gauss1');
+                        [ft(2).f gt(2).g] = fit(F_model',Cxy','gauss2');
+                        [ft(3).f gt(3).g] = fit(F_model',Cxy','gauss3');
+                        [dum qi] = max([gt(1).g.adjrsquare gt(2).g.adjrsquare gt(3).g.adjrsquare]);
+                        
+                        Cxy = ft(qi).f (F_model)';
+                         clear ft gt
                     end
                     meannpd_data(C,i,j,k,:) = Cxy;
                 end

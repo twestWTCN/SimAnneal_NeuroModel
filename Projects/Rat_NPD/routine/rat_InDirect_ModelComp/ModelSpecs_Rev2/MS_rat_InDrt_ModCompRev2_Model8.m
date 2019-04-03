@@ -7,6 +7,7 @@ m.m = 6; % # of sources
 m.x = {[0 0 0 0 0 0 0 0]  [0 0]  [0 0]  [0 0]  [0 0]  [0 0]}; % Initial states
 m.Gint = [14 1 1 1 1 1];
 m.Tint = [4 1 1 1 1 1];
+m.Sint = [9 2 2 1 2 2];
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)

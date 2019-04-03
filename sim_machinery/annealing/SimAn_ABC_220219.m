@@ -153,7 +153,8 @@ while ii <= R.SimAn.searchMax
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         %         eps_act = min(parOptBank(end,:));
-        eps_act = prctile(parBank(end,1:R.SimAn.minRank),15);
+        
+        eps_act = prctile(parBank(end,1:R.SimAn.minRank),75);
         cflag = 1;
         itry = 0;
     end
