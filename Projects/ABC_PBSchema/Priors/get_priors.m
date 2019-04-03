@@ -1,20 +1,21 @@
-function Qp = get_priors();
+function Qp = get_priors()
 % setup priors
 % I wave parameters
-Qp.IWS(1,1) = 1; Qp.IWS(1,2) = 0.05; % Mean and std of Iwave Amp
-Qp.IWS(2,1) = 0.8; Qp.IWS(2,2) = 0.05;
+Qp.IWS_amp = [1 0.75];  % Mean of 1st and 2nd I wave
+Qp.IWS_amp_jit = [0.05 0.05];  % Mean of 1st and 2nd I wave
 
 % EPSP decay parameters
-Qp.EPSP_Tdecay = [0.015 0.008 0.008];
+Qp.EPSP_Tdecay = [0.008 0.008]; % AMN; CSN
 % EPSP sizes
-Qp.EPSP_amp = [50 50 50];
+Qp.EPSP_amp = [50 50]; % AMN; CSN
 % EPSP jitter
-Qp.EPSP_ampJit = [0.1 0.1 0.1];
+Qp.EPSP_ampJit = [0.5 0.5]; % CSN; AMN
 % Spiking thresholds
-Qp.SP_eps = [15 8];
+Qp.SCRate = [65 60]; % success rate
+% SNR
+Qp.SNRs = [5 2 2 2]; % beta; CSN; AMN; EMG
 
-Qp.SCRate = [65 60 75];
-
-Qp.SNRs = [5 2 2]; % beta; CSN; AMN
-
+Qp.CSN_n = 10;
+Qp.AMN_n = 8;
+Qp.CSN2AMN = 5;
 % MASON 1991 - EPSP variability 

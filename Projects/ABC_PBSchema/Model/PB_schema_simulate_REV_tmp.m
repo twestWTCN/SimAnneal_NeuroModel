@@ -1,4 +1,4 @@
-function [xsims,dum,wflag] = PB_schema_simulate_REV(R,~,uc,p,m)
+function [xsims,dum,wflag] = PB_schema_simulate_REV_tmp(R,~,uc,p,m)
 wflag = 0; dum = [];
 fsamp = R.model.fsamp;
 
@@ -14,18 +14,6 @@ p.AMN_n = round(Qp.AMN_n .*exp(p.AMN_n));
 p.CSN_n = round(Qp.CSN_n .*exp(p.CSN_n));
 p.CSN2AMN = round(Qp.CSN2AMN .*exp(p.CSN2AMN));
 
-if p.AMN_n>10
-    p.AMN_n = 10;
-end
-if p.AMN_n <= 0
-    p.AMN_n = 1;
-end
-if p.CSN_n>10
-    p.CSN_n = 10;
-end
-if p.CSN_n <= 0
-    p.CSN_n = 1;
-end
 % p.SP_eps = Qp.SP_eps .*exp(p.SP_eps);
 
 %% Make Beta Signal (common to all CSNs)
@@ -63,7 +51,8 @@ epsp_EMG = p.EPSP_amp(2).*makeEPSP(epsp_win,0.002,p.EPSP_Tdecay(2)); % EMG PSP
 
 %% LEVEL 1: Make corticospinal neuron pool with noise + shared beta wave
 % Setup the I-wave depolarizations
-tx_csn = nan(size(t,2),p.CSN_n);
+CSN_n = 10;
+tx_csn = nan(size(t,2),CSN_n);
 for cn = 1:p.CSN_n
     tx_csn(:,cn) = tx_beta + p.SNRs(2)*randn(size(t));
     for i = 1:size(TMS_onsets,2)
@@ -83,7 +72,7 @@ while (srate < 30  || srate > p.SCRate(1)) && csn_thresh < max(tx_csn(:))
     i = i + 1;
     csn_thresh = csn_thresh + (csn_thresh./50); % find upper-bound!
     in_spT = []; csn_scsrate = [];
-    for cn = 1:p.CSN_n
+    for cn = 1:CSN_n
         [csn_spT{cn},nspike,nspike_inWin] = findSpike(tx_csn(:,cn),csn_thresh,0.075*fsamp,TMS_win);
         csn_scsrate(cn) = 100.*(nspike_inWin/nTMS);
     end
@@ -92,6 +81,7 @@ end
 
 
 %% LEVEL 2: Make alpha motor neuron pool with noise
+AMN_n = 8;
 % Now convolve the spike times with the EPSP kernel to get the
 % depolarizations of the AMN
 tx_amn = nan(size(t,2),p.AMN_n);
@@ -121,7 +111,7 @@ end
 %% Level 3: Get the EMG depolarization (MEP!)
 % Now convolve the spike times with the EPSP kernel
 tx_emg = nan(size(t,2),1);
-amn2emg = 1:p.AMN_n;
+amn2emg = 1:AMN_n;
 sum_spT = sort(vertcat(amn_spT{amn2emg})); % summated spike times for AMN
 emg_P = convSpikePSP(sum_spT,epsp_EMG,p.EPSP_ampJit(2),t); %tx_iws(:,cn));
 tx_emg = (emg_P +  p.SNRs(4).*randn(size(t)))'; % beta plus noise

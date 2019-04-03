@@ -3,35 +3,42 @@ function [R p m uc] = setup_model_testing(R)
 m.m = 1; % # of sources
 m.x = [];
 %% Prepare Priors
-p.IWS(1,1) = 1;  % mean I1
-p.IWS(1,2) = 0.25; % jitter I1 
-p.IWS(2,1) = 1; % mean I2
-p.IWS(2,2) = 0.25; % jitter I2
+p.IWS_amp = [0 0];  % mean I1
+p.IWS_amp_s = [0.15 0.15];
 
-p.IWS_s(1,:) = [0.15 0.3];
-p.IWS_s(2,:) = [0.15 0.3];
+p.IWS_amp_jit = [0 0];  % mean I1
+p.IWS_amp_jit_s = [0.15 0.15];
+
 
 % EPSP decay parameters
-p.EPSP_Tdecay = [0 0.20 0.32];
-p.EPSP_Tdecay_s = [0.05 0.1 0.09];
+p.EPSP_Tdecay = [0.20 0.32];
+p.EPSP_Tdecay_s = [0.1 0.1];
 
 % EPSP sizes
-p.EPSP_amp = [1.21 0.6 0.33];
-p.EPSP_amp_s = [0.13 0.46 0.22];
+p.EPSP_amp = [0.6 0.33];
+p.EPSP_amp_s = [1/4 1/4];
 
 % EPSP Jitter
-p.EPSP_ampJit = [0.17 0.56 -0.28];
-p.EPSP_ampJit_s = [0.09 0.05 0.00];
+p.EPSP_ampJit = [0 0 ];
+p.EPSP_ampJit_s = [1/4 1/4];
 
-p.SCRate = [0 0 0]; % CSN SR; AMN SR
-p.SCRate_s = [1/8 1/8 1/8];
+% Threshold for the success rates
+p.SCRate = [0 0]; % CSN SR; AMN SR
+p.SCRate_s = [1/8 1/8];
 
+% SNR for beta; csn noise; amn noise; emg noise
+p.SNRs = [0 0 0 0 ];
+p.SNRs_s = [1/8 1/8 1/8 1/8];
 
-p.SNRs = [0 0 0];
-p.SNRs_s = [1/8 1/8 1/8];
+p.CSN2AMN = 0;
+p.CSN2AMN_s = 1/16;
 
-p.csn2amnN = 0;
-p.csn2amnN_s = 1/16;
+p.CSN_n = 0;
+p.CSN_n_s = 1/16;
+
+p.AMN_n = 0;
+p.AMN_n_s = 1/16;
+
 
 % Spiking thresholds
 % p.SP_eps = [0 0];

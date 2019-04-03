@@ -17,6 +17,8 @@ u = varo.varo;
 varo = load([R.rootn '\Inputs\betaSig\betaSignal_' num2str(randi(25))]);
 m = varo.varo;
 
+
+
 pfit = spm_unvec(parBank(1:end-1,1),pt);
 pfit.IWS_amp = [1 0];
 pfit.IWS_amp_jit = [0 -2];

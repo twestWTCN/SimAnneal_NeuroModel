@@ -8,4 +8,4 @@ for i = 1:size(feat_sim,2)
 %     r(i) = goodnessOfFit(yfx',ffx','NRMSE');
     r(i) = rsquare(yfx',ffx');
 end
-r2mean = mean(r([1 2 3 4 5 6 7]));
+r2mean = mean(r([1 3 5 6 7])); %4 5 6 7

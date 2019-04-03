@@ -1,7 +1,9 @@
 function P_out = convSpikePSP(spT,epsp_t,ampJit,t)
         % Convert spike times to train
         pspT = zeros(size(t));
-        pspT(spT) = 1+ ampJit.*randn(size(spT));
+        absspT = unique(spT);
+        spReps = histc(spT,absspT);
+        pspT(absspT) = spReps+ (spReps*ampJit.*randn(size(absspT)));
         % Convolve the train with PSP
         P_out = conv(pspT,epsp_t);
         % Truncate
