@@ -64,7 +64,7 @@ for condsel = 1:numel(R.condnames)
     E(2,:) = [1 .3571 1 .625]*100000;          % CMC connections (to ctx) with T = [2 2 16 28] gives [200 100 200 100] = regular DCM
     E(3,:) = [1.8 1.2 1.8 1.2]*10000;         % BGC connections (to bgc) with T_str=8 and T_stn=4 gives A = 144 and 48
     %     E(4,:) = [.2 .2 -.2 -.2]*(200);  %500           % MMC connections (to mmc) with T_mp=3 and T_sp=2 gives A = 270 and 180; with T_dp=18 gives A=200
-    E(4,:) = [.9 .9 -.9 -.9]*2000;
+    E(4,:) = [.2 .2 -.2 -.2]*2000;
     %% to calculate E divide the target value for A by the value of the time constant (in seconds, i.e. 0.018)
     % E(5,:) = [.5 .5 -.5 -.5]*100000;             % STR connections
     % E(6,:) = [.5 .5 -.5 -.5]*100000;             % GPE connections
@@ -110,16 +110,23 @@ for condsel = 1:numel(R.condnames)
     D = zeros(m.m);
     D(p.D>-30) = 4/1000; % set all delay priors to 4ms.
     
-    D(2,1) = 10/1000;   % M1 to STR (Gerfen and Wilson 1996)
-    D(4,1) = 2.5/1000;  % M1 to STN (Nakanishi et al. 1987)
+    D(2,1) = 3/1000;   % M1 to STR (Jaeger and Kita, 2011)
+    D(4,1) = 3/1000;  % M1 to STN (Jaeger and Kita, 2011)
+   
+    D(3,2) = 7/1000;   % STR to GPe (Kita and Kitai 1991)
+    D(5,2) = 12/1000;  % STR to GPi (Kita and Kitai 1991)
+
+    D(4,3) = 1/1000;    % GPe to STN (Jaeger and Kita, 2011)
+    D(5,3) = 1/1000;    % GPe to GPi (Jaeger and Kita, 2011)
+   
+    D(3,4) = 3/1000;    % STN to GPe (Kita and Kitai 1991)
+    D(5,4) = 3/1000;    % STN to GPi (Kita and Kitai 1991)
     
-    D(3,4) = 2/1000;    % STN to GPe (Kita and Kitai 1991)
-    D(5,4) = 5/1000;    % STR to GPi (Kita and Kitai 1991)
+    D(6,5) = 3/1000;    % GPi to Thal (Stoelzel J Neurosci. 2017)
+    
     D(1,6) = 10/1000;   % Thal to M1 (Hashemi 2017)
     D(1,6) = 15/1000;   % M1 to Thal (Steriade; Llinas and Jones 1990)
     
-    D(4,3) = 4/1000;    % GPe to STN (Fujimoto and Kita 1993)
-    D(6,5) = 4/1000;    % GPi to Thal (Stoelzel J Neurosci. 2017)
     
     D = D(1:m.m,1:m.m);
     D = ceil(D.*exp(p.D).*(1/R.IntP.dt)); % As expectation of priors and convert units to steps

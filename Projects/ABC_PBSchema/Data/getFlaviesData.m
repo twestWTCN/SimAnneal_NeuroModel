@@ -7,8 +7,8 @@ Data.Phase_Lat(:,1) = deg2rad(Data.Phase_Lat(:,1));
 Data.Phase_LatCV(:,1) = deg2rad(Data.Phase_LatCV(:,1));
 
 % conver %CV to CV
-Data.Phase_AmpCV(:,2) = Data.Phase_AmpCV(:,2)./500; %100
-Data.Phase_LatCV(:,2) = Data.Phase_LatCV(:,2)./500;
+Data.Phase_AmpCV(:,2) = Data.Phase_AmpCV(:,2)./100; %100
+Data.Phase_LatCV(:,2) = Data.Phase_LatCV(:,2)./100;
 
 feat_emp{1} = Data.Phase_Amp';
 feat_emp{2} = Data.Phase_AmpCV';
