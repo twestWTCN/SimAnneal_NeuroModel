@@ -237,7 +237,7 @@ xsims.zMEP_amp = zMEP_amp;
 xsims.csn_thresh = csn_thresh;
 xsims.amn_thresh = amn_thresh;
 xsims.CSN_sync = CSN_sync;
-xsims.CSN_delay = CSN_sync;
+xsims.CSN_delay = CSN_delay;
 
 % scatter(TMS_phase,MEP_amp); yyaxis right; scatter(TMS_phase,MEP_mconset)
 
