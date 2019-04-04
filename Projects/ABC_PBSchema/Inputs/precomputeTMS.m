@@ -3,8 +3,8 @@ t = makeBetaSignal(R.model.t_in);
 fsamp = R.model.fsamp;
 
 % TMS parameters
-TMS_dur = floor(1*fsamp/1000);          % durations of TMS pulses (# time steps)
-TMS_winL= floor(200*fsamp/1000);          % durations of TMS pulse window (# time steps)
+TMS_dur = floor((1*fsamp)/1000);          % durations of TMS pulses (# time steps)
+TMS_winL= floor((120*fsamp)/1000);          % durations of TMS pulse window (# time steps)
 
 TMS_amp = 35;   % this matters only for plotting!
 nPulses = R.model.nPulses;

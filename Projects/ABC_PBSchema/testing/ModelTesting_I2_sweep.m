@@ -1,7 +1,5 @@
 close all
 % rng(1231)
-% RESULTS ARENT REPRODUCIBLE AT ALL - IS THIS LARGE AMOUNTS OF NOISE? CUT
-% OUT SOME NOISE!
 load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
 Mfit = varo;
 load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'])
@@ -24,21 +22,21 @@ m = varo.varo;
 % I2amp = [-2 0 2];
 % betaSNR = [-1 0 1]; % The background beta power decides the slope of the
 % amp vs latency (sensitive parameter!)
-CSNSNR = [-2 0 2];
- 
+CSNSNR = [-3 0 3];
+
 for isweep = 1:3
     
     pfit = spm_unvec(parBank(1:end-1,1),pt);
-%     pfit.IWS_amp = [1 0];
-%     pfit.IWS_amp_jit = [0 -2];
-%     pfit.SNRs = [0.2 CSNSNR(isweep) 0.4 -0.5];
-%     pfit.EPSP_amp = [0.25 1];
-% p.CSN2AMN = CSNSNR(isweep);
+%         pfit.IWS_amp = [CSNSNR(isweep) 0];
+%         pfit.IWS_amp_jit = [0 CSNSNR(isweep)];
+%         pfit.SNRs = [0.2 CSNSNR(isweep) 0.4 -0.5];
+    %     pfit.EPSP_amp = [0.25 1];
+%     pfit.CSN2AMN = CSNSNR(isweep);
     % [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,BPfit,0,1);
     R = PB_scheme_setup();
     [R] = getFlaviesData(R);
     % pfit.EPSP_ampJit = [0 0 0];
-    [xsims,dum,wflag] = PB_schema_simulate_REV(R,[],u,pfit,m);
+    [xsims,dum,wflag] = PB_schema_simulate_REV_messaround(R,[],u,pfit,m);
     
     [dum,data_emp] = getFlaviesData(R);
     
@@ -61,7 +59,7 @@ for isweep = 1:3
     subplot(2,2,3)
     histogram(lat_sim(amp_sim>1.2),lat_supp,'Normalization','probability')
     xlabel('Mean Corrected Latency (ms)'); title('MEP > 1.2z')
-      hold on
+    hold on
     %    histogram(lat_emp(amp_emp>1.2),lat_supp,'Normalization','probability')
     subplot(2,2,4)
     histogram(lat_sim(amp_sim<1.2),lat_supp,'Normalization','probability')
