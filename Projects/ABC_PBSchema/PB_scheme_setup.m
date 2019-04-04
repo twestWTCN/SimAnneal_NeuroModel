@@ -47,7 +47,7 @@ R.obs.transFx = @PB_DataTransform;
 
 R.obs.glist = 1;
 
-R.trans.pirange = linspace(-pi,pi,10);
+R.trans.pirange = linspace(-pi,pi,9);
 R.trans.amprange = 0.1:0.2:3.2;
 % Plot Outputs
 R.plot.outFeatFx = @PB_PlotOutputs;

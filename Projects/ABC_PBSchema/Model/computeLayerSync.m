@@ -4,7 +4,7 @@ for i = 1:numel(spT)
     
     ab = windInds(1) - intersect(windInds,spT{i});
     if any(ab)
-        spDelay(i) = ab;
+        spDelay(i) = ab(1);
     else
         spDelay(i) = NaN;
     end

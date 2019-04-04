@@ -1,5 +1,7 @@
 close all
-rng(231)
+% rng(1231)
+% RESULTS ARENT REPRODUCIBLE AT ALL - IS THIS LARGE AMOUNTS OF NOISE? CUT
+% OUT SOME NOISE!
 load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\modelfit_' R.out.tag '_' R.out.dag '.mat'])
 Mfit = varo;
 load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\R_' R.out.tag '_' R.out.dag '.mat'])
@@ -12,9 +14,11 @@ clear varo
 R = PB_scheme_setup();
 % precomputeBetaSig(R,mt)
 % precomputeTMS(R,mt)
-varo = load([R.rootn '\Inputs\TMSsig\TMSsignal_' num2str(randi(25))]);
+i = randi(25);
+varo = load([R.rootn '\Inputs\TMSsig\TMSsignal_' num2str(i)]);
 u = varo.varo;
-varo = load([R.rootn '\Inputs\betaSig\betaSignal_' num2str(randi(25))]);
+j = randi(25);
+varo = load([R.rootn '\Inputs\betaSig\betaSignal_' num2str(j)]);
 m = varo.varo;
 
 % I2amp = [-2 0 2];
@@ -24,21 +28,22 @@ CSNSNR = [-2 0 2];
  
 for isweep = 1:3
     
-%     pfit = spm_unvec(parBank(1:end-1,1),pt);
+    pfit = spm_unvec(parBank(1:end-1,1),pt);
 %     pfit.IWS_amp = [1 0];
 %     pfit.IWS_amp_jit = [0 -2];
 %     pfit.SNRs = [0.2 CSNSNR(isweep) 0.4 -0.5];
 %     pfit.EPSP_amp = [0.25 1];
+% p.CSN2AMN = CSNSNR(isweep);
     % [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,BPfit,0,1);
     R = PB_scheme_setup();
     [R] = getFlaviesData(R);
     % pfit.EPSP_ampJit = [0 0 0];
-    [xsims,dum,wflag] = PB_schema_simulate_REV_tmp(R,[],u,pfit,m);
+    [xsims,dum,wflag] = PB_schema_simulate_REV(R,[],u,pfit,m);
     
     [dum,data_emp] = getFlaviesData(R);
     
     [~, feat_sim, wflag(2)] = R.obs.transFx(R,xsims);
-    % figure(1);  R.plot.outFeatFx(R,{R.data.feat_emp},{feat_sim},1)
+    figure(1);  R.plot.outFeatFx(R,{R.data.feat_emp},{feat_sim},1)
     
     amp_emp = data_emp.AmpvsLat(:,1);
     lat_emp = data_emp.AmpvsLat(:,2)*1000;

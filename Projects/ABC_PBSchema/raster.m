@@ -1,5 +1,5 @@
 subplot(3,1,1)
-imagesc(t,1:CSN_n,tx_csn')
+imagesc(t,1:p.CSN_n,tx_csn')
 colormap('hot'); a(2) = gca;
 yyaxis right
 hold on
@@ -8,7 +8,7 @@ colormap('hot'); a(1) = gca;
 title('CSN Potential')
 
 subplot(3,1,2)
-imagesc(t,1:AMN_n,tx_amn')
+imagesc(t,1:p.AMN_n,tx_amn')
 colormap('hot'); a(3) = gca;
 title('AMN Potential')
 
