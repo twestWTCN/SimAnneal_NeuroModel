@@ -4,7 +4,7 @@
 % models to the data specified in fx prepareRatData. WML stores batch
 % progress and can be accessed by multiple MATLAB realizations.
 %%%% TO DO
-
+% MODEL 12 HASNT BEEN DONE!
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])

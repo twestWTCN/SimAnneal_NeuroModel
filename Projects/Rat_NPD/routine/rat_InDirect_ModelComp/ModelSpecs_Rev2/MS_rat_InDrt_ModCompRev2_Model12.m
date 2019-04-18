@@ -50,7 +50,7 @@ uc = innovate_timeseries(R,m);
 
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(2,1) = 0; % MMC -> STR
+% p.A{1}(2,1) = 0; % MMC -> STR
 p.A{1}(4,1) = 0; % MMC -> STN (hd pathway)
 p.A{1}(3,4) = 0; % STN -> GPE
 p.A{1}(5,4) = 0; % STN -> GPi
@@ -59,6 +59,7 @@ p.A{1}(6,1) = 0; % MMC -> Thal (Thalcort pathway)
 p.A_s{1} = repmat(1/4,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
+p.A{2}(3,2) = 0; % STR -| GPe
 p.A{2}(5,2) = 0; % STR -| GPi
 p.A{2}(4,3) = 0; % GPe -| STN
 p.A{2}(6,5) = 0; % GPi -| Thal

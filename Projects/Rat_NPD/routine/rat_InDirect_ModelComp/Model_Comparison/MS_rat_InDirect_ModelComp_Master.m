@@ -11,11 +11,11 @@ R = prepareRatData_InDirect_Group_NPD(R);
 
 %% Do the model probability computations
 R.comptype = 1;
-modelCompMaster(R,1) %,[1:8 10:12]
+modelCompMaster(R,1:12) %,[1:8 10:12]
 
 %% Plot the modComp results
 R.modcomp.modN = [1:12];
-R.modcompplot.NPDsel = 1:12; %[6 9 10];
+R.modcompplot.NPDsel = [6 8 10 12]; %[6 9 10];
 R.plot.confint = 'yes';
 cmap = linspecer(numel(R.modcomp.modN));
 cmap = cmap(end:-1:1,:);

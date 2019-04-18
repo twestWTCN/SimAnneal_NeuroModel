@@ -37,8 +37,8 @@ if wflag == 0
             end
             % Run Data Transform d
             if isfield(R.obs,'transFx')
-%                 [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
-                [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(R,xsims_gl{gl});
+                [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);
+%                 [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(R,xsims_gl{gl});
             else
                 feat_sim{gl} = xsims_gl{gl}; % else take raw time series
             end

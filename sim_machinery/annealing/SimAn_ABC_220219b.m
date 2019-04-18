@@ -151,7 +151,7 @@ while ii <= R.SimAn.searchMax
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         %         eps_act = min(parOptBank(end,:));
-        eps_act = prctile(parBank(end,1:R.SimAn.minRank),15);
+        eps_act = prctile(parBank(end,1:R.SimAn.minRank),75);
         cflag = 1;
         itry = 0;
     end
@@ -173,12 +173,12 @@ while ii <= R.SimAn.searchMax
         [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg);
     end
     if cflag == 0 % Draw from Normal Distribution
-        if size(parOptBank,2)>2
+        if size(parOptBank,2)>R.SimAn.minRank
             Mfit.Mu = mean(parOptBank(pMuMap,:),2);
             Mfit.Sigma = cov(parOptBank(pMuMap,:)');
         else
-            Mfit.Mu = mean(parBank(pMuMap,intersect(1:2*R.SimAn.minRank,1:size(parBank,2))),2);
-            Mfit.Sigma = cov(parBank(pMuMap,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)))');
+            Mfit.Mu = mean(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2))),2);
+            Mfit.Sigma = cov(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)))');
         end
     end
     
