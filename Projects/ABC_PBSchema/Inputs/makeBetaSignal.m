@@ -5,7 +5,7 @@ lorentzian = @(x,kx,gamma)((1/(pi*gamma))*((gamma^2)./((x-kx).^2 + (gamma^2))));
 % x = 0:fsamp/N:fsamp/2;
 x = 0:0.001:(fsamp); % support
 kx = 20; % centre
-gamma = 0.75; %FWHM
+gamma = 0.5; %FWHM
 fx = lorentzian(x,kx,gamma) .*exp(1i.*rand(size(x)));
 % figure
 % subplot(2,1,1)

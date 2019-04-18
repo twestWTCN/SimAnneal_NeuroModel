@@ -27,7 +27,7 @@ R.SimAn.pOptBound = [-8 8];
 R.SimAn.pOptRange = -3:.01:3;
 R.SimAn.convIt = 0.0001;
 % Simulation
-R.IntP.intFx = @PB_schema_simulate_REV;
+R.IntP.intFx = @PB_schema_simulate_REV2;
 R.IntP.compFx = @PB_compareData;
 R.IntP.Utype = 'zero';
  
@@ -39,7 +39,7 @@ R.model.nPulses = 20000;
 
 % Time Scale
 R.model.fsamp = 4048;
-R.model.tend = 5000;
+R.model.tend = 50;
 R.model.t_in = linspace(0,R.model.tend,(R.model.fsamp*R.model.tend));
 
 % Data tranform
