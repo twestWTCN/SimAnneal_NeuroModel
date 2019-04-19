@@ -4,7 +4,7 @@
 % models to the data specified in fx prepareRatData. WML stores batch
 % progress and can be accessed by multiple MATLAB realizations.
 %%%% TO DO
-% MODEL 12 HASNT BEEN DONE!
+% MODEL 12 HASNT BEEN DONE!temperature
 %%%%%%%%%%%%%%%%%%%%%%%%
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
@@ -24,6 +24,7 @@ R = simannealsetup_InDirect_ModelComp;
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
 R = prepareRatData_InDirect_Group_NPD(R);
+WML = [1:6 11:12];
 
 try
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'])

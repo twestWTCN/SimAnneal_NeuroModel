@@ -67,7 +67,7 @@ p.A_s{2} = repmat(1/4,m.m,m.m);
 
 % Connection strengths
 p.C = zeros(m.m,1);
-p.C_s = repmat(1/4,size(p.C));
+p.C_s = repmat(1/16,size(p.C));
 
 % Leadfield
 p.obs.LF = [1 1 1 1];

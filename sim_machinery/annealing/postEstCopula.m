@@ -1,12 +1,16 @@
 function [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg)
 disp('Forming new copula...')
 clear copU xf ilist
+% Set Weights
+W = 10.^(1-(parOptBank(end,1)-parOptBank(end,:)).^1/3); 
+W = W./sum(W);
+
 % First form kernel density estimates for each optimized
 % parameter
 clear copU
 for i = 1:size(pIndMap,1)
     x = parOptBank(pIndMap(i),:); % choose row of parameter values
-    copU(i,:) = ksdensity(x,x,'function','cdf'); % KS density estimate per parameter
+    copU(i,:) = ksdensity(x,x,'function','cdf','Weights',W); % KS density estimate per parameter
     xf(i,:) = x;
 end
 try
