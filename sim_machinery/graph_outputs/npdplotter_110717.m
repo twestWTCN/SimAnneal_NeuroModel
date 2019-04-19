@@ -2,6 +2,9 @@ function ab = npdplotter_110717(NPD_data,NPD_sim,F,R,bestn,labelna)
 if isempty(NPD_data)
     NPD_data = {zeros(size(NPD_sim{1}))};
 end
+if ~isfield(R.plot,'cmap')
+    R.plot.cmap = [1 0 0];
+end
 if isempty(NPD_sim)
     NPD_sim= {zeros(size(NPD_data{1}))};
 end
@@ -30,7 +33,9 @@ for L = 1:length(NPD_sim)
                 subplot(N,M,k)
                 if i == j
                     ab(1) = plot(F,squeeze(NPD_sim_n(C,i,j,1,:)),'k--','linewidth',lwid); hold on
+                    ab(1).Color = R.plot.cmap;
                     ab(2) = plot(F,squeeze(NPD_data_n(C,i,j,1,:)),'k','linewidth',2);
+                    ab(2).Color = [0 0 0];
                     xlabel('Hz'); ylabel('Power'); %title(sprintf('Ch %1.f Pxx',i))
                 else
                     %                     a(3) = plot(F,squeeze(NPD_sim_n(C,i,j,1,:)),'k--','linewidth',lwid); hold on
@@ -38,10 +43,16 @@ for L = 1:length(NPD_sim)
                     %                     xlabel('Hz'); ylabel(labelna);
                     if i<j
                         a(1) = plot(F,squeeze(NPD_sim_n(C,i,j,2,:)),'r--','linewidth',lwid); hold on
-                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'r','linewidth',2);
+                        a(2) = plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'r','linewidth',2);
+                        
+                        a(1).Color = R.plot.cmap;
+                        a(2).Color = [0 0 0];
                     elseif i>=j
-                        a(2) = plot(F,squeeze(NPD_sim_n(C,i,j,2,:)),'b--','linewidth',lwid); hold on
-                        plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'b','linewidth',2);
+                        a(1) = plot(F,squeeze(NPD_sim_n(C,i,j,2,:)),'b--','linewidth',lwid); hold on
+                        a(2) = plot(F,squeeze(NPD_data_n(C,i,j,2,:)),'b','linewidth',2);
+                        a(1).Color = R.plot.cmap;
+                        a(2).Color = [0 0 0];
+                        
                     end
                     xlabel('Hz'); ylabel(labelna); %title(sprintf('Ch %1.f -> Ch %1.f NPD',i,j));
                     %                 legend(a,{'Forward','Reverse'})

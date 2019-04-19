@@ -15,7 +15,7 @@ BB.plot.lims.Dur = [1.8 3.2];
 
 % Compute  Burst Amplitude/Duration Statistics
 % for i = 1:5; F(i) = figure; end
-BB = compute_BetaBurstAmpDurStats_v2(R,BB,[],0);
+BB = computeBetaBurstAmpDurStats_v2(R,BB);
 
 % Plot Burst Properties
 for i = 1:2

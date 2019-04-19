@@ -2,7 +2,7 @@ function BB = compute_BurstThreshold(R,BB,condsel,plotop)
 surflag = 0;
 % Find the amplitude threshold from the prctile of concatanated data
 if surflag == 0
-    concatA = [BB.A{condsel}];
+    concatA = [BB.AEnv{condsel}];
     BB.epsAmp = prctile(concatA(R.BB.pairInd(2),:),85,2);
     concatA = [BB.PLV{condsel}];
     BB.epsPLV = prctile(concatA(1,:),90,2);
@@ -19,4 +19,3 @@ if plotop == 1
     set(gcf,'Position',[680  358  1048  622])
 end
 
-save([R.rootn '\routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'],'BB','R')

@@ -12,7 +12,7 @@ R.condcmap = linspecer(3);
 R.cohband = 2;
 
 %% Simulate Data
-R = BAA_sim_discreteModels(R,12,250);
+R = BAA_sim_discreteModels(R,10,250);
 % OR load
 load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'],'xsimMod','feat')    
  

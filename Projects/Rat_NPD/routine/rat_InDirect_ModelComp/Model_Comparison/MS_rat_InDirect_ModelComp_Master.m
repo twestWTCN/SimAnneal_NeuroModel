@@ -11,7 +11,7 @@ R = prepareRatData_InDirect_Group_NPD(R);
 
 %% Do the model probability computations
 R.comptype = 1;
-modelCompMaster(R,1:12) %,[1:8 10:12]
+modelCompMaster(R,8) %,[1:8 10:12]
 
 %% Plot the modComp results
 R.modcomp.modN = [1:12];

@@ -21,9 +21,9 @@ function [R,parBank] = SimAn_ABC_220219b(R,p,m,parBank)
 % There are several plotting functions which will track the progress of the
 % annealing.
 % TO DO:
-% Change convergence parameters upon the inference of parameter precision.
-% In this way the convergence depends upon the inference and not on the
-% outcome (accuracy).
+% Explore weighting the particles for each iteration placing emphasis on
+% the highest.
+% Consider two proposals - one conservative vs one exploratory
 % Timothy West (2018) - UCL CoMPLEX
 % / UCL, Wellcome Trust Centre for Human Neuroscience
 %%%%%%%%%%%%%%%%%%%%%%

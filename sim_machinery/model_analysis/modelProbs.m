@@ -115,6 +115,9 @@ permMod.feat_rep = feat_rep;
 permMod.DKL = DKL;
 permMod.KL = KL;
 xsimMod = xsims_rep;
+    permMod.MAP = spm_unvec(median(base,2),p);
+[a b] = max([r2rep{:}]);
+    permMod.bestP = spm_unvec(base(:,b),p);
 
 % mkdir([R.rootn 'outputs\' R.out.tag '2\'])
 % save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')

@@ -53,7 +53,7 @@ for modID = modlist
         [dum prior] = a(R);
         R.Mfit.prior = prior;
         % load parbank?
-        load([R.rootn 'outputs\' Rorg.out.tag '\' dagname '\parBank_' Rorg.out.tag '_' dagname '.mat'])
+        load([Rorg.rootn 'outputs\' Rorg.out.tag '\' dagname '\parBank_' Rorg.out.tag '_' dagname '.mat'])
         parBank =  varo;
         R = setSimTime(R,32);
         

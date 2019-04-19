@@ -11,7 +11,7 @@ for pn = 1:numel(modID)
     R.Mfit.prior = prior;
     
     R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
-    parOptBank = parBank(1:end-1,1:2^10);
+    parOptBank = parBank(1:end,1:2^10);
     
     R.parOptBank = parOptBank;
     R.obs.gainmeth = R.obs.gainmeth(1);
