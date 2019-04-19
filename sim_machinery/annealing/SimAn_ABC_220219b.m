@@ -40,8 +40,8 @@ end
 pOrg = p; % Record prior parameters.
 
 % Set Fixed Annealing Parameters
-eps_prior = -4; % prior eps (needed for gradient approximation);
-eps_exp = -3.9;
+eps_prior = -25; % prior eps (needed for gradient approximation);
+eps_exp = -20;
 eps_act = eps_prior;
 delta_act = 0.05;
 % Compute indices of parameters to be optimized
@@ -72,20 +72,60 @@ while ii <= R.SimAn.searchMax
     % This is where the heavy work is done. This is run inside parfor. Any
     % optimization here is prime.
     clear xsims_rep feat_sim_rep
-    parfor jj = 1:rep % Replicates for each temperature
-        % Get sample Parameters
-        pnew = par{jj};
-        %% Simulate New Data
-        u = innovate_timeseries(R,m);
-        u{1} = u{1}.*sqrt(R.IntP.dt);
-        [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,pnew,0,0);
+    ji = 0;
+    parnum = (8*2);
+    while ji < (rep/parnum)
+        parfor jj = 1:parnum % Replicates for each temperature
+            % Get sample Parameters
+            parl = (ji*parnum) + jj;
+            pnew = par{parl};
+            %% Simulate New Data
+            u = innovate_timeseries(R,m);
+            u{1} = u{1}.*sqrt(R.IntP.dt);
+            [r2,pnew,feat_sim,xsims,xsims_gl] = computeSimData120319(R,m,u,pnew,0,0);
+            
+            r2rep{jj} = r2;
+            par_rep{jj} = pnew;
+            %         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
+            feat_sim_rep{jj} = feat_sim;
+            disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
+        end % End of batch replicates
         
-        r2rep{jj} = r2;
-        par_rep{jj} = pnew;
-        %         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
-        feat_sim_rep{jj} = feat_sim;
-        disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
-    end % End of batch replicates
+        % Retrieve fits
+        r2loop = [r2rep{:}];
+        % Delete failed simulations
+        r2loop(r2loop==1) = -inf;
+        r2loop(isnan(r2loop)==1) = -inf;
+        r2loop(imag(r2loop)==1) = -inf;
+        r2loop(isinf(r2loop)==1) = -inf;
+        % Append succesful replicates to bank of params and fits
+        %(parameter table, with fits)
+        for i = 1:numel(r2loop)
+            if ~isinf(r2loop(i))
+                parI(:,i) = [full(spm_vec(par_rep{i})); r2loop(i)]';
+                parBank = [parBank parI(:,i) ];
+            end
+        end
+        [Ylist Ilist] = sort(r2loop,'descend');
+        bestr2(ii) = Ylist(1);
+        %     Ilist(isnan(r2loop(Ilist))) = []; % reconstruct Ilist without NaNs
+        
+        % Clip parBank to the best (keeps size manageable
+        [dum V] = sort(parBank(end,:),'descend');
+        if size(parBank,2)>2^13
+            parBank = parBank(:,V(1:2^12));
+        else
+            parBank = parBank(:,V);
+        end
+        parOptBank = parBank(:,parBank(end,:)>eps_exp);
+        
+        if size(parOptBank,2)> R.SimAn.minRank-1
+            break
+        else
+            ji = ji+1;
+        end
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % PARAMETER OPTIMIZATION BEGINS HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,35 +134,8 @@ while ii <= R.SimAn.searchMax
     % icop(2)<itry: Try to force
     
     %% Concatanate Batch Results and Decide Acceptance Level Epsilon
-    % Retrieve fits
-    r2loop = [r2rep{:}];
-    % Delete failed simulations
-    r2loop(r2loop==1) = -inf;
-    r2loop(isnan(r2loop)==1) = -inf;
-    r2loop(imag(r2loop)==1) = -inf;
-    r2loop(isinf(r2loop)==1) = -inf;
-    % Append succesful replicates to bank of params and fits
-    %(parameter table, with fits)
-    for i = 1:numel(r2loop)
-        if ~isinf(r2loop(i))
-            parI(:,i) = [full(spm_vec(par_rep{i})); r2loop(i)]';
-            parBank = [parBank parI(:,i) ];
-        end
-    end
-    [Ylist Ilist] = sort(r2loop,'descend');
-    bestr2(ii) = Ylist(1);
-    %     Ilist(isnan(r2loop(Ilist))) = []; % reconstruct Ilist without NaNs
-    
-    % Clip parBank to the best (keeps size manageable
-    [dum V] = sort(parBank(end,:),'descend');
-    if size(parBank,2)>2^13
-        parBank = parBank(:,V(1:2^12));
-    else
-        parBank = parBank(:,V);
-    end
-    
+
     %% Find error threshold for temperature (epsilon) and do rejection sampling
-    parOptBank = parBank(:,parBank(end,:)>eps_exp);
     A = parOptBank(pIndMap,:);
     B = eig(cov(A));
     C = B/sum(B);
@@ -173,13 +186,18 @@ while ii <= R.SimAn.searchMax
         [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg);
     end
     if cflag == 0 % Draw from Normal Distribution
+        % Set Weights
         if size(parOptBank,2)>R.SimAn.minRank
-            Mfit.Mu = mean(parOptBank(pMuMap,:),2);
-            Mfit.Sigma = cov(parOptBank(pMuMap,:)');
+            xs = parOptBank(pMuMap,:);
         else
-            Mfit.Mu = mean(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2))),2);
-            Mfit.Sigma = cov(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)))');
+            xs = parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
         end
+        W = 10.^(1-(xs(end,1)-xs(end,:)).^1/3);
+        W = W./sum(W);
+        Mfit.Mu = wmean(xs,W,2);
+        Mfit.Sigma = weightedcov(xs',W);
+        %             Mfit.Mu = mean(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2))),2);
+        %             Mfit.Sigma = cov(parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)))');
     end
     
     %% Draw from Proposal Distribution
@@ -210,7 +228,7 @@ while ii <= R.SimAn.searchMax
             if size(Ilist,2)<12; xn = size(Ilist,2); else; xn = 12; end
             try
                 fx({R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},R.data.feat_xscale,R,1,[])
-%                 fx(R,{R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},Ilist(1))
+                %                 fx(R,{R.data.feat_emp},{feat_sim_rep{Ilist(1:xn)}},Ilist(1))
                 drawnow; shg
             end
         end

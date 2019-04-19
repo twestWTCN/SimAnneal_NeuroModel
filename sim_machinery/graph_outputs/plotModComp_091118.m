@@ -18,7 +18,7 @@ for modID = 1:numel(R.modcomp.modN)
 end
 
 prct = 50;
-r2bankcat = horzcat(r2bank{:});
+r2bankcat = horzcat(r2bank{[1:4 7:10]});
 R.modcomp.modEvi.epspop = prctile(r2bankcat,prct); % threshold becomes median of model fits
 % Adjust the acceptance threshold if any models have no rejections
 exc = ones(1,numel(R.modcomp.modN));
@@ -41,14 +41,15 @@ for modID = 1:numel(R.modcomp.modN)
     if ~isempty(A)
         r2rep = [A.r2rep{:}];
         r2rep(isnan(r2rep) | isinf(r2rep)) = [];
-        
-        r2repSave{modID} = (r2rep);
-        pd = fitdist(r2rep','Normal');
+        pd = fitdist(r2rep','normal');
         x_values = -1:0.01:1;
         y = pdf(pd,x_values);
         figure(1)
         plot(x_values,y,'LineWidth',2)
         
+        r2rep = r2rep(r2rep>-5);
+                r2repSave{modID} = (r2rep);
+
         %         figure(1)
         %         histogram(r2rep,-1:0.1:1);
         hold on
@@ -128,6 +129,7 @@ end
 a = gca; a.XTick = 1:numel(R.modcomp.modN); grid on
 a.XTickLabel = shortlab;
 xlabel('Model'); ylabel('-log_{10} P(M|D)')
+xlim([0.5 numel(R.modcomp.modN)+0.5])
 
 subplot(3,1,3)
 for i = 1:numel(R.modcomp.modN)
@@ -139,6 +141,7 @@ a.XTickLabel = shortlab;
 grid on
 xlabel('Model'); ylabel('KL Divergence')
 set(gcf,'Position',[277   109   385   895])
+xlim([0.5 numel(R.modcomp.modN)+0.5])
 % subplot(3,1,3)
 % bar(DKL)
 % xlabel('Model'); ylabel('Joint KL Divergence')

@@ -62,6 +62,8 @@ for C =1:numel(R.condnames)
                     F_data = fxA(:,1);
                     F_model = R.frqz;
                     Cxy = mean(horzcat(NPDmat{chsel(i),chsel(j),k,condsel(C),:})',1);
+                    Cxy = Cxy.*1.5; % rescale (NPD issue)
+                    
                     % Remove the powerline frequency
                     Cxy(F_data>48 & F_data<52) = [];
                     F_data(F_data>48 & F_data<52) = [];
