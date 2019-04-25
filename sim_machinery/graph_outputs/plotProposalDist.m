@@ -25,7 +25,7 @@ elseif cflag == 1 % Kernel Density Estimates
     r = copularnd('t',Mfit.Rho,Mfit.nu,500);
     for Q = 1:numel(QL)
         peln = plotNormalPDF(xrange,preMu(QL(Q)),preSig(QL(Q)),'--',cmap(Q,:));
-        poln = plotKSPDF(R.SimAn.pOptRange,Mfit.xf(QL(Q),:),r(:,QL(Q)),'-',cmap(Q,:));
+        poln = plotKSPDF(R.SimAn.pOptRange,Mfit.xf(QL(Q),:),r(:,QL(Q)),Mfit.bwid(Q),'-',cmap(Q,:));
     end
 end
 

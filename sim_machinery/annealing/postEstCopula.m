@@ -10,7 +10,8 @@ W = W./sum(W);
 clear copU
 for i = 1:size(pIndMap,1)
     x = parOptBank(pIndMap(i),:); % choose row of parameter values
-    copU(i,:) = ksdensity(x,x,'function','cdf','Weights',W); % KS density estimate per parameter
+    bwid(i) = KSDensityCVWidth(x,x,W,[-2 3],25,'cdf');
+    copU(i,:) = ksdensity(x,x,'function','cdf','Weights',W,'width',bwid(i)); % KS density estimate per parameter
     xf(i,:) = x;
 end
 try
@@ -19,6 +20,7 @@ try
     Mfit.xf = xf;
     Mfit.ks = copU;
     Mfit.nu = nu;
+    Mfit.bwid = bwid;
     Mfit.tbr2 = parOptBank(end,1); % get best fit
     Mfit.Pfit = spm_unvec(mean(parOptBank,2),pOrg);
     Mfit.BPfit = spm_unvec(parOptBank(1:end-1,1),pOrg);
