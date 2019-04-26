@@ -41,7 +41,7 @@ for C =1:numel(R.condnames)
                     Pxy = Pxy-yCalc';
                     % Bring to zero-base
                     Pxy = Pxy-min(Pxy);
-                    % Fit 3rd order Gaussian
+                    % Fit up to 3rd order Gaussian
                     [ft(1).f gt(1).g] = fit(F_model',Pxy','gauss1');
                     [ft(2).f gt(2).g] = fit(F_model',Pxy','gauss2');
                     [ft(3).f gt(3).g] = fit(F_model',Pxy','gauss3');

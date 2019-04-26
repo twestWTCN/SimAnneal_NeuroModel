@@ -24,7 +24,7 @@ R = simannealsetup_InDirect_ModelComp;
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
 R = prepareRatData_InDirect_Group_NPD(R);
-WML = [1:6 11:12];
+WML = [];
 
 try
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'])
@@ -54,14 +54,14 @@ for modID = 12:-1:1
         
         %% Prepare Model
         modelspec = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID)]);
-        [R p m uc] = modelspec(R);
+        [R p m uc] = modelspec(R); % M! intrinsics shrunk"
         pause(5)
         R.out.dag = sprintf('NPD_InDrt_ModCompRev2_M%.0f',modID); % 'All Cross'
         
         %% Run ABC Optimization
         R = setSimTime(R,32);
         R.Bcond = 0;
-        R.SimAn.rep = 128;
+        R.SimAn.rep = 512;
         [p] = SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes
     end

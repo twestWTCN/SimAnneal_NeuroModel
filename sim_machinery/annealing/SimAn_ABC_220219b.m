@@ -40,8 +40,8 @@ end
 pOrg = p; % Record prior parameters.
 
 % Set Fixed Annealing Parameters
-eps_prior = -25; % prior eps (needed for gradient approximation);
-eps_exp = -20;
+eps_prior = -8; % prior eps (needed for gradient approximation);
+eps_exp = -6;
 eps_act = eps_prior;
 delta_act = 0.05;
 % Compute indices of parameters to be optimized
@@ -50,7 +50,7 @@ delta_act = 0.05;
 pIndMap = spm_vec(pInd); % in flat form
 pMuMap = spm_vec(pMu);
 pSigMap = spm_vec(pSig);
-R.SimAn.minRank = ceil(size(pIndMap,1)*3); %Ensure rank of sample is large enough to compute copula
+R.SimAn.minRank = ceil(size(pIndMap,1)*4); %Ensure rank of sample is large enough to compute copula
 % set initial batch of parameters from gaussian priors
 if isfield(R,'Mfit')
     rep =  R.SimAn.rep(1);
@@ -139,7 +139,11 @@ while ii <= R.SimAn.searchMax
     A = parOptBank(pIndMap,:);
     B = eig(cov(A));
     C = B/sum(B);
-    fprintf('effective rank of optbank is %.0f\n',sum(cumsum(C)>0.01))
+    eRank = sum(cumsum(C)>0.01);
+    if size(A,2)>8
+        R.SimAn.minRank = ceil(eRank*4);
+    end
+    fprintf('effective rank of optbank is %.0f\n',eRank)
     if size(parOptBank,2)> R.SimAn.minRank-1
         if size(parOptBank,2) < 2*(R.SimAn.minRank-1)
             disp('Bank satisfies current eps')
@@ -153,14 +157,14 @@ while ii <= R.SimAn.searchMax
             cflag = 1; % copula flag (enough samples)
             itry = 0;  % set counter to 0
         end
-    elseif itry < 2
+    elseif itry < 1
         fprintf('Trying for the %.0f\n time with the current eps \n',itry)
         disp('Trying once more with current eps')
         if isfield(Mfit,'Rho')
             cflag = 1;
         end
         itry = itry + 1;
-    elseif itry >= 2
+    elseif itry >= 1
         disp('Recomputing eps from parbank')
         parOptBank = parBank(:,intersect(1:2*R.SimAn.minRank,1:size(parBank,2)));
         %         eps_act = min(parOptBank(end,:));
@@ -192,7 +196,7 @@ while ii <= R.SimAn.searchMax
         else
             xs = parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
         end
-        W = 10.^(1-(xs(end,1)-xs(end,:)).^1/3);
+        W = ((1-xs).^(-3));
         W = W./sum(W);
         Mfit.Mu = wmean(xs,W,2);
         Mfit.Sigma = weightedcov(xs',W);
