@@ -9,8 +9,10 @@ wflag = 0; dum = [];
 
 [binStats_phizAmp] = binDatabyRange(xsims.TMS_phase,R.trans.pirange,xsims.zMEP_amp);
 binStats_phizAmp(end,:) = [];
-[y,K] = recentreDist(binStats_phizAmp(:,3));
-binStatsRS_phizAmp = y;
+% [y,K] = recentreDist(binStats_phizAmp(:,3));
+% binStatsRS_phizAmp = y;
+binStatsRS_phizAmp = binStats_phizAmp(:,3)
+K = 0;
 
 [binStats_phizLag] = binDatabyRange(xsims.TMS_phase,R.trans.pirange,xsims.zMEP_onset);
 binStats_phizLag(end,:) = [];

@@ -4,7 +4,8 @@ r = copularnd('t',Mfit.Rho,Mfit.nu,rep);
 clear x1
 xf = Mfit.xf;
 for Q = 1:size(xf,1)
-    x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf');
+    bwid(Q) = KSDensityCVWidth(xf(Q,:),r(:,Q),repmat(1./size(xf,1),1,size(xf,2)),[-2 3],25,'icdf');
+    x1(Q,:) = ksdensity(xf(Q,:),r(:,Q),'function','icdf','width',Mfit.bwid(Q));
 end
 % setup pars from base
 clear base
