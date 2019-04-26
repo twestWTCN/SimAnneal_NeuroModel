@@ -192,7 +192,7 @@ while ii <= R.SimAn.searchMax
         else
             xs = parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
         end
-        W = (1-parOptBank(end,:)).^-3;
+        W = 10.^(1-(xs(end,1)-xs(end,:)).^1/3);
         W = W./sum(W);
         Mfit.Mu = wmean(xs,W,2);
         Mfit.Sigma = weightedcov(xs',W);
