@@ -66,7 +66,7 @@ for modID = modlist
             R.obs.gainmeth = R.obs.gainmeth(1);
             R.obs.trans.gauss = 0;
             figure(modID);
-            R.analysis.modEvi.N = 1500;
+            R.analysis.modEvi.N = 500;
             permMod = modelProbs(m.x,m,p,R);
         else
             permMod = [];
