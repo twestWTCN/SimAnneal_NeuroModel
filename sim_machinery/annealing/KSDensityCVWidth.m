@@ -8,22 +8,22 @@ v = zeros(size(uu));
 cp = cvpartition(length(x),'kfold',10);
 for j=1:length(uu)
       % compute log likelihood for test data based on training data
-      loglik = @(xtr,xte) sum(log(ksdensity(xtr(:,1),xte(:,1),'function','pdf','Weights',xtr(:,3),'width',uu(j))));
+      loglik = @(xtr,xte) sum(log(ksdensity(xtr(:,1),xte(:,1),'function','pdf','Weights',xtr(:,2),'width',uu(j))));
       % sum across all train/test partitions
-      v(j) = sum(crossval(loglik,[x' xf' W'],'partition',cp));
+      v(j) = sum(crossval(loglik,[x' W'],'partition',cp));
 end 
 
 [~,maxi] = max(v);
 u0 = uu(maxi);
 
-% % subplot(2,1,1)
-% % [f0,x0,u0] = ksdensity(x,xf,'function','pdf','Weights',W,'width',u0);
-% % scatter(x1,f1); hold on; scatter(x0,f0)
-% % histogram(x,'Normalization','pdf')
-% % subplot(2,1,2)
-% % 
-% % [fl0,xl0] = ksdensity(x,xf,'function',fx,'Weights',W,'width',u0);
-% % [fl1,xl1] = ksdensity(x,xf,'function',fx,'Weights',W,'width',u1);
-% % scatter(xl1,fl1); hold on; scatter(xl0,fl0)
-% % 
-% % close all
+% subplot(2,1,1)
+% [f0,x0,u0] = ksdensity(x,xf,'function','pdf','Weights',W,'width',u0);
+% scatter(x1,f1); hold on; scatter(x0,f0)
+% histogram(x,'Normalization','pdf')
+% subplot(2,1,2)
+% 
+% [fl0,xl0] = ksdensity(x,xf,'function',fx,'Weights',W,'width',u0);
+% [fl1,xl1] = ksdensity(x,xf,'function',fx,'Weights',W,'width',u1);
+% scatter(xl1,fl1); hold on; scatter(xl0,fl0)
+% 
+% close all
