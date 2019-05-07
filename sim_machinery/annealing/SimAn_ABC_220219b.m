@@ -196,7 +196,7 @@ while ii <= R.SimAn.searchMax
         else
             xs = parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
         end
-        W = ((xs-1).^-2);
+        W = ((xs(end,:)-1).^-2);
         W = W./sum(W);
         Mfit.Mu = wmean(xs,W,2);
         Mfit.Sigma = weightedcov(xs',W);
@@ -297,7 +297,6 @@ while ii <= R.SimAn.searchMax
         end
         return
     end
-    
     
     ii = ii + 1;
     %     uv = whos;
