@@ -2,7 +2,7 @@ function [Mfit,cflag] = postEstCopula(parOptBank,Mfit,pIndMap,pOrg)
 disp('Forming new copula...')
 clear copU xf ilist
 % Set Weights
-W = (1-parOptBank(end,:)).^-3; 
+W = (parOptBank(end,:)-1).^-2; 
 W = W./sum(W);
 
 % First form kernel density estimates for each optimized
