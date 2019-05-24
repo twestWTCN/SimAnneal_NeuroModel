@@ -87,7 +87,7 @@ p.D_s = repmat(1/16,size(p.D));
 % time constants and gains
 for i = 1:m.m
     if i == 1
-        prec = 1/8;
+        prec = 1/4;
     else
         prec = 1/8;
     end

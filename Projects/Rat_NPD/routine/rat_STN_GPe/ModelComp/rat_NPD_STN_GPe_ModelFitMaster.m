@@ -41,11 +41,11 @@ for modID = 1:3
         pause(5)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R.out.dag = sprintf('NPD_STN_GPe_ModComp_M%.0f',modID); % 'All Cross'
-        R.SimAn.rep = 300;
+        R.SimAn.rep = 308;
         R = setSimTime(R,24);
         R.Bcond = 0;
         R.plot.flag = 1;
-        [p] = SimAn_ABC_220219(R,p,m);
+        [p] = SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes()
     end
 end

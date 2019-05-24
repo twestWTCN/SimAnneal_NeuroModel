@@ -66,7 +66,8 @@ elseif R.analysis.BAA.flag
             par = [];
             par{1} = spm_unvec(base(:,end),p);
         case 'UQ'
-            nmrse = base(end-1,:);
+%             nmrse = base(end-1,:);
+            nmrse = base(end,:);
             X = base(:,nmrse>prctile(nmrse,75));
             par = [];
             par{1} = spm_unvec(mean(X,2),p);

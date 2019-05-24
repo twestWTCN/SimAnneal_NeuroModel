@@ -4,8 +4,8 @@ if ~isfield(R.plot,'confint')
 end
 CSD_data_n = permMod.feat_rep{1};
 % list = find([permMod.r2rep{:}]>-0.2,1)
-% list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],99));
-list = find([permMod.r2rep{:}]>R.modcomp.modEvi.epspop);
+list = find([permMod.r2rep{:}]>prctile([permMod.r2rep{:}],75));
+% list = find([permMod.r2rep{:}]>R.modcomp.modEvi.epspop);
 C = size(CSD_data_n,1); N = size(CSD_data_n,2); M = size(CSD_data_n,3);O = size(CSD_data_n,4);
 if ~isempty(list)
     for ii = 1:size(list,2)
@@ -36,9 +36,9 @@ if ~isempty(list)
         CSD_std(:,:,:,2,3)  = prctile(abs(CSD_bank),75,4);
     elseif strncmp(R.data.datatype,'NPD',3)
         partlabs ={'Instant','Forward','Backward'}; msr = 'NPD';
-        CSD_mean = mean(CSD_bank,5);
-        CSD_std(:,:,:,:,1)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
-        CSD_std(:,:,:,:,2)  = std(CSD_bank,1,5)./sqrt(size(CSD_bank,5)); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
+        CSD_mean = prctile(CSD_bank,50,5);
+        CSD_std(:,:,:,:,1)  = prctile(CSD_bank,50,5)-prctile(CSD_bank,25,5); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
+        CSD_std(:,:,:,:,2)  = prctile(CSD_bank,75,5)-prctile(CSD_bank,50,5); %std(CSD_bank,1,5); %prctile(CSD_bank,5,5); %
     end
     % F = repmat(R.frqz',1,3);
     F = linspace(min(R.frqz),max(R.frqz),size(CSD_mean,1));
@@ -71,9 +71,7 @@ if ~isempty(list)
                 B = zeros(size(B));
                 alpval = 0;
             end
-            %         if i==j
-            %             B = B./10; %size(CSD_bank,5);
-            %         end
+
             [hl, hp] = boundedline(F(:,lr),Y(:,lr),B(:,:,lr),'cmap',R.plot.cmap,'alpha','transparency',alpval);
             hl(1).LineWidth = 2; %hl(2).LineWidth = 1; %hl(3).LineWidth = 1;
             hl(1).LineStyle = '-';% hl(2).LineStyle = '--';% hl(3).LineStyle = '--';
@@ -94,7 +92,7 @@ if ~isempty(list)
             end
             xlim([min(R.frqz) max(R.frqz)])
             xlabel('Freq (Hz)');
-grid on
+            grid on
             %         ylim([-0.03 0.03])
         end
     end

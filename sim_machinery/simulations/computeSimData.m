@@ -2,6 +2,10 @@ function [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(R,m,uc,pnew,si
 if nargin<6
     plotop = 0;
 end
+if isempty(uc)
+        uc = innovate_timeseries(R,m);
+    uc{1} = uc{1}.*sqrt(R.IntP.dt);
+end
 if simtime ~= 0
     R = setSimTime(R,simtime);
     uc = innovate_timeseries(R,m);
@@ -55,7 +59,7 @@ if sum(isnan(vertcat(xsims{1}(:),xsims{1}(:)) )) == 0 && wflag == 0
         %         toc
         if plotop == 1
                     figure(1);  R.plot.outFeatFx({R.data.feat_emp},{feat_sim},R.data.feat_xscale,R,1,[])
-                    figure(2);subplot(2,1,1); plot(xsims_gl{1}')
+                    figure(2);subplot(2,1,1); plot(R.IntP.tvec_obs,xsims_gl{1}(1:6,2:end)')
             % % %                                                 subplot(2,1,2); plot(xsims_gl{1}{1}')
         end
     catch

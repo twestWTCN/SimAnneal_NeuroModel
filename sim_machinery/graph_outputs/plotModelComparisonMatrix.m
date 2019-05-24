@@ -3,25 +3,27 @@ function h = plotModelComparisonMatrix(R,compStruc,shortlab,type)
 if type == 1 % model probs
     F = compStruc.pmod; %-log10(1-compStruc.pmod);
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
-   Flab = 1-F;
+    Flab = F;
     F = -log10(1-F);
     yl = 'Posterior Model Probability';
 elseif type == 2 % KL divergences
     F = compStruc.KL;
     F = reshape(F,sqrt(numel(F)),sqrt(numel(F)));
     Flab = F;
+    F = -F;
     yl = 'KL Divergence';
 elseif type == 3 % Score
     F1 = compStruc.KL;
     F1 = reshape(F1,sqrt(numel(F1)),sqrt(numel(F1)));
-    F1 = log10(1./F1);
-%     for i = 1:3
-%         F1(i,:) = F1(i,:)./max(F1(i,:));
-%     end
+    F1 = log10(F1./median(F1(:)));
+    %     for i = 1:3
+    %         F1(i,:) = F1(i,:)./max(F1(i,:));
+    %     end
     F2 = compStruc.pmod;
     F2 = reshape(F2,sqrt(numel(F2)),sqrt(numel(F2)));
     F2 = -log10(1-F2);
-    F = F2-F1;
+    F = F1-F2;
+    F = -F;
     Flab = F;
     yl = 'Accuracy-Divergence';
 end

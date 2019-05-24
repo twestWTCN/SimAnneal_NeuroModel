@@ -58,11 +58,9 @@ switch R.data.datatype
             case 'auto'
                 r2mean = mean(diag(r2loop));
                 %         r2mean = sum(diag(r2loop));
-                
             case 'cross'
                 r2mean = mean(r2loop(triu(r2loop)~=0));
                 %         r2mean = sum(r2loop(triu(r2loop)~=0));
-                
         end
         %% NPD
     case 'NPD'
@@ -70,6 +68,7 @@ switch R.data.datatype
         NPDsim  = sim_dat; % simulated
         yfxx = [];
         ffxx = [];
+r = [];
         for C = 1:numel(R.condnames)
             for i = 1:numel(R.chloc_name)
                 for j = 1:numel(R.chloc_name)
@@ -86,9 +85,9 @@ switch R.data.datatype
                                 yfxx = [yfxx yfx];
                                 ffxx  = [ffxx ffx];
                                 yfx = yfx+1; ffx = ffx+1;
-                                r(2) = goodnessOfFit(yfx',ffx','NRMSE');
-%                                 r(2) =  1-(RMSE(yfx',ffx')./std(ffx));
-%                                     r(2) = rsquare(yfx',ffx');
+                                %                                 r(2) = goodnessOfFit(yfx',ffx','NRMSE');
+                                %                                 r(2) =  1-(RMSE(yfx',ffx')./std(ffx));
+                                r(2) = rsquare(yfx',ffx');
                                 r2loop(C,i,j) = r(2);
                             elseif j>i
                                 for k = 2:3 % 1 is zerolag
@@ -104,11 +103,12 @@ switch R.data.datatype
                                     yfxx = [yfxx yfx];
                                     %                                     ffxx  = [ffxx ffx];
                                     yfx = yfx+1; ffx = ffx+1;
-                                    r(k) = goodnessOfFit(yfx',ffx','NRMSE');
-%                                     r(k) =  1-(RMSE(yfx',ffx')./std(ffx));
-%                                     r(k) = rsquare(yfx',ffx');
+                                    %                                     r(k) = goodnessOfFit(yfx',ffx','NRMSE');
+                                    %                                     r(k) =  1-(RMSE(yfx',ffx')./std(ffx));
+                                    r(k) = rsquare(yfx',ffx');
                                 end
-                                r2loop(C,i,j) = mean(r(r~=0));
+                                r2loop(C,i,j) = mean(r(2));
+                                r2loop(C,j,i) = mean(r(3));
                             end
                     end
                 end
@@ -124,7 +124,8 @@ switch R.data.datatype
             case 'cross'
                 for C = 1:numel(R.condnames)
                     r2C = squeeze(r2loop(C,:,:));
-                    r2mean(C) = nanmean(r2C(triu(r2C)~=0));
+%                     r2mean(C) = nanmean(r2C(triu(r2C)~=0));
+                    r2mean(C) = nanmean(r2C(:));
                 end
                 %         r2mean = sum(r2loop(triu(r2loop)~=0));
                 r2mean = mean(r2mean);

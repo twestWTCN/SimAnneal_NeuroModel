@@ -74,7 +74,7 @@ while ii <= R.SimAn.searchMax
     clear xsims_rep feat_sim_rep
     ji = 0;
     parnum = (8*2);
-    while ji < (rep/parnum)
+    while ji < floor(rep/parnum)
         parfor jj = 1:parnum % Replicates for each temperature
             % Get sample Parameters
             parl = (ji*parnum) + jj;
@@ -111,19 +111,23 @@ while ii <= R.SimAn.searchMax
         %     Ilist(isnan(r2loop(Ilist))) = []; % reconstruct Ilist without NaNs
         
         % Clip parBank to the best (keeps size manageable
-        [dum V] = sort(parBank(end,:),'descend');
-        if size(parBank,2)>2^13
-            parBank = parBank(:,V(1:2^12));
+        if ~isempty(parBank)
+            [dum V] = sort(parBank(end,:),'descend');
+            if size(parBank,2)>2^13
+                parBank = parBank(:,V(1:2^12));
+            else
+                parBank = parBank(:,V);
+            end
+            parOptBank = parBank(:,parBank(end,:)>eps_exp);
+            if size(parOptBank,2)> R.SimAn.minRank-1
+                break
+            else
+                ji = ji+1;
+            end
         else
-            parBank = parBank(:,V);
+             ji = ji+1;
         end
-        parOptBank = parBank(:,parBank(end,:)>eps_exp);
-        
-        if size(parOptBank,2)> R.SimAn.minRank-1
-            break
-        else
-            ji = ji+1;
-        end
+
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -134,7 +138,7 @@ while ii <= R.SimAn.searchMax
     % icop(2)<itry: Try to force
     
     %% Concatanate Batch Results and Decide Acceptance Level Epsilon
-
+    
     %% Find error threshold for temperature (epsilon) and do rejection sampling
     A = parOptBank(pIndMap,:);
     B = eig(cov(A));
@@ -192,11 +196,13 @@ while ii <= R.SimAn.searchMax
     if cflag == 0 % Draw from Normal Distribution
         % Set Weights
         if size(parOptBank,2)>R.SimAn.minRank
-            xs = parOptBank(pMuMap,:);
+            s = parOptBank(end,:);
+            xs = parOptBank(pIndMap,:);
         else
-            xs = parBank(pMuMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
+            s = parBank(end,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
+            xs = parBank(pIndMap,intersect(1:1.5*R.SimAn.minRank,1:size(parBank,2)));
         end
-        W = ((xs(end,:)-1).^-2);
+        W = ((s(end,:)-1).^-1);
         W = W./sum(W);
         Mfit.Mu = wmean(xs,W,2);
         Mfit.Sigma = weightedcov(xs',W);
