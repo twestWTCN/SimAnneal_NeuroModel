@@ -5,7 +5,7 @@ function u0 = KSDensityCVWidth(x,xf,W,range,n,fx)
 uu = logspace(log10(u1.*10^range(1)),log10(u1.*10^range(2)),n);
 v = zeros(size(uu));
 % using same partition each time reduces variation 
-cp = cvpartition(length(x),'kfold',8);
+cp = cvpartition(length(x),'kfold',6);
 for j=1:length(uu)
       % compute log likelihood for test data based on training data
       loglik = @(xtr,xte) sum(log(ksdensity(xtr(:,1),xte(:,1),'function','pdf','Weights',xtr(:,2),'width',uu(j))));

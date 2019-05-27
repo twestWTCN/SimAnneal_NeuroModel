@@ -34,7 +34,7 @@ R.obs.csd.reps = 32; %96;
 
 %% INTEGRATION
 % Main dynamics function
-R.IntP.intFx = @spm_fx_compile_180817;
+R.IntP.intFx = @spm_fx_compile_120319;
 R.IntP.compFx= @compareData_100717;
 
 R.IntP.dt = .001;
@@ -84,10 +84,10 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.S','.C','.A','.D'}; %,'.S','.int{sr
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
-R.SimAn.convIt = 1e-3;
+R.SimAn.convIt = 1e-4;
 R.SimAn.rep = 256; %512; % Repeats per temperature
 % R.SimAn.saveout = 'xobs1';
-R.SimAn.jitter = 1.5; % Global precision
+R.SimAn.jitter = 1; % Global precision
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

@@ -2,6 +2,7 @@ function R = simannealsetup_InDirect_ModelComp()
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'InDrt_ModCompRev2';
+R.out.oldtag = 'InDrt_ModCompRev2';
 
 switch getenv('computername')
     case 'SFLAP-2'
@@ -85,10 +86,10 @@ R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.D'}; %
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;
-R.SimAn.convIt = 2e-3;
-R.SimAn.rep = 512; %128; %512; % Repeats per temperature
+R.SimAn.convIt = 1e-4;
+R.SimAn.rep = 720; %128; %512; % Repeats per temperature
 R.SimAn.saveout = 'xobs1';
-R.SimAn.jitter = 0.75; % Global precision
+R.SimAn.jitter = 1; % Global precision
 %% PLOTTING
 R.plot.outFeatFx = @npdplotter_110717; %%@;csdplotter_220517
 R.plot.save = 'False';

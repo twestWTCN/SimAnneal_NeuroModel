@@ -11,13 +11,13 @@ parfor i = 1:numel(ck);
     % Model 1 (hyperdirect)
     Pbase = permMod{1}.par_rep{1};
     Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(4,1))*ck(i)); % 
-    [r2mean,pnew,feat_sim] = computeSimData(R,m,Pbase,0);
+    [r2mean,pnew,feat_sim] = computeSimData(R,m,[],Pbase,0);
     feat_HD{i} = feat_sim;
     
     % Model 2 (striatopallidal)
     Pbase = permMod{1}.par_rep{1};
     Pbase.A{1}(4,1) = log(exp(Pbase.A{2}(3,2))*ck(i)); % 
-    [r2mean,pnew,feat_sim] = computeSimData(R,m,Pbase,0);
+    [r2mean,pnew,feat_sim] = computeSimData(R,m,[],Pbase,0);
     feat_STR_GPe{i} = feat_sim;    
 end
 

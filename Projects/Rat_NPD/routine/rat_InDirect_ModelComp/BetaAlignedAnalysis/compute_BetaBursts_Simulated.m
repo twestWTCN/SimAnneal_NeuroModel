@@ -21,14 +21,18 @@ for cond = 1:size(R.condname,2)
     R.bandinits = {'\alpha','\beta_1','\beta_2'};
     R.cohband = 2;
     R.BB.PLmeth = 'PPC';
-    R.BB.decompmeth.type = 'wavelet';
-    %     R.BB.decompmeth.filter.bwid = 2.5; % filter bandwidth
+    R.BB.decompmeth.type = 'filter';
+        R.BB.decompmeth.filter.bwid = 2.5; % filter bandwidth
     R.BB.SW.winsize = 0.25;
     R.BB.SW.winover = 0.90;
     BB.powfrq = 21;
     BB.cohfrq = 21;
+    R.BB.powres = 5;
+    R.BB.cohres = 5;
     BB.fsamp = vc_clean.fsample;
     R.BB.pairInd = [1 4]; % first is reference, second is main channel (e.g. M2 and STN)
+    BB.preproc.fillmissing = 0;
+    BB.preproc.znorm = 0;
     % Now do the decomposition
     BB = compute_SpectralDecomposition(R,BB,vc_clean,cond,0);
 end
@@ -36,7 +40,7 @@ end
 % Setup Time Vectors
 BB.fsamp_sw = 1/(BB.SWTvec{1}(5)-BB.SWTvec{1}(4));
 R.fsamp = BB.fsamp;
-BB.T = linspace(0,length([BB.A{1}])/BB.fsamp,length([BB.A{1}]));
+BB.T = linspace(0,length([BB.AEnv{1}])/BB.fsamp,length([BB.AEnv{1}]));
 BB.TSw = linspace(0,length([BB.PLV{1}])/BB.fsamp_sw,length([BB.PLV{1}]));
 
 disp('Assumes condition 6 is empirical!!')
@@ -44,4 +48,3 @@ BB.TSwEmp = linspace(0,length([BB.PLV{6}])/BB.fsamp_sw,length([BB.PLV{6}]));
 % % Switch for Surrogates
 surflag = 0; plotop = 1;
 
-save([R.rootn '\routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'],'BB','R')

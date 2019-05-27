@@ -35,6 +35,9 @@ if wflag == 0
             else
                 xsims_gl{gl} =xsims;
             end
+            if any(wflag(1))
+                error('Rejection at Observation!')
+            end
             % Run Data Transform d
             if isfield(R.obs,'transFx')
                 [~, feat_sim{gl}, wflag(2)] = R.obs.transFx(xsims_gl{gl},R.chloc_name,R.chsim_name,1/R.IntP.dt,R.obs.SimOrd,R);

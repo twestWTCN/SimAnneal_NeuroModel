@@ -5,6 +5,8 @@ m.m = 2; % # of sources
 m.x = {[0 0]  [0 0]}; % Initial states
 m.Gint = [1 1];
 m.Tint = [1 1];
+m.Sint = [2 2];
+
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
@@ -51,8 +53,8 @@ p.A_s{1}(1,2) = 1/4; % STN -> GPe
 
 p.A{2} =  repmat(-32,m.m,m.m);
 p.A_s{2} = repmat(0,m.m,m.m);
-% p.A{2}(2,1) = -6; % GPe -| STN
-% p.A_s{2}(2,1) = 0; % GPe -| STN
+p.A{2}(2,1) = -6; % GPe -| STN
+p.A_s{2}(2,1) = 1/32; % GPe -| STN
 
 % Connection strengths
 p.C = zeros(m.m,1);
@@ -70,8 +72,8 @@ p.D = repmat(-32,size(p.A{1})).*~((p.A{1}>-32) | (p.A{2}>-32)) ;
 p.D_s = repmat(1/16,size(p.D));
 
 % Sigmoid transfer for connections
-p.S = [0 0];
-p.S_s = [1/16 1/16];
+% p.S = [0 0];
+% p.S_s = [1/8 1/8];
 
 % time constants and gains
 for i = 1:m.m
@@ -80,8 +82,8 @@ for i = 1:m.m
     p.int{i}.T_s = repmat(prec,size(p.int{i}.T));
     p.int{i}.G = zeros(1,m.Gint(i));
     p.int{i}.G_s = repmat(prec/2,size(p.int{i}.G));
-    p.int{i}.S = zeros(1);
-    p.int{i}.S_s = repmat(prec/4,size(p.int{i}.S));
+    p.int{i}.S = zeros(1,m.Sint(i));
+    p.int{i}.S_s = repmat(prec,size(p.int{i}.S));
     %     p.int{i}.BT = zeros(1,m.Tint(i));
     %     p.int{i}.BT_s = repmat(prec,size(p.int{i}.T));
 end

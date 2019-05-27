@@ -16,7 +16,7 @@ clear ; close all
 closeMessageBoxes
 % Add relevant paths for toolboxes
 % simAnnealAddPaths(
-rng(123123)
+rng(232452)
 
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
@@ -37,7 +37,7 @@ catch
 end
 
 for modID = 12:-1:1
-    if modID>=7
+    if modID>= 7
         R.obs.LF = [1 1 1 1 1 1].*10; % Fit visually and for normalised data
         R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
     else
@@ -61,7 +61,6 @@ for modID = 12:-1:1
         %% Run ABC Optimization
         R = setSimTime(R,32);
         R.Bcond = 0;
-        R.SimAn.rep = 512;
         [p] = SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes
     end

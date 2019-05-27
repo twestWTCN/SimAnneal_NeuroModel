@@ -12,7 +12,7 @@ for i = 1:size(feat,2)
     a(i) = plot(Hz,squeeze(feat{i}(1,4,4,1,:)),'color',cmapcur,'LineWidth',2);
     hold on
 end
-% a(i+1) = plot(Hz,15*squeeze(featemp{end}(1,4,4,1,:)),'k:','LineWidth',2);
+a(i+1) = plot(Hz,squeeze(featemp(1,4,4,1,:)),'k:','LineWidth',2);
 
 
 legend(a([6 1 9]),legn)
