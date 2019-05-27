@@ -5,6 +5,7 @@ end
 if nargin<3
     nulldat = 0;
 end
+% prepareratdata_group(R.rootn,R.projectn);
 load([R.filepathn '\NPD_paper_RatNPD_150618.mat']);
 NPDmat = fyA;
 load([R.filepathn '\nsPow_paper_RatNPD_150618.mat']);
@@ -37,16 +38,12 @@ for C =1:numel(R.condnames)
                 if nulldat == 1
                     Pxy = 10.^yCalc;
                 else
-                    Pxy = Pxy-yCalc';
+                    Pxy = Pxy-yCalc'; % Regress out linear fit
                     % Bring to zero-base
                     Pxy = Pxy-min(Pxy);
-                    % Fit up to 3rd order Gaussian
-                    [ft(1).f gt(1).g] = fit(F_model',Pxy','gauss1');
-                    [ft(2).f gt(2).g] = fit(F_model',Pxy','gauss2');
-                    [ft(3).f gt(3).g] = fit(F_model',Pxy','gauss3');
-                    [dum qi] = max([gt(1).g.adjrsquare gt(2).g.adjrsquare gt(3).g.adjrsquare]);
-                    
-                    Pxy = ft(qi).f(F_model)';
+                    w = gausswin(50,2.5);
+                    w = w/sum(w); % normalize
+                    Pxy = conv(Pxy,w,'same');
                     clear ft gt
                     % Bring back to non-log space
                     Pxy = 10.^Pxy;
@@ -71,14 +68,9 @@ for C =1:numel(R.condnames)
                     if nulldat == 1
                         Cxy = zeros(size(Cxy));
                     else
-                        % Fit 3rd order Gaussian
-                        [ft(1).f gt(1).g] = fit(F_model',Cxy','gauss1');
-                        [ft(2).f gt(2).g] = fit(F_model',Cxy','gauss2');
-                        [ft(3).f gt(3).g] = fit(F_model',Cxy','gauss3');
-                        [dum qi] = max([gt(1).g.adjrsquare gt(2).g.adjrsquare gt(3).g.adjrsquare]);
-                        
-                        Cxy = ft(qi).f (F_model)';
-                         clear ft gt
+                        w = gausswin(50,2.5);
+                        w = w/sum(w); % normalize
+                        Cxy = conv(Cxy,w,'same');
                     end
                     meannpd_data(C,i,j,k,:) = Cxy;
                 end
