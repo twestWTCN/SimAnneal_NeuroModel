@@ -1,8 +1,8 @@
 function R = setup_demo()
 % 
 R.projectn = 'Demo';
-R.out.tag = 'Demo_v1';
-R.out.oldtag = 'Demo_v1';
+R.out.tag = 'NPD_Demo_v1';
+R.out.oldtag = 'NPD_Demo_v1';
 
 switch getenv('computername')
     case 'SFLAP-2'

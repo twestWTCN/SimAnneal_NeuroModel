@@ -2,11 +2,11 @@ function [R p m uc] = MS_demo_model1(R)
 %% Revised Model Space %%
 % Model 1.1
 %% MODEL 1 %%%
-m.m = 4; % # of sources
-m.x = {[0 0 0 0 0 0 0 0] [0 0]  [0 0] [0 0]}; % Initial states
-m.Gint = [14 1 1 1]; % number of gain parameters
-m.Tint = [4 1 1 1]; % number of time constant parameters
-m.Sint = [9 2 2 1]; % number of transfer constants (for sigmoid)
+m.m = 3; % # of sources
+m.x = {[0 0]  [0 0] [0 0]}; % Initial states
+m.Gint = [1 1 1]; % number of gain parameters
+m.Tint = [1 1 1]; % number of time constant parameters
+m.Sint = [2 2 1]; % number of transfer constants (for sigmoid)
 m.n =  size([m.x{:}],2); % Number of states
 % These outline the models to be used in compile function
 for i = 1:numel(R.chsim_name)
@@ -14,7 +14,7 @@ for i = 1:numel(R.chsim_name)
 end
 % Define the states that are passed to the observer function (but not
 % necessarily observed; this is set by R.obs.obsstates!!)
-m.outstates = {[0 0 0 0 0 0 1 0] [1 0] [1 0] [1 0]};
+m.outstates = {[1 0] [1 0] [1 0]};
 R.obs.outstates = find([m.outstates{:}]);
 % for i=1:numel(R.chloc_name)
 %     R.obs.obsstates(i) = find(strcmp(R.chloc_name{i},R.chsim_name));
@@ -50,13 +50,12 @@ uc = innovate_timeseries(R,m);
 % to target i.
 % Excitatory connections
 p.A{1} =  repmat(-32,m.m,m.m);
-p.A{1}(2,1) = 0; % MMC -> STR
-p.A{1}(4,1) = 0; % MMC -> STN
+p.A{1}(3,2) = 0; % STN -| GPi
 p.A{1}(3,4) = 0; % STN -> GPe
 p.A_s{1} = repmat(1/4,m.m,m.m);
 
 p.A{2} =  repmat(-32,m.m,m.m);
-p.A{2}(3,2) = 0; % STR -| GPe
+
 p.A{2}(4,3) = 0; % GPe -| STN
 p.A_s{2} = repmat(1/4,m.m,m.m);
 

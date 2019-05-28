@@ -6,7 +6,7 @@ for pn = 1:numel(modID)
     % Load Model Data
     R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID(pn));
     [R,m,p,parBank] = loadABCData(R);
-    a = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID(pn))]);
+    a = eval(['@MS_' R.out.tag '_Model' num2str(modID(pn))]);
     [dum prior] = a(R);
     R.Mfit.prior = prior;
     
