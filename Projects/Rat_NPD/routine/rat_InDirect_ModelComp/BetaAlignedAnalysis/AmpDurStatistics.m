@@ -1,23 +1,23 @@
 function BB = AmpDurStatistics(R,BB)
 % Setup Bin Ranges
-BB.range.Amp = linspace(5e-9,2e-8,20);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
-BB.range.Dur = linspace(50,850,20);
+BB.range.Amp = linspace(0.1,10,20);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
+BB.range.Dur = linspace(50,600,20);
 BB.range.segDur = linspace(1.5,3.2,24); %0:100:1800; % Group: 0:100:1800; single: 25:150:1800
 BB.range.AmpPrc = 0:5:100;
 
 % Setup Plot Limits
-BB.plot.lims.burfreq = [0 6; 0 15];
+BB.plot.lims.burfreq = [0 20; 0 20];
 BB.plot.lims.PLV = [-100 100]; %[0 0.35];
 BB.plot.lims.PLVun = [0 0.6];
 BB.plot.lims.wPLV = [-10 10];
-BB.plot.lims.Amp =  [5e-9 2e-8];
+BB.plot.lims.Amp =  [0.1 10];
 BB.plot.lims.wAmpPrc =  [-2 6];
-BB.plot.lims.Dur = [0 1000];
+BB.plot.lims.Dur = [0 600];
 
 % Compute  Burst Amplitude/Duration Statistics
 % for i = 1:5; F(i) = figure; end
 BB = computeBetaBurstAmpDurStats_v2(R,BB);
-
+figure
 % Plot Burst Properties
 for i = 1:2
     if i == 1
@@ -27,8 +27,7 @@ for i = 1:2
         condsel = [1 4 5];
         ip(:,2) = [2 4 6];
     end
-    
-    BB = compute_BurstThreshold(R,BB,condsel,0);
+%     BB = compute_BurstThreshold(R,BB,condsel,0);
     
     subplot(3,2,ip(1,i));
     [h,l] = plotBurstAmplitudeHistogram(R,BB,condsel);

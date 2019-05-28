@@ -1,18 +1,14 @@
 function [R,BB] = compute_BetaBursts_Simulated(R,xsimMod)
 for cond = 1:size(R.condname,2)
     % Setup Data Structure
-    if cond == 1
-        vc_clean.trial{1} = xsimMod{1}{1}{1}{1}([1:4],:);
-    elseif cond > 1
-        vc_clean.trial{1} = xsimMod{cond}{1}([1:4],:);
-    end
+    vc_clean.trial{1} = xsimMod{cond}([1:4],:);
     vc_clean.fsample = 1/R.IntP.dt;
-    vc_clean.time{1} = linspace(0,size(vc_clean.trial{1},2)/2000,size(vc_clean.trial{1},2));
+    vc_clean.time{1} = linspace(0,size(vc_clean.trial{1},2)/vc_clean.fsample,size(vc_clean.trial{1},2));
     vc_clean.label = R.chsim_name;
     
     % Resample to workable resolution
     cfg = [];
-    cfg.resamplefs = 200;
+    cfg.resamplefs = 512;
     vc_clean = ft_resampledata(cfg,vc_clean);
     if isequal(R.condname{cond},'Empirical')
         BB.TEmp = vc_clean.time{1};
@@ -20,15 +16,15 @@ for cond = 1:size(R.condname,2)
     % Set up some parameters
     R.bandinits = {'\alpha','\beta_1','\beta_2'};
     R.cohband = 2;
-    R.BB.PLmeth = 'PPC';
+    R.BB.PLmeth = 'PLV';
     R.BB.decompmeth.type = 'filter';
-        R.BB.decompmeth.filter.bwid = 2.5; % filter bandwidth
+    R.BB.decompmeth.filter.bwid = 1.5; % filter bandwidth
     R.BB.SW.winsize = 0.25;
     R.BB.SW.winover = 0.90;
-    BB.powfrq = 21;
-    BB.cohfrq = 21;
-    R.BB.powres = 5;
-    R.BB.cohres = 5;
+    BB.powfrq = 20;
+    BB.cohfrq = 20;
+    R.BB.powres = 3;
+    R.BB.cohres = 3;
     BB.fsamp = vc_clean.fsample;
     R.BB.pairInd = [1 4]; % first is reference, second is main channel (e.g. M2 and STN)
     BB.preproc.fillmissing = 0;
