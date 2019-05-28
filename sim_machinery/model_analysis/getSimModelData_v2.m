@@ -14,8 +14,8 @@ for pn = 1:numel(modID)
     parOptBank = parBank(1:end,1:2^10);
     
     R.parOptBank = parOptBank;
-    R.obs.gainmeth = R.obs.gainmeth(1);
-    
+    R.obs.gainmeth = {};
+    R.obs.trans.norm = 0;
     R.analysis.modEvi.N = 2000;
     R.analysis.BAA.flag = 1;
     R.analysis.BAA.redmeth = 'UQ'; % average samples to get parameters

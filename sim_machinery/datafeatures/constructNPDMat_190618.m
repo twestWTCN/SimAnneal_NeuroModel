@@ -52,7 +52,7 @@ for C = 1:O
                             Pxy = Pxy - min(Pxy);
                         end
                         if R.obs.trans.gauss == 1
-%                             Pxy = smoothdata(Pxy,'gaussian');
+                            %                             Pxy = smoothdata(Pxy,'gaussian');
                             f = fit(F_scale',Pxy','gauss3');
                             Pxy = f(F_scale)';
                         end
@@ -81,7 +81,7 @@ for C = 1:O
                             end
                             
                             if R.obs.trans.gauss == 1
-%                             Pxy = smoothdata(Pxy,'gaussian');
+                                %                             Pxy = smoothdata(Pxy,'gaussian');
                                 f = fit(F_scale',Pxy','gauss3');
                                 Pxy = f(F_scale)';
                             end                            %                         Pxy = Pxy./max(nPxy);
