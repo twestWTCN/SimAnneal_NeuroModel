@@ -28,6 +28,7 @@ R.frqz = [6:.2:68];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MMC','STR','GPE','STN'};
 R.chsim_name = {'MMC','STR','GPE','STN'};
+R.data.chsel = [1 3 2 4]'; % Order of the imported data
 R.condnames = {'OFF'};
 % Spectral characteristics
 R.obs.csd.df = 0.5;
@@ -81,7 +82,7 @@ R.objfx.feattype = 'ForRev'; %%'ForRev'; %
 R.objfx.specspec = 'cross'; %%'auto'; % which part of spectra to fit
 
 %% OPTIMISATION
-R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A'}; %,'.D','.int{src}.S','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
+R.SimAn.pOptList = {'.int{src}.T','.int{src}.G','.int{src}.S','.C','.A','.D'}; %,'.D','.int{src}.S','.A',,'.int{src}.BG','.int{src}.S','.S','.D','.obs.LF'};  %,'.C','.obs.LF'}; % ,'.obs.mixing','.C','.D',
 R.SimAn.pOptBound = [-12 12];
 R.SimAn.pOptRange = R.SimAn.pOptBound(1):.1:R.SimAn.pOptBound(2);
 R.SimAn.searchMax = 200;

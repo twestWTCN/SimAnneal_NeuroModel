@@ -88,7 +88,7 @@ while ii <= R.SimAn.searchMax
             par_rep{jj} = pnew;
             %         xsims_rep{jj} = xsims_gl; % This takes too much memory: !Modified to store last second only!
             feat_sim_rep{jj} = feat_sim;
-            disp(['Iterate ' num2str(jj) ' temperature ' num2str(ii)])
+            disp(['Iterate ' num2str(parl) ' temperature ' num2str(ii)])
         end % End of batch replicates
         
         % Retrieve fits

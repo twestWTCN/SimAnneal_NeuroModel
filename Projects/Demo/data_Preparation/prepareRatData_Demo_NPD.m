@@ -1,4 +1,4 @@
-function R = prepareRatData_InDirect_Group_NPD(R,plotop,nulldat)
+function R = prepareRatData_Demo_NPD(R,plotop,nulldat)
 if nargin<2
     plotop = 1;
 end
@@ -16,7 +16,7 @@ meannpd_data = [];
 R.condnames = {'OFF'};
 R.Bcond = 1;
 condsel = 2;
-chsel = [1 3 2 4]'; % M1 STR GPe STN
+chsel = R.data.chsel; % 2 4]'; % M1 GPe STN
 
 for C =1:numel(R.condnames)
     %     X = squeeze(fyA(:,:,:,:,2,:)); {i,j,dirc,cond,sub}
