@@ -15,7 +15,9 @@ end
 a(i+1) = plot(Hz,2e-14.*squeeze(featemp(1,4,4,1,:)),'k:','LineWidth',2);
 
 
-legend(a([6 1 9]),legn)
+legend(a([1 6 10]),legn)
+xlim([0 48])
 xlabel('Frequency (Hz)')
 ylabel('Amplitude')
+title('Simulated STN Spectra')
 box off
