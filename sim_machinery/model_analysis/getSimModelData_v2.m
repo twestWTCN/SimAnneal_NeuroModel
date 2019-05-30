@@ -4,9 +4,9 @@ function [R,m,permMod,xsimMod] = getSimModelData_v2(R,modID,simtime)
 for pn = 1:numel(modID)
     rng(2223) % Ensure random elements are the same
     % Load Model Data
-    R.out.dag = sprintf(['NPD_' R.out.tag '_M%.0f'],modID(pn));
+    R.out.dag = sprintf([R.out.tag '_M%.0f'],modID(pn));
     [R,m,p,parBank] = loadABCData(R);
-    a = eval(['@MS_' R.out.tag '_Model' num2str(modID(pn))]);
+    a = eval(['@MS_' R.out.tag '_M' num2str(modID(pn))]);
     [dum prior] = a(R);
     R.Mfit.prior = prior;
     

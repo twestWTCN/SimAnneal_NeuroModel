@@ -102,7 +102,7 @@ while wfstr(end)>0
             ppm.increment();
             xsims_rep{jj} = [];
         else
-            xsims_rep{jj} = xsims;
+            xsims_rep{jj} = xsims_gl;
         end
     end
     if ~R.analysis.BAA.flag

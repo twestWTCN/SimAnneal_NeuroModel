@@ -14,9 +14,10 @@ R = setSimTime(R,32);
 % IF FRESH START
 % delete([R.rootn 'outputs\' R.out.tag '\WorkingModList.mat'])
 %% Prepare the data
-R = prepareRatData_Demo_NPD(R);
-% WML = [];
-% save([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
+% R = prepareRatData_Demo_NPD(R);
+
+WML = [];
+save([R.rootn 'outputs\' R.out.tag '\WorkingModList'],'WML')
 
 try
     load([R.rootn 'outputs\' R.out.tag '\WorkingModList'])
@@ -49,7 +50,7 @@ for modID = 2
         elseif modID == 2
             R.data.chsel = [2 4]';
             R.obs.obsstates = [1 2 3];
-            R = prepareRatData_Demo_NPD(R);
+            R = prepareRatData_DemoSynthPeak_NPD(R);
             R.chloc_name = {'GPE'    'STN'};
             R.chsim_name = {'GPE'    'STN'  'GPI'};
             
