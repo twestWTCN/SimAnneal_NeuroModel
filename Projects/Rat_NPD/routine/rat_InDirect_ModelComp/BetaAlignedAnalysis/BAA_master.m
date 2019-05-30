@@ -7,7 +7,7 @@ clear; close all
 R = simannealsetup_InDirect_ModelComp;
 
 %% Simulate Data
-R = simulateBurstData(R);
+% R = simulateBurstData(R);
 load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep.mat'])
 % 
 %% Plot Model Sweep Spectra
