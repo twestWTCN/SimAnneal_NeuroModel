@@ -3,6 +3,7 @@ surflag = 0;
 % Find the amplitude threshold from the prctile of concatanated data
 if surflag == 0
     concatA = [BB.AEnv{condsel}];
+    BB.epsAmpfull = prctile(concatA(:,:),R.BB.thresh_prctile ,2);
     BB.epsAmp = prctile(concatA(R.BB.pairInd(2),:),R.BB.thresh_prctile ,2);
     concatA = [BB.PLV{condsel}];
     BB.epsPLV = prctile(concatA(1,:),R.BB.thresh_prctile ,2);

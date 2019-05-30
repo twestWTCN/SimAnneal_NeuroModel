@@ -9,7 +9,7 @@ R.obs.trans.norm = 0;
 % load([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Sims.mat'],'xsimMod','feat')
 
 % Setup condition variables
-R.condname = {'Full','1% M2->STN','150% M2->STN','1% STR->GPe','150% STR->GPe','Empirical'};
+R.condname = {'Fitted','1% M2->STN','150% M2->STN','Fitted','1% STN ->GPe','150% STN->GPe'};
 R.condnames =  R.condname;
 % R.data = feat{end};
-R = BAA_sim_ConnectionSweep(R,10,500);
+R = BAA_sim_ConnectionSweep(R,10,1024);

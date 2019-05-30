@@ -1,28 +1,28 @@
 function [R] = BAA_sim_discreteModels(R,modID,simtime)
-[R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
+[R,m,permMod,~,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
 feat{1} = permMod{1}.feat_rep;
 % Now Modify
 % Model 2 (weakened hyperdirect)
 Pbase = permMod{1}.par_rep{1};
 Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(4,1))*0.01); % reduce connection by 90%
-[r2mean,pnew,feat_sim,xsimMod{2}] = computeSimData(R,m,[],Pbase,0);
+[r2mean,pnew,feat_sim,~,xsimMod{2}] = computeSimData(R,m,[],Pbase,0);
 feat{2} = feat_sim;
 % Model 3 (strengthened hyperdirect)
 Pbase = permMod{1}.par_rep{1};
 Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(4,1))*3); % strengthen connection by 90%
-[r2mean,pnew,feat_sim,xsimMod{3}] = computeSimData(R,m,[],Pbase,0);
+[r2mean,pnew,feat_sim,~,xsimMod{3}] = computeSimData(R,m,[],Pbase,0);
 feat{3} = feat_sim;
 
 % Model 4 (weakened striato-pallidal)
 Pbase = permMod{1}.par_rep{1};
 Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(3,4))*0.01); % reduce connection by 95%
-[r2mean,pnew,feat_sim,xsimMod{4}] = computeSimData(R,m,[],Pbase,0);
+[r2mean,pnew,feat_sim,~,xsimMod{4}] = computeSimData(R,m,[],Pbase,0);
 feat{4} = feat_sim;
 
 % Model 5 (weakened striato-pallidal)
 Pbase = permMod{1}.par_rep{1};
 Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(3,4))*1.25); % strengthen connection by 90%
-[r2mean,pnew,feat_sim,xsimMod{5}] = computeSimData(R,m,[],Pbase,0);
+[r2mean,pnew,feat_sim,~,xsimMod{5}] = computeSimData(R,m,[],Pbase,0);
 feat{5} = feat_sim;
 
 %% Now Add the Empirical Data
