@@ -3,8 +3,8 @@ function [R,MP] = BAA_sim_betaInputs(R,modID,simtime)
 [R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
 MP.p = permMod{1}.par_rep{1};
 MP.m = m;
-% connection list
-% Give all timeseries the same input - makes comparable
+connection list
+Give all timeseries the same input - makes comparable
 uc = innovate_timeseries(R,m);
 uc{1} = uc{1}.*sqrt(R.IntP.dt);
 % 

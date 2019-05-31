@@ -1,6 +1,10 @@
 function TL = defineBurstTimeLockEpoch(BB,TL,cond)
 % EpochTime
-TL.epochT = TL.periodT(1):1000/BB.fsamp:TL.periodT(2);
+Bo = 0;
+preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
+postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+epochdef = [preBo(1):postBo(end)];
+TL.epochT = linspace(TL.periodT(1),TL.periodT(2),size(epochdef,2));
 
 % LocalEps
 localeps = BB.epsAmpfull;
@@ -9,7 +13,7 @@ segInds = BB.segInds{cond};
 clear BEpoch REpoch PLVpoch dRPdEpoch meanPLV maxAmp minAmp epsCross usedinds
 for i = 1:numel(segInds)
     Bo = segInds{i};
-    preBo = [Bo(1)+ ceil((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
+    preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
     postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
     epochdef = [preBo(1):postBo(end)];
     
@@ -17,20 +21,22 @@ for i = 1:numel(segInds)
     if preBo(1)>0 && postBo(end)<size(BB.AEnv{cond},2)
         % Find onset Time aligned to beta onset
         A = BB.AEnv{cond}(:,epochdef);%.*hanning(numel(epochdef))'; % amplitude data
+        AH = BB.AEnv{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
         % Find Crossing times with respect to STN onset
         for L = 1:size(BB.AEnv{cond},1)
-            if any(A(L,:)>localeps(L)) % For finding maximums locally
+            if any(AH(L,:)>localeps(L)) % For finding maximums locally
 %                 [dum ec] = find(A(L,:)==max(A(L,:)),1,'first');
-                [dum ec] = find(A(L,:)>localeps(L),1,'first');
+                [dum ec] = find(AH(L,:)>localeps(L),1,'first');
                 epsCross(L) =  TL.epochT(ec);
+%                 epsCross(L) = min(BB.Tvec{cond}(BB.segInds{cond}{L}))
             else
                 epsCross(L) = NaN;
             end
         end
         TL.onsetT{cond}(:,i) = epsCross;
-%         A = (A-min(A,2)); %./std(A,[],2);
+        A = (A-min(A,2))./std(A,[],2);
         A = A.^2; %.^2;
-        TL.amp{cond}(:,:,i) =(A-min(A,2))./std(A,[],2);
+        TL.amp{cond}(:,:,i) = A;
         raw = BB.data{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data
         TL.raw{cond}(:,:,i) =raw;
         BP = BB.BP{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data

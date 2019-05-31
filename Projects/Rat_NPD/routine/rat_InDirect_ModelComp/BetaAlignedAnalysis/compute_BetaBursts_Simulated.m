@@ -4,7 +4,7 @@ for cond = 1:size(R.condname,2)
     vc_clean.trial{1} = xsimMod{cond}([1:4],:);
     vc_clean.fsample = 1/R.IntP.dt;
     vc_clean.time{1} = linspace(0,size(vc_clean.trial{1},2)/vc_clean.fsample,size(vc_clean.trial{1},2));
-    vc_clean.label = R.chsim_name;
+    vc_clean.label = R.chloc_name;
     
     % Resample to workable resolution
     cfg = [];
