@@ -1,4 +1,4 @@
-function R = simannealsetup_InDirect_ModelComp()
+function R = simannealsetup_InDirect_ModelComp(R)
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'InDrt_ModCompRev2';

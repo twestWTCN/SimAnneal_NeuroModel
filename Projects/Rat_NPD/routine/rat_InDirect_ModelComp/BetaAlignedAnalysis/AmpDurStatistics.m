@@ -36,21 +36,21 @@ for i = 1:2
     [h,l] = plotBurstAmplitudeHistogram(R,BB,condsel);
     ylim(BB.plot.lims.burfreq(1,:))
     p = get(gca,'Children');
-    if i == 1
-        set(gca,'Children',p([2 3 1]));
-    else
-        set(gca,'Children',p([2 3 1]));
-    end
+%     if i == 1
+%         set(gca,'Children',p([2 3 1]));
+%     else
+%         set(gca,'Children',p([2 3 1]));
+%     end
     subplot(3,2,ip(2,i));
     plotBurstDurationHistogram(R,BB,condsel);
     ylim(BB.plot.lims.burfreq(2,:))
     p = get(gca,'Children');
     p(1).FaceAlpha = 0.85;
-    if i == 1
-        set(gca,'Children',p([2 3 1]));
-    else
-        set(gca,'Children',p([2 3 1]));
-    end
+%     if i == 1
+%         set(gca,'Children',p([2 3 1]));
+%     else
+%         set(gca,'Children',p([2 3 1]));
+%     end
     subplot(3,2,ip(3,i));
     plotBurstAmpDurScatter(R,BB,condsel)
     %     p = get(gca,'Children');

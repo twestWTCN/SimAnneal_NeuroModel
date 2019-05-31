@@ -29,11 +29,11 @@ for i = 1:numel(segInds)
         end
         TL.onsetT{cond}(:,i) = epsCross;
 %         A = (A-min(A,2)); %./std(A,[],2);
-        A = A; %.^2;
+        A = A.^2; %.^2;
         TL.amp{cond}(:,:,i) =(A-min(A,2))./std(A,[],2);
-        raw = BB.data{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
+        raw = BB.data{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data
         TL.raw{cond}(:,:,i) =raw;
-        BP = BB.BP{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
+        BP = BB.BP{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data
         TL.BP{cond}(:,:,i) = BP;
 
         % STR_M2 RP

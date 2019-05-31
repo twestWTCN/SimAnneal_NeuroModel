@@ -19,7 +19,7 @@ for cond = condsel
     title(R.condname{cond})
     figure(4)
     subplot(2,3,ip)
-    plotTLTimeEvolutions(TL,cond,'BP',1.5)
+    plotTLTimeEvolutions(TL,cond,'BP')
     title(R.condname{cond})
     xlabel('Burst Onset Time (ms)')
     xlim([TL.periodT])
