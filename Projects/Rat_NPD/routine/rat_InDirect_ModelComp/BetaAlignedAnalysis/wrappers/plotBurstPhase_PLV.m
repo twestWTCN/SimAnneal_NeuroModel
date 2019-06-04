@@ -1,5 +1,4 @@
-close all
-
+function plotBurstPhase_PLV(R,BB)
 condSel = [1:20];
 stats_PPC = [];
 p = 0;
@@ -23,34 +22,45 @@ for cond = condSel
     % [BB.Amp_binRP(:,:,cond),BB.Amp_binRP_data{cond}] = binDatabyRange(BB.segRP{cond}(IndsByDur{1}),BB.range.RP,BB.segAmp{cond}(IndsByDur{1}));
     
 end
-subplot(2,1,1)
-H = bar(1:20,stats_PPC(:,:,1)');
-hold on
 
-a= gca;
-a.XTickLabel = R.condname(condSel);
-a.YLabel.String = 'M2/STR Pairwise Phase Consistency';
-es = stats_PPC(:,:,2)';
-em = stats_PPC(:,:,1)';
-
-% sp = [0.85 1.15 1.85 2.15 2.85 3.15 3.85 4.15 4.85 5.15];
-% E = errorbar(sp,reshape(em',1,10),reshape(es',1,10));
-% E.LineStyle = 'none';
-
-subplot(2,1,2)
-H = bar(1:20,stats_amp(:,:,1)');
-hold on
-
-a= gca;
-a.XTickLabel = R.condname(condSel);
-a.YLabel.String = 'Median Burst Amplitude';
-es = stats_amp(:,:,2)';
-em = stats_amp(:,:,1)';
-
-% sp = [0.85 1.15 1.85 2.15 2.85 3.15 3.85 4.15 4.85 5.15];
-% E = errorbar(sp,reshape(em',1,10),reshape(es',1,10));
-% E.LineStyle = 'none';
-% legend(H,splitlab)
+% Now Plot the Bars
+inds = [1:10;11:20];
+for  cond = 1:2
+    subplot(2,2,cond)
+    H = bar(inds(cond,:),stats_PPC(:,inds(cond,:),1)');
+    hold on
+    
+    a= gca;
+    a.XTickLabel = R.condname(condSel);
+    a.YLabel.String = 'M2/STN PPC';
+    es = stats_PPC(:,inds(cond,:),2)';
+    em = stats_PPC(:,inds(cond,:),1)';
+    
+    sp = repmat([-0.15 0.15],1,10)+ reshape(repmat(inds(cond,:),2,[]),1,[]); % Complicated function to find spacing of the errorbars
+    E = errorbar(sp,reshape(em',1,20),reshape(es',1,20));
+    E.LineStyle = 'none';
+    E.Color = [0 0 0];
+    E.LineWidth = 1;
+    
+    
+    subplot(2,2,cond+2)
+    H = bar(inds(cond,:),stats_amp(:,inds(cond,:),1)');
+    hold on
+    
+    a= gca;
+    a.XTickLabel = R.condname(condSel);
+    a.YLabel.String = 'Median Burst Amplitude';
+    es = stats_amp(:,inds(cond,:),2)';
+    em = stats_amp(:,inds(cond,:),1)';
+    
+    sp = repmat([-0.15 0.15],1,10)+ reshape(repmat(inds(cond,:),2,[]),1,[]); % Complicated function to find spacing of the errorbars
+    E = errorbar(sp,reshape(em',1,20),reshape(es',1,20));
+    E.LineStyle = 'none';
+    E.Color = [0 0 0];
+    E.LineWidth = 1;
+    legend(H,splitlab)
+end
+set(gcf,'Position',[ 680   118   977   860])
 
 figure
 BB.range.RPmid = binEdge2Mid(BB.range.RP);
@@ -77,5 +87,8 @@ for i = 1:2
     end
     xlim([-pi pi])
     ylabel('Median Burst Amplitude (ms)')
-    xlabel('Relative Phase (\phi_{M2}-\phi_{STN})')    
+    xlabel('Relative Phase (\phi_{M2}-\phi_{STN})')
+    legend
 end
+set(gcf,'Position',[ 680   118   977   860])
+

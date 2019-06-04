@@ -9,7 +9,7 @@ ck_2 = [0.00001 0.1 0.25 0.5 0.75 1 1.05 1.10 1.20 1.3];
 uc = innovate_timeseries(R,m);
 uc{1} = uc{1}.*sqrt(R.IntP.dt);
 XBase = permMod{1}.par_rep{1};
-for i = 1:numel(ck_1)
+parfor i = 1:numel(ck_1)
     % Now Modify
     % Model 1 (hyperdirect)
     Pbase = XBase;

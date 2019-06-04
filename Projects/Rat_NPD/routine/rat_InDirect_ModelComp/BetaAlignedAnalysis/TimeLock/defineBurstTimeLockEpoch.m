@@ -21,18 +21,23 @@ for i = 1:numel(segInds)
     if preBo(1)>0 && postBo(end)<size(BB.AEnv{cond},2)
         % Find onset Time aligned to beta onset
         A = BB.AEnv{cond}(:,epochdef);%.*hanning(numel(epochdef))'; % amplitude data
+%         Apost = [zeros(size(A,1),size(preBo,2)) BB.AEnv{cond}(:,postBo)];%.*hanning(numel(epochdef))'; % amplitude data
         AH = BB.AEnv{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
         % Find Crossing times with respect to STN onset
         for L = 1:size(BB.AEnv{cond},1)
             if any(AH(L,:)>localeps(L)) % For finding maximums locally
-%                 [dum ec] = find(A(L,:)==max(A(L,:)),1,'first');
+                [dum ec] = find(A(L,:)>=prctile(A(L,:),85),1,'first');
+                maxCross(L) =  TL.epochT(ec);
+
                 [dum ec] = find(AH(L,:)>localeps(L),1,'first');
                 epsCross(L) =  TL.epochT(ec);
 %                 epsCross(L) = min(BB.Tvec{cond}(BB.segInds{cond}{L}))
             else
                 epsCross(L) = NaN;
+                maxCross(L) = NaN;
             end
         end
+        TL.maxT{cond}(:,i) = maxCross;
         TL.onsetT{cond}(:,i) = epsCross;
         A = (A-min(A,2))./std(A,[],2);
         A = A.^2; %.^2;

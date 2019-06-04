@@ -9,7 +9,6 @@ for pn = 1:numel(modID)
     a = eval(['@MS_rat_' R.out.tag '_Model' num2str(modID(pn))]);
     [dum prior] = a(R);
     R.Mfit.prior = prior;
-    
     R.analysis.modEvi.eps = parBank(end,R.SimAn.minRank);
     parOptBank = parBank(1:end,1:2^10);
     

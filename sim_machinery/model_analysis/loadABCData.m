@@ -23,5 +23,5 @@ if nargout>3
     load([R.rootn 'outputs\' R.out.tag '\' R.out.dag '\parBank_' R.out.tag '_' R.out.dag '.mat'])
     parBank =  varo;
 end
-'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\InDrt_ModCompRev2\NPD_InDrt_ModCompRev2_M10\R_InDrt_ModCompRev2_NPD_InDrt_ModCompRev2_M10.mat'
-'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\InDrt_ModCompRev2\InDrt_ModCompRev2_M10\R_InDrt_ModCompRev2_InDrt_ModCompRev2_M10.mat'
+% 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\InDrt_ModCompRev2\NPD_InDrt_ModCompRev2_M10\R_InDrt_ModCompRev2_NPD_InDrt_ModCompRev2_M10.mat'
+% 'C:\Users\Tim\Documents\Work\GIT\SimAnneal_NeuroModel\Projects\Rat_NPD\outputs\InDrt_ModCompRev2\InDrt_ModCompRev2_M10\R_InDrt_ModCompRev2_InDrt_ModCompRev2_M10.mat'
