@@ -7,7 +7,7 @@ clear; close all
 R = simannealsetup_InDirect_ModelComp;
 
 %% Simulate Data
-% R = simulateBurstData(R);
+R = simulateBurstData(R);
 load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat'])
 %% Plot Model Sweep Spectra
 plotSweepSpectraWrapper(R)
@@ -19,6 +19,8 @@ close all
 load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'])
 BB = AmpDurStatistics(R,BB);
 
+BB.range.RP = linspace(-pi,pi,7);
+BB = computeBetaBurstRPStats(R,BB);
 %% Plot TimeLocked Statistics
 BB.struccmap = linspecer(4);
 TimeLockAnalysisMaster(R,BB,[5 4 6])

@@ -21,3 +21,4 @@ xlabel('Frequency (Hz)')
 ylabel('Amplitude')
 title('Simulated STN Spectra')
 box off
+% set(gca, 'XScale', 'log', 'YScale', 'log')

@@ -55,6 +55,10 @@ for i = 1:2
     plotBurstAmpDurScatter(R,BB,condsel)
         p = get(gca,'Children');
         set(gca,'Children',p([1 3 5 2 4 6]));
+        
+        
+        
+        
 end
 set(gcf,'Position',[680 104 1024 800])
 
