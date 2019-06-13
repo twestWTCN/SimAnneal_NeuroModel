@@ -3,8 +3,7 @@ function [R] = BAA_sim_lesionExp(R,MP,simtime)
 % [R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
 % MP = permMod{1}.par_rep{1};
 R = setSimTime(R,simtime);
- R.Bcond = -1
-
+ R.Bcond = -1;
 cmap = brewermap(18,'Spectral');
 % PRC.condcmap = cmap([1 4 8 16 4 18],:);
 condname = {'Fitted','M2->STR','M2->STN','M2->Thal','STN->GPe','STR-|Gpe','STR->GPi','GPe-|STN','STN->GPi','GPi-|Thal','Thal->M2'};
@@ -16,7 +15,7 @@ P = MP.p;
 % Give all timeseries the same input - makes comparable
 uc = innovate_timeseries(R,m);
 uc{1} = uc{1}.*sqrt(R.IntP.dt);
-R.obs.trans.norm = 1;
+R.obs.trans.norm = 0;
 Pbase = P;
 for i = 1:size(condname,2)
     Pbase_i = Pbase;

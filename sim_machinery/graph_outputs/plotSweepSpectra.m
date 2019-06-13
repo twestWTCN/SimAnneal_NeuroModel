@@ -1,24 +1,17 @@
-function plotSweepSpectra(Hz,feat,featemp,cmaplims,cmdata,legn)
-for c = 1:3
-    cmap(:,c) = linspace(cmaplims(1,c),cmaplims(2,c),size(feat,2));
-end
+function plotSweepSpectra(Hz,feat,featemp,cmap,legn,legsel,condsel)
 
-for i = 1:size(feat,2)
-    if i == 6
-        cmapcur = cmdata;
-    else
-        cmapcur = cmap(i,:);
-    end
-    a(i) = plot(Hz,squeeze(feat{i}(1,4,4,1,:)),'color',cmapcur,'LineWidth',2);
+for i = condsel
+    a(i) = plot(Hz,1e7.*squeeze(feat{i}(1,4,4,1,:)),'color',cmap(i,:),'LineWidth',2);
     hold on
 end
-a(i+1) = plot(Hz,2e-14.*squeeze(featemp(1,4,4,1,:)),'k:','LineWidth',2);
+% a(i+1) = plot(Hz,2e-14.*squeeze(featemp(1,4,4,1,:)),'k:','LineWidth',2);
 
-
-legend(a([1 6 10]),legn)
+a(legsel(2)).LineStyle = '--';
+legend(a(legsel),legn)
 xlim([0 48])
 xlabel('Frequency (Hz)')
-ylabel('Amplitude')
+ylabel('Amplitude (uV Hz^-1)')
 title('Simulated STN Spectra')
 box off
-% set(gca, 'XScale', 'log', 'YScale', 'log')
+set(gca, 'YScale', 'log'); %, 'XScale', 'log')
+grid on

@@ -24,9 +24,9 @@ xsimMod{i} = 1e7.*xsim_STR_GPe{i-10}{1};
 end
 
 [R,BB] = compute_BetaBursts_Simulated(R,xsimMod);
-R.BB.thresh_prctile = 80;% o85;
+R.BB.thresh_prctile = 90;% o85; tl 80
 BB = compute_BurstThreshold(R,BB,[1:20],0);
-R.BB.minBBlength = 1.5; %o1; %  Minimum burst period- cycles
+R.BB.minBBlength = 1; %o1 tl 1.5; %  Minimum burst period- cycles
 BB.plot.durlogflag = 0;
 BB = defineBetaEvents(R,BB);
 save([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'])
