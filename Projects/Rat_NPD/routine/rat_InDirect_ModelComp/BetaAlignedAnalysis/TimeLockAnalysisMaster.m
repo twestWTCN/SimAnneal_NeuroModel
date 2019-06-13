@@ -6,6 +6,7 @@ figure
 for cond = condsel
     ip = ip + 1;
     TL.periodT = [-300 300];
+%     TL.periodT = [-50 300];
     TL = defineBurstTimeLockEpoch(BB,TL,cond);
     
     
@@ -48,9 +49,31 @@ for cond = condsel
     xlabel('Burst Time of 85% Amplitude (ms)')
     grid on
     title(R.condname{cond})
+    
+   figure(7) 
+%     subplot(1,3,ip)
+    plotTLPhaseSlipProb(TL,cond,'dPhi',ip)
+    xlim([TL.periodT])
+    xlabel('Burst Onset Time (ms)')
+    ylabel('Phase Slip Probability')
+    xlim([TL.periodT])
+    grid on
+    ylim([0 0.5])
+    
+   figure(8) 
+    subplot(1,3,ip)
+    a = genBoxPlot(TL.onsetOffT{cond}',BB.struccmap,'horizontal');
+    b= gca;
+    xlim([TL.periodT])
+    b.YTickLabel = R.chsim_name;
+    ylabel('Region')
+    xlabel('Time of Theshold Offset(ms)')
+    grid on
+    title(R.condname{cond})
+    
 end
 
-for i = [3 4 5 6]
+for i = [3 4 5 6 7 8]
 set(figure(i),'Position',[364         656        1445         322])
 end
 

@@ -13,32 +13,46 @@ segInds = BB.segInds{cond};
 clear BEpoch REpoch PLVpoch dRPdEpoch meanPLV maxAmp minAmp epsCross usedinds
 for i = 1:numel(segInds)
     Bo = segInds{i};
-    preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
-    postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+    %     preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
+    %     postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+    
+    %
+    % If you want to do it aligned to burst termination (epochdef)
+    preBo = [Bo(end)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(end)-1]; %pre burst onset
+    postBo = [Bo(end): Bo(end) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+    %
     epochdef = [preBo(1):postBo(end)];
     
     % Convert from full time to SW time
     if preBo(1)>0 && postBo(end)<size(BB.AEnv{cond},2)
         % Find onset Time aligned to beta onset
-        A = BB.AEnv{cond}(:,epochdef);%.*hanning(numel(epochdef))'; % amplitude data
-%         Apost = [zeros(size(A,1),size(preBo,2)) BB.AEnv{cond}(:,postBo)];%.*hanning(numel(epochdef))'; % amplitude data
+        A = BB.AEnv{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data
+        Apost = [zeros(size(A,1),size(preBo,2)) BB.AEnv{cond}(:,postBo)];%.*hanning(numel(epochdef))'; % amplitude data
         AH = BB.AEnv{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
         % Find Crossing times with respect to STN onset
+        epsCross = []; maxCross = []; epsLast = [];
         for L = 1:size(BB.AEnv{cond},1)
             if any(AH(L,:)>localeps(L)) % For finding maximums locally
-                [dum ec] = find(A(L,:)>=prctile(A(L,:),85),1,'first');
+                [dum ec] = find(A(L,:)>=prctile(A(L,:),99),1,'first');
                 maxCross(L) =  TL.epochT(ec);
-
+                
                 [dum ec] = find(AH(L,:)>localeps(L),1,'first');
                 epsCross(L) =  TL.epochT(ec);
-%                 epsCross(L) = min(BB.Tvec{cond}(BB.segInds{cond}{L}))
+                %                 epsCross(L) = min(BB.Tvec{cond}(BB.segInds{cond}{L}))
+                
+                [dum ec] = find(AH(L,:)>localeps(L),1,'last');
+                epsLast(L) =  TL.epochT(ec);
+                
             else
                 epsCross(L) = NaN;
                 maxCross(L) = NaN;
+                epsLast(L) = NaN;
+                
             end
         end
         TL.maxT{cond}(:,i) = maxCross;
         TL.onsetT{cond}(:,i) = epsCross;
+        TL.onsetOffT{cond}(:,i) = epsLast;
         A = (A-min(A,2))./std(A,[],2);
         A = A.^2; %.^2;
         TL.amp{cond}(:,:,i) = A;
@@ -46,13 +60,19 @@ for i = 1:numel(segInds)
         TL.raw{cond}(:,:,i) =raw;
         BP = BB.BP{cond}(:,epochdef); %.*hanning(numel(epochdef))'; % amplitude data
         TL.BP{cond}(:,:,i) = BP;
-
+        
         % STR_M2 RP
-%         uwRP = unwrap(BB.Phi{cond}(1,:))-unwrap(BB.Phi{cond}(2,:));
-%         RP = wrapToPi(uwRP(epochdef));
-%         TL.STR_M2_RP{cond}(i) = circ_mean(RP');
-%         TL.STR_M2_dRP{cond}(:,i) = diff(uwRP(epochdef));
-
+        phi = []; dPhi = [];
+        for L = 1:size(BB.Phi{cond},1)
+            phi(L,:) = unwrap(BB.Phi{cond}(L,epochdef));
+            dPhi(L,:) = [NaN abs(diff(phi(L,:)))];
+        end
+        TL.dPhi{cond}(:,:,i) = dPhi;
+        %         uwRP = unwrap(BB.Phi{cond}(1,:))-unwrap(BB.Phi{cond}(2,:));
+        %         RP = wrapToPi(uwRP(epochdef));
+        %         TL.STR_M2_RP{cond}(i) = circ_mean(RP');
+        %         TL.STR_M2_dRP{cond}(:,i) = diff(uwRP(epochdef));
+        
         %         PLVbase = nanmedian(BB.PLV{cond});
         %         [dum T(1)] = min(abs(BB.SWTvec{cond}-BB.TSw(epochdef(1))));
         %         T(2) = T(1) + floor(sum(abs(periodT/1000))/diff(BB.TSw(1:2)));
