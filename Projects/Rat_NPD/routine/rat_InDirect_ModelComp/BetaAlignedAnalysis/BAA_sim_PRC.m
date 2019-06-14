@@ -17,9 +17,9 @@ conStren = [0.3 1 1.3];
 for cond = 1:numel(conStren)
     R.obs.brn = 3; % temporarily!
     % Setup pulses for PRC computation
-    delayPulse = (1.*fsamp);
+    delayPulse = (1.25.*fsamp);
     pulseWid = (0.002.*fsamp);
-    pulseAmp = 0.1;
+    pulseAmp = 0.01;
     delayJit = 0.2*fsamp;
     pU = zeros(size(R.IntP.tvec));
     pulseStart = [];
@@ -33,7 +33,7 @@ for cond = 1:numel(conStren)
     pU = pU.*pulseAmp;
     uc_ip{1} = uc;
     uc_ip{2} =  uc_ip{1};
-    uc_ip{2}{1}(:,1) = uc{1}(:,1) + pU'; % Give it a cortical pulse
+    uc_ip{2}{1}(:,1) = uc{1}(:,4) + pU'; % Give it a cortical pulse
     
     % Setup the simulations
     Pbase = P;
@@ -46,7 +46,7 @@ for cond = 1:numel(conStren)
     XL(1,:,:) = xsim_ip{1}{1}([1 4],:);
     XL(2,:,:) = xsim_ip{2}{1}([1 4],:);
     
-    PRC = computePRC(PRC,XL,pulseStart,[12 28],fsamp,cond);
+    PRC = computePRC(PRC,XL,pulseStart,[16 24],fsamp,cond);
 end
 save([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\PRCtmp'],'PRC')
 load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\PRCtmp'],'PRC')

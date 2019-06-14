@@ -1,15 +1,16 @@
 function plotSimulatedPRC(PRC,condsel)
 
 for i = condsel
+    B_sel = PRC.impBetaLev{i}>50;
     subplot(1,3,2)
-    a = scatter(PRC.impPhi_cS{i},PRC.impdPhi_cS{i});
+    a = scatter(PRC.impPhi_cS{i}(B_sel),PRC.impdPhi_cS{i}(B_sel),PRC.impBetaLev{i}(B_sel));
     a.MarkerEdgeColor = PRC.condcmap(i,:);
     a.MarkerFaceColor = PRC.condcmap(i,:);
     a.MarkerFaceAlpha = 0.5;
     a.LineWidth = 1;
     hold on
     
-    [xq yq R2] = sinfit(PRC.impPhi_cS{i},PRC.impdPhi_cS{i},50,0);
+    [xq yq R2] = sinfit(PRC.impPhi_cS{i}(B_sel),PRC.impdPhi_cS{i}(B_sel),50,0);
     b = plot(xq,yq);
     b.Color = PRC.condcmap(i,:).*0.8;
     b.LineWidth = 2;
@@ -17,14 +18,14 @@ for i = condsel
     ylabel('Change in phase \Delta\phi')
     
     subplot(1,3,1)
-    a = scatter(PRC.impPhi_cS{i},PRC.impdA_cS{i});
+    a = scatter(PRC.impPhi_cS{i}(B_sel),PRC.impdA_cS{i}(B_sel));
     a.MarkerEdgeColor = PRC.condcmap(i,:);
     a.MarkerFaceColor = PRC.condcmap(i,:);
     a.MarkerFaceAlpha = 0.5;
     a.LineWidth = 1;
     hold on
     
-    [xq yq R2] = sinfit(PRC.impPhi_cS{i},PRC.impdA_cS{i},25,0);
+    [xq yq R2] = sinfit(PRC.impPhi_cS{i}(B_sel),PRC.impdA_cS{i}(B_sel),25,0);
     b = plot(xq,yq);
     b.Color = PRC.condcmap(i,:).*0.8;
     b.LineWidth = 2.5;
@@ -33,7 +34,7 @@ for i = condsel
     
     
     subplot(1,3,3)
-   binRP = binDatabyRange(PRC.impPhi_cS{i},-pi:pi/6:pi,PRC.impdA_cS{i},'number');
+   binRP = binDatabyRange(PRC.impPhi_cS{i}(B_sel),-pi:pi/6:pi,PRC.impdA_cS{i}(B_sel),'number');
     a = scatter(binEdge2Mid(-pi:pi/6:pi),binRP(1:end-1,1));
     a.MarkerEdgeColor = PRC.condcmap(i,:);
     a.MarkerFaceColor = PRC.condcmap(i,:);
