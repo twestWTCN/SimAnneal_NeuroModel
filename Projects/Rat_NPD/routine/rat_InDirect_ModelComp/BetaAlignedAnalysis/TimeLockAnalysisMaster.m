@@ -5,7 +5,7 @@ ip = 0;
 figure
 for cond = condsel
     ip = ip + 1;
-    TL.periodT = [-300 300];
+    TL.periodT = [-200 600];
 %     TL.periodT = [-50 300];
     TL = defineBurstTimeLockEpoch(BB,TL,cond);
     
@@ -60,7 +60,7 @@ for cond = condsel
     grid on
     ylim([0 0.5])
     
-   figure(8) 
+    figure(8) 
     subplot(1,3,ip)
     a = genBoxPlot(TL.onsetOffT{cond}',BB.struccmap,'horizontal');
     b= gca;
@@ -70,10 +70,20 @@ for cond = condsel
     xlabel('Time of Theshold Offset(ms)')
     grid on
     title(R.condname{cond})
+
+    
+    figure(9)
+    plotTLPhaseLocking(TL,cond,'dPhi',ip)
+    xlim([TL.periodT])
+    xlabel('Burst Onset Time (ms)')
+    ylabel('Within Burst PLV')
+    xlim([TL.periodT])
+    grid on
+    ylim([0.15 1])
     
 end
 
-for i = [3 4 5 6 7 8]
+for i = [3 4 5 6 7 8 9]
 set(figure(i),'Position',[364         656        1445         322])
 end
 

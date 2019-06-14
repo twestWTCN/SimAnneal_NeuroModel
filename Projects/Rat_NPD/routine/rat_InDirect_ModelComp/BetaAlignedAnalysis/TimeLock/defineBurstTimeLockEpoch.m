@@ -13,13 +13,13 @@ segInds = BB.segInds{cond};
 clear BEpoch REpoch PLVpoch dRPdEpoch meanPLV maxAmp minAmp epsCross usedinds
 for i = 1:numel(segInds)
     Bo = segInds{i};
-    %     preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
-    %     postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+    preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
+    postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
     
     %
     % If you want to do it aligned to burst termination (epochdef)
-    preBo = [Bo(end)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(end)-1]; %pre burst onset
-    postBo = [Bo(end): Bo(end) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
+%         preBo = [Bo(end)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(end)-1]; %pre burst onset
+%         postBo = [Bo(end): Bo(end) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
     %
     epochdef = [preBo(1):postBo(end)];
     
@@ -64,10 +64,17 @@ for i = 1:numel(segInds)
         % STR_M2 RP
         phi = []; dPhi = [];
         for L = 1:size(BB.Phi{cond},1)
-            phi(L,:) = unwrap(BB.Phi{cond}(L,epochdef));
-            dPhi(L,:) = [NaN abs(diff(phi(L,:)))];
+            phi(L,:) = BB.Phi{cond}(L,epochdef);
+            uphi(L,:) = unwrap(phi(L,:));
+            dPhi(L,:) = [NaN abs((diff(uphi(L,:))))];
         end
+        TL.phi{cond}(:,:,i) = phi;
         TL.dPhi{cond}(:,:,i) = dPhi;
+        
+        
+        % Get Indices of Long Bursts
+        TL.durFlag{cond}(i,1) = BB.segDur{cond}(i) > prctile(BB.segDur{1},75);
+        TL.durFlag{cond}(i,2) = BB.segDur{cond}(i) < prctile(BB.segDur{1},25);
         %         uwRP = unwrap(BB.Phi{cond}(1,:))-unwrap(BB.Phi{cond}(2,:));
         %         RP = wrapToPi(uwRP(epochdef));
         %         TL.STR_M2_RP{cond}(i) = circ_mean(RP');

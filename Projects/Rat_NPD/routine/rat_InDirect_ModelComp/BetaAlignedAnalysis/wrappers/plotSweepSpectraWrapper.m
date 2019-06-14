@@ -1,6 +1,6 @@
 function plotSweepSpectraWrapper(R)
 close all
-load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_feat.mat'],'feat_HD','feat_STR_GPe')
+load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_feat_F1.mat'],'feat_HD','feat_STR_GPe')
 cmap = brewermap(30,'Spectral');
 R.condname = {'Fitted','1% M2->STN','150% M2->STN','Fitted','1% STN->GPe','150% STN->GPe'};
 cmap1 = brewermap(30,'Reds');
@@ -16,7 +16,7 @@ plotSweepSpectra(R.frqz,feat_HD,feat_HD{6},cmap1,{R.condname{[2 1 3]}},[1 22 25]
 hold on
 subplot(1,2,2)
 x = [3:2:30];x(end-2) = 27; x(end-2) = 28; x(end-1) = 29;
-plotSweepSpectra(R.frqz,feat_STR_GPe,feat_STR_GPe{6},cmap2,{R.condname{[5 4 6]}},[3 28 30],x)
+plotSweepSpectra(R.frqz,feat_STR_GPe,feat_STR_GPe{6},cmap2,{R.condname{[5 4 6]}},[3 28 29],x)
 set(gcf,'Position',[684         501        1024         366])
 
 

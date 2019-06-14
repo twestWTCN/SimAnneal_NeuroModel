@@ -31,6 +31,9 @@ for L = 1:size(TL.(feat){cond},1)
 %             psProb(i,3) = sum(sum(phslip3(swInds(:,i),:),2))/numel(phslip3(swInds(:,i),:));
     end
     psProb(1,:) = nan(1,2);
+    
+    
+    
 %     psProb(:,1) = sum(phslip,2)/size(phslip,2);
 %     
 %     phslip = double(squeeze(TL.(feat){cond}(L,:,:))>eps*0.99);

@@ -13,7 +13,7 @@ P = MP.p;
 uc = innovate_timeseries(R,m);
 uc{1} = uc{1}.*sqrt(R.IntP.dt);
 fsamp = 1/R.IntP.dt;
-conStren = [0.0001 1 1.3];
+conStren = [0.3 1 1.3];
 for cond = 1:numel(conStren)
     R.obs.brn = 3; % temporarily!
     % Setup pulses for PRC computation
@@ -33,7 +33,7 @@ for cond = 1:numel(conStren)
     pU = pU.*pulseAmp;
     uc_ip{1} = uc;
     uc_ip{2} =  uc_ip{1};
-    uc_ip{2}{1}(:,4) = uc{1}(:,4) + pU';
+    uc_ip{2}{1}(:,1) = uc{1}(:,1) + pU'; % Give it a cortical pulse
     
     % Setup the simulations
     Pbase = P;
@@ -43,12 +43,13 @@ for cond = 1:numel(conStren)
     [~,~,~,~,xsim_ip{2}]  = computeSimData(R,m,uc_ip{2},Pbase,0);
     
     XL = [];
-    XL(1,:) = xsim_ip{1}{1}(4,:);
-    XL(2,:) = xsim_ip{2}{1}(4,:);
+    XL(1,:,:) = xsim_ip{1}{1}([1 4],:);
+    XL(2,:,:) = xsim_ip{2}{1}([1 4],:);
     
     PRC = computePRC(PRC,XL,pulseStart,[12 28],fsamp,cond);
 end
 save([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\PRCtmp'],'PRC')
+load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\PRCtmp'],'PRC')
 
 plotSimulatedPRC(PRC,[2 1 3])
 set(gcf,'Position',[711         604        1081         374])

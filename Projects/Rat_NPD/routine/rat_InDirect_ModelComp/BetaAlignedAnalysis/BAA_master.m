@@ -24,7 +24,7 @@ BB.range.RP = linspace(-pi,pi,7);
 BB = computeBetaBurstRPStats(R,BB);
 %% Plot TimeLocked Statistics
 BB.struccmap = linspecer(4);
-TimeLockAnalysisMaster(R,BB,[14 16 20])
+TimeLockAnalysisMaster(R,BB,[15 17 20]); % [15 17 20] for STN_GPE [1 6 8]
 % % TimeLockedBetaPLVAnalysis(R,BB,xsimMod,AS)
 %
 [R,MP] = BAA_sim_betaInputs(R,10,32);

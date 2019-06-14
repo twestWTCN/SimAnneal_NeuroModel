@@ -64,12 +64,19 @@ for i = 1:2
 end
 set(gcf,'Position',[680 104 1024 800])
 figure(7)
-cmap = brewermap(30,'Blues');
-[h,l] = plotBurstAmplitudeDurationHistogram(R,BB,[1 6 8],cmap);
+cmap = brewermap(30,'Reds');
+cntlevs = 0.5:0.5:6;
+[h,l] = plotBurstAmplitudeDurationHistogram(R,BB,[1 6 8],cmap,cntlevs);
 cb = colorbar('southoutside');
-cb.Position = [0.1548    0.0360    0.7589    0.0112]
+cb.Position = [0.1548    0.0360    0.7589    0.0112];
+cb.Label.String = 'Burst Rate (min^-1)';
 set(gcf,'Position',[680    29   336   949])
 figure(8)
-[h,l] = plotBurstAmplitudeDurationHistogram(R,BB,[15 17 20],brewermap(30,'Reds'));
+cmap = brewermap(30,'Blues');
+cntlevs = 0.5:0.5:10;
+[h,l] = plotBurstAmplitudeDurationHistogram(R,BB,[15 17 20],cmap,cntlevs);
+cb = colorbar('southoutside');
+cb.Position = [0.1548    0.0360    0.7589    0.0112];
+cb.Label.String = 'Burst Rate (min^-1)';
 set(gcf,'Position',[680    29   336   949])
 

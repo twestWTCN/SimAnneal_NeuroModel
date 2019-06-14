@@ -3,7 +3,7 @@ load([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_Con
 R.BBA_path ='C:\Users\twest\Documents\Work\GitHub\BurstToolbox';
 addpath( genpath(R.BBA_path));
 % R.condname = {'Fitted','1% M2->STN','150% M2->STN','Fitted','1% STN->GPe','150% STN->GPe'};
-R.condname = num2cell(1:20)
+R.condname = num2cell(1:20);
 cmap = brewermap(18,'Spectral');
 R.condcmap = cmap([1 4 8 16 4 18],:);
 % R.condcmap(6,:) = [0 0 0];
