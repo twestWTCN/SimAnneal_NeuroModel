@@ -26,9 +26,15 @@ BB = computeBetaBurstRPStats(R,BB);
 BB.struccmap = linspecer(4);
 TimeLockAnalysisMaster(R,BB,[15 17 20]); % [15 17 20] for STN_GPE [1 6 8]
 % % TimeLockedBetaPLVAnalysis(R,BB,xsimMod,AS)
-%
+
+% This is a tasty lesion analysis
+BAA_sim_lesionExp(R,MP,32)
+
+% This is a analysis of Beta inputs STR/M2
 [R,MP] = BAA_sim_betaInputs(R,10,32);
+
+% This is pertubation analysis to get PRCs- at the moment its not very
+% clear what were looking for with it
 [R] = BAA_sim_PRC(R,MP,500);
 
 
-BAA_sim_lesionExp(R,MP,32)

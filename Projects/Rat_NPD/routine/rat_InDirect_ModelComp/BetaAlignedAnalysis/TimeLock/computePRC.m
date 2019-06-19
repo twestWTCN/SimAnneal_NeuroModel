@@ -5,7 +5,7 @@ function PRC = computePRC(PRC,XL,pulseStart,bdef,fsamp,cond)
     XL_M2 = ft_preproc_bandpassfilter(squeeze(XL(:,1,:)),fsamp,bdef,[],'but');
     XL_STN = ft_preproc_bandpassfilter(squeeze(XL(:,2,:)),fsamp,bdef,[],'but');
     
-    PRC.pulseStart_cS{cond}(B_sel) = pulseStart;
+    PRC.pulseStart_cS{cond} = pulseStart(1:end-1);
     
     % Relative Phases
     phiL_STN = [];
@@ -13,8 +13,8 @@ function PRC = computePRC(PRC,XL,pulseStart,bdef,fsamp,cond)
     phiL_STN(2,:) = unwrap(angle(hilbert(XL_STN(2,:))));
     
     RPL = [];
-    RPL(1,:) = unwrap(angle(hilbert(XL_STN(1,:)))) - unwrap(angle(hilbert(XL_M2(1,:))));
-    RPL(2,:) = unwrap(angle(hilbert(XL_STN(2,:)))) - unwrap(angle(hilbert(XL_M2(2,:))));
+    RPL(1,:) = unwrap(angle(hilbert(XL_STN(1,:))));% - unwrap(angle(hilbert(XL_M2(1,:))));
+    RPL(2,:) = unwrap(angle(hilbert(XL_STN(2,:))));% - unwrap(angle(hilbert(XL_M2(2,:))));
     RP = wrapToPi(RPL);
     PRC.phiL_cS{cond} = RP;
     

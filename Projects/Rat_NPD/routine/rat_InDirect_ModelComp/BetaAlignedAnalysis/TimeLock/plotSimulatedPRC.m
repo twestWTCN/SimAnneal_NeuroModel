@@ -1,9 +1,9 @@
-function plotSimulatedPRC(PRC,condsel)
+function plotSimulatedPRC(PRC,condsel,conStren)
 
 for i = condsel
-    B_sel = PRC.impBetaLev{i}>50;
+    B_sel = PRC.impBetaLev{i}>0;
     subplot(1,3,2)
-    a = scatter(PRC.impPhi_cS{i}(B_sel),PRC.impdPhi_cS{i}(B_sel),PRC.impBetaLev{i}(B_sel));
+    a = scatter(PRC.impPhi_cS{i}(B_sel),PRC.impdPhi_cS{i}(B_sel),PRC.impBetaLev{i}(B_sel)-min(PRC.impBetaLev{i}(B_sel))+1);
     a.MarkerEdgeColor = PRC.condcmap(i,:);
     a.MarkerFaceColor = PRC.condcmap(i,:);
     a.MarkerFaceAlpha = 0.5;
@@ -34,19 +34,54 @@ for i = condsel
     
     
     subplot(1,3,3)
-   binRP = binDatabyRange(PRC.impPhi_cS{i}(B_sel),-pi:pi/6:pi,PRC.impdA_cS{i}(B_sel),'number');
-    a = scatter(binEdge2Mid(-pi:pi/6:pi),binRP(1:end-1,1));
+   binRP = binDatabyRange(PRC.impPhi_cS{i}(B_sel),-pi:pi/6:pi,PRC.impdPhi_cS{i}(B_sel),'number');
+    a = scatter(binEdge2Mid(-pi:pi/6:pi),binRP(1:end-1,4));
     a.MarkerEdgeColor = PRC.condcmap(i,:);
     a.MarkerFaceColor = PRC.condcmap(i,:);
     a.MarkerFaceAlpha = 0.5;
     hold on
     
-    a = plot(binEdge2Mid(-pi:pi/6:pi),binRP(1:end-1,1));
+    a = plot(binEdge2Mid(-pi:pi/6:pi),binRP(1:end-1,4));
     a.Color = PRC.condcmap(i,:);
     a.LineWidth = 2;
     
     
 end
+
+
+%% Summary STats of PRC
+figure(3)
+
+subplot(2,1,1)
+% For Amplitudes
+for i = 1:size(PRC.impBetaLev,2)
+    B_sel = PRC.impBetaLev{i}>0;
+    mindPhi(i) = min(PRC.impdA_cS{i}(B_sel));
+    maxdPhi(i) = max(PRC.impdA_cS{i}(B_sel));
+    randPhi(i) = range(PRC.impdA_cS{i}(B_sel));
+end
+[p sc] = plotPRCSumStats(conStren,maxdPhi,mindPhi,randPhi,condsel,condcmap);
+
+set(p,'Color',cmap(end,:),'LineWidth',2)
+ylabel('% Change in STN Beta Amplitude')
+xlabel('Connection Strength (% of fitted)')
+grid on
+legend(p,'PRC Max','PRC Min','PRC Range')
+xlim([5 250])
+
+
+subplot(2,1,2)
+% For Angles
+for i = 1:size(PRC.impBetaLev,2)
+    B_sel = PRC.impBetaLev{i}>0;
+    mindPhi(i) = min(PRC.impdPhi_cS{i}(B_sel));
+    maxdPhi(i) = max(PRC.impdPhi_cS{i}(B_sel));
+    randPhi(i) = range(PRC.impdPhi_cS{i}(B_sel));
+end
+[p sc] = plotPRCSumStats(conStren,maxdPhi,mindPhi,randPhi,condsel,condcmap);
+
+
+
 
 % subplot(1,2,1)
 % grid on
