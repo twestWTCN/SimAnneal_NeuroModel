@@ -43,7 +43,8 @@ if fresh
         
         % Setup the simulations
         Pbase = P;
-        Pbase.A{1}(3,4) = log(exp(Pbase.A{1}(3,4))*conStren(cond)); %
+        %         Pbase.A{1}(3,4) = log(exp(Pbase.A{1}(3,4))*conStren(cond)); %
+        Pbase.A{2}(4,3) = log(exp(Pbase.A{2}(4,3))*ck_2(i)); %
         R.obs.brn = 0; % temporarily!
         [~,~,~,~,xsim_ip{1}] = computeSimData(R,m,uc_ip{1},Pbase,0);
         [~,~,~,~,xsim_ip{2}]  = computeSimData(R,m,uc_ip{2},Pbase,0);

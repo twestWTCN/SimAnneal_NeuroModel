@@ -12,6 +12,6 @@ R.obs.trans.norm = 0;
 R.condname = {'Fitted','1% M2->STN','150% M2->STN','Fitted','1% STN ->GPe','150% STN->GPe'};
 R.condnames =  R.condname;
 % R.data = feat{end};
-for HD = 1; %0:1
-R = BAA_sim_ConnectionSweep(R,10,500,HD);
+for HD = 0:1
+R = BAA_sim_ConnectionSweep_v2(R,10,500,HD);
 end

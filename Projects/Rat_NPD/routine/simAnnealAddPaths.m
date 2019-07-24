@@ -23,6 +23,7 @@ addpath(['C:\Users\' usname '\Documents\' madpath '\Circular_Statistics_Toolbox'
 addpath(['C:\Users\' usname '\Documents\' madpath '\DrosteEffect-BrewerMap-221b913'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\export_fig'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\FMINSEARCHBND'])
+addpath(['C:\Users\' usname '\Documents\' madpath '\HotellingT2'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\linspecer'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\MEG_STN_Project'])
 addpath(['C:\Users\' usname '\Documents\' madpath '\Neurospec\neurospec21'])
@@ -38,6 +39,7 @@ addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\
 addpath(genpath(['C:\Users\' usname '\Documents\' madpath '\boundedline-pkg']))
 addpath(genpath(['C:\Users\' usname '\' gitpath '\BrewerMap']))
 addpath(genpath(['C:\Users\' usname '\' gitpath '\BurstToolbox']))
+addpath(genpath(['C:\Users\' usname '\' gitpath '\highdim']))
 addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\data']));
 addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\model_fx']));
 addpath(genpath(['C:\Users\' usname '\' gitpath '\SimAnneal_NeuroModel\Projects\Rat_NPD\priors']));

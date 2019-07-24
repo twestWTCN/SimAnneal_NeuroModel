@@ -35,8 +35,12 @@ for multiStart = 1:2*N
         disp('Writing to Mod List!!')
         fprintf('Now Fitting Mulitstart %.0f',multiStart)
         f = msgbox(sprintf('Fitting Multistart %.0f',multiStart));
-
-        if multiStart > N
+        
+        if multiStart < N
+            load([R.rootn 'outputs\' R.out.tag '\ConfData'],'RSimData')
+            R.data = RSimData(1).data;
+            figure(1);  R.plot.outFeatFx({R.data.feat_emp},{},R.data.feat_xscale,R,1,[])
+        else
             load([R.rootn 'outputs\' R.out.tag '\ConfData'],'RSimData')
             R.data = RSimData(2).data;
             figure(1);  R.plot.outFeatFx({R.data.feat_emp},{},R.data.feat_xscale,R,1,[])
@@ -51,11 +55,11 @@ for multiStart = 1:2*N
         R.SimAn.rep = 128;
         R = setSimTime(R,32);
         R.Bcond = 0;
-         R.plot.save = 1;
+        R.plot.save = 1;
         R.plot.flag = 1;
-        R.SimAn.convIt = 1e-3;
+        R.SimAn.convIt = 1e-4;
         R.SimAn.jitter = 1;
-        SimAn_ABC_220219(R,p,m);
+        SimAn_ABC_220219b(R,p,m);
         closeMessageBoxes
     end
 end

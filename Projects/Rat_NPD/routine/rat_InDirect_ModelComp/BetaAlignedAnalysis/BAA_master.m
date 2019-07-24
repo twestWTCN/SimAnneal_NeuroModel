@@ -7,18 +7,22 @@ clear; close all
 R = simannealsetup_InDirect_ModelComp;
 
 %% Simulate Data
-R = simulateBurstData(R);
-load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim_F1.mat']); % This is the high density one
-load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat']); % This is the normal one
+simulateBurstData(R);
+% load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim_F1.mat']); % This is the high density one
+% load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat']); % This is the normal one
 %% Plot Model Sweep Spectra
 plotSweepSpectraWrapper(R); % WILL ONLY WORK WITH FI
 % %
+% Lesion analysis
+load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_MP.mat'],'MP')
+BAA_sim_lesionExp(R,MP,32)
+
 %% COMPUTE BETA BURSTS
-[R,BB] = computeBurstWrapper(R);
+R = computeBurstWrapper(R);
 close all
 %% Plot Burst Statistics
 load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims.mat'])
-BB = AmpDurStatistics(R,BB);
+BB = AmpDurStatistics(R);
 
 BB.range.RP = linspace(-pi,pi,7);
 BB = computeBetaBurstRPStats(R,BB);
@@ -26,9 +30,6 @@ BB = computeBetaBurstRPStats(R,BB);
 BB.struccmap = linspecer(4);
 TimeLockAnalysisMaster(R,BB,[15 17 20]); % [15 17 20] for STN_GPE [1 6 8]
 % % TimeLockedBetaPLVAnalysis(R,BB,xsimMod,AS)
-
-% This is a tasty lesion analysis
-BAA_sim_lesionExp(R,MP,32)
 
 % This is a analysis of Beta inputs STR/M2
 [R,MP] = BAA_sim_betaInputs(R,10,32);

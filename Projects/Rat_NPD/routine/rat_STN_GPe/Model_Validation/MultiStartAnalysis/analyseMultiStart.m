@@ -74,5 +74,5 @@ T = [parWeighted{:}];
 
 D = pdist(T','euclidean');
 [Y,eigvals] = cmdscale(squareform(D));
-
-save('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave2.mat')
+save('C:\Users\timot\Documents\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave3.mat')
+% save('C:\Users\twest\Documents\Work\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\rat_STN_GPe\Model_Validation\MultiStartAnalysis\MSAsave3.mat')

@@ -34,7 +34,7 @@ R.obs.csd.reps = 32; %96;
 
 %% INTEGRATION
 % Main dynamics function
-R.IntP.intFx = @spm_fx_compile_120319;
+R.IntP.intFx = @spm_fx_compile_120319; %@spm_fx_compile_120319;
 R.IntP.compFx= @compareData_100717;
 
 R.IntP.dt = .001;
