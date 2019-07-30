@@ -76,7 +76,7 @@ end
 
 subplot(1,2,2)
 colormap(bcmap)
-igsc = imagesc(sign(Y).*(Y-X))
+igsc = imagesc(abs(X)-abs(Y))
 set(gca,'YDir','normal');
 caxis([-100 100])
 

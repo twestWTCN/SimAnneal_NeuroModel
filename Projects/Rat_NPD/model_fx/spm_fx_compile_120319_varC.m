@@ -1,20 +1,13 @@
-function [xstore_cond,tvec,wflag,J,Es] = spm_fx_compile_120319(R,x,uc,pc,m)
+function [xstore_cond,tvec,wflag,J,Es] = spm_fx_compile_120319_varC(R,x,uc,pc,m)
 % To Do:
 % 1)Precompute the expectations of the within source parameters and take
 %   outside of the integration loop.
-% If you want to estimate the noise floor - then use 'decon' to deconnect
-% both intrinsic/extrinsic couplings.
-if isfield(R.IntP,'getNoise') && R.IntP.getNoise == 1
-    decon = 0;
-else
-    decon = 1;
-end
-
+%
 cs = 0; % cond counter
 wflag= 0; tvec = [];
 for condsel = 1:numel(R.condnames)
     cs = cs+1;
-    us = uc{cs};
+    u = uc{cs};
     p = pc;
     % Compiles NMM functions with delays, seperates intrinsic and extrinsic
     % dynamics then summates
@@ -63,7 +56,7 @@ for condsel = 1:numel(R.condnames)
     
     efferent(9,:) = [1 1 1 1];               % sources of THAL connections
     afferent(9,:) = [2 2 2 2];               % targets of THAL connections
-       
+    
     
     % scaling of afferent extrinsic connectivity (Hz)
     %--------------------------------------------------------------------------
@@ -119,13 +112,13 @@ for condsel = 1:numel(R.condnames)
     
     D(2,1) = 3/1000;   % M1 to STR (Jaeger and Kita, 2011)
     D(4,1) = 3/1000;  % M1 to STN (Jaeger and Kita, 2011)
-   
+    
     D(3,2) = 7/1000;   % STR to GPe (Kita and Kitai 1991)
     D(5,2) = 12/1000;  % STR to GPi (Kita and Kitai 1991)
-
+    
     D(4,3) = 1/1000;    % GPe to STN (Jaeger and Kita, 2011)
     D(5,3) = 1/1000;    % GPe to GPi (Jaeger and Kita, 2011)
-   
+    
     D(3,4) = 3/1000;    % STN to GPe (Kita and Kitai 1991)
     D(5,4) = 3/1000;    % STN to GPi (Kita and Kitai 1991)
     
@@ -163,7 +156,7 @@ for condsel = 1:numel(R.condnames)
             end
         end
     end
-       
+    
     % Condition Dependent Modulation of Synaptic gains
     %-----------------------------------------
     for i = 1:m.m
@@ -177,7 +170,7 @@ for condsel = 1:numel(R.condnames)
     % Rescale background Input
     for i = 1:m.m
         C    = exp(p.C(i));
-        us(:,i) = C*us(:,i)*0.01;
+        u(:,i) = C*u(:,i)*0.01;
     end
     % Extrinsic connections
     %--------------------------------------------------------------------------
@@ -186,9 +179,9 @@ for condsel = 1:numel(R.condnames)
     alist = [1; 3];
     for i = 1:numel(p.A)
         if cs ~= R.Bcond
-            A{i} = decon*exp(p.A{i});
+            A{i} = exp(p.A{i});
         else
-            A{i} = decon*exp(p.A{i}+p.B{i}); % Add the second condition
+            A{i} = exp(p.A{i}+p.B{i}); % Add the second condition
         end
         %     A{alist(i,2)} = exp(p.A{i});
     end
@@ -213,7 +206,7 @@ for condsel = 1:numel(R.condnames)
     
     % synaptic activation function priors
     %--------------------------------------------------------------------------
-    Rz_base     = 2/3;                      % gain of sigmoid activation function   
+    Rz_base     = 2/3;                      % gain of sigmoid activation function
     B = 0;
     %% Precompute parameter expectations
     % Parameter Priors
@@ -225,12 +218,15 @@ for condsel = 1:numel(R.condnames)
         nbank{i} = N;
         Q = p.int{i};
         Q.T = pQ(i).T.*exp(Q.T);
-        Q.G = decon*pQ(i).G.*exp(Q.G);
+        Q.G = pQ(i).G.*exp(Q.G);
         Q.Rz = Rz_base.*exp(Q.S);
         Rz(i) = Q.Rz(1);
         Q.C  = p.C(i,:);
         qbank{i} = Q;
     end
+    
+    % Dynamic Connectivty base
+    Abase = A;
     
     %% TIME INTEGRATION STARTS HERE ===========================================
     f = zeros(xinds(end),1); dt = R.IntP.dt;
@@ -239,6 +235,7 @@ for condsel = 1:numel(R.condnames)
     else
         xstore = x;
     end
+    
     % pad out the rest of xstore with zeros
     %     xstore =    [xstore zeros(m.xinds(end),(R.IntP.nt+1)-size(xstore,2))];
     
@@ -246,6 +243,14 @@ for condsel = 1:numel(R.condnames)
     xint = zeros(m.n,1);
     TOL = exp(-4);
     for tstep = R.IntP.buffer:R.IntP.nt
+        
+        % Dynamic Modulation of Connectivity
+        % ================================
+        if u(tstep,end)<0
+            A{2}(4,3) = 0.1*Abase{2}(4,3);
+        else
+            A{2}(4,3) = Abase{2}(4,3);
+        end
         % assemble flow
         %==========================================================================
         N     = m;
@@ -267,7 +272,7 @@ for condsel = 1:numel(R.condnames)
             end
             % intrinsic flow at target
             %----------------------------------------------------------------------
-            ui   = us(tstep,i)+ sum(fA);
+            ui   = u(tstep,i)+ sum(fA);
             xi = xstore(m.xinds(i,1):m.xinds(i,2),tstep)';
             f(m.xinds(i,1):m.xinds(i,2)) = fx{nmm(i)}(xi,ui,qbank{i});
             %             f(Dt(1,i))  = f(Dt(1,i)) + sum(fA) ;

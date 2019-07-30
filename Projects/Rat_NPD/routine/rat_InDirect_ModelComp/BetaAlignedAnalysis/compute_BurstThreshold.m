@@ -1,6 +1,7 @@
 function BB = compute_BurstThreshold(R,BB,condsel,plotop)
 surflag = 0;
 % Find the amplitude threshold from the prctile of concatanated data
+
 if surflag == 0
     concatA = [BB.AEnv{condsel}];
     BB.epsAmpfull = prctile(concatA(:,:),R.BB.thresh_prctile ,2);

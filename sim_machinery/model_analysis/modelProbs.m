@@ -66,7 +66,7 @@ elseif R.analysis.BAA.flag
             par = [];
             par{1} = spm_unvec(base(:,end),p);
         case 'UQ'
-%             nmrse = base(end-1,:);
+            %             nmrse = base(end-1,:);
             nmrse = base(end,:);
             X = base(:,nmrse>prctile(nmrse,75));
             par = [];
@@ -83,8 +83,8 @@ u{1} = u{1}.*sqrt(R.IntP.dt);
 [r2,pnew,feat_sim,xsims,xsims_gl,wflag] = computeSimData(R,m,u,pnew,0);
 wfstr = ones(1,N);
 while wfstr(end)>0
-%         parfor (jj = 1:N, parforArg)
-    parfor jj = 1:N
+    parfor (jj = 1:N, parforArg)
+        %     parfor jj = 1:N
         
         %     ppm.increment();
         pnew = par{jj};
@@ -116,9 +116,9 @@ permMod.feat_rep = feat_rep;
 permMod.DKL = DKL;
 permMod.KL = KL;
 xsimMod = xsims_rep;
-    permMod.MAP = spm_unvec(median(base,2),p);
+permMod.MAP = spm_unvec(median(base,2),p);
 [a b] = max([r2rep{:}]);
-    permMod.bestP = spm_unvec(base(:,b),p);
+permMod.bestP = spm_unvec(base(:,b),p);
 
 % mkdir([R.rootn 'outputs\' R.out.tag '2\'])
 % save([R.rootn 'outputs\' R.out.tag '2\permMod_' R.out.tag '_' d '.mat'],'permMod')

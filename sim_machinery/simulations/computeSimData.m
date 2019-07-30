@@ -16,7 +16,7 @@ wflag = 0;
 %% Simulate New Data
 % Integrate in time master fx function
 try
-    [xsims dum wflag] = R.IntP.intFx(R,m.x,uc,pnew,m);
+    [xsims dum1 wflag] = R.IntP.intFx(R,m.x,uc,pnew,m);
 catch
     disp('Simulation failed!')
     xsims{1} = nan(1,3);
