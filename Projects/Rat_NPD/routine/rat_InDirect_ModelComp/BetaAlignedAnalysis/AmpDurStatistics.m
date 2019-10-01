@@ -1,11 +1,11 @@
 function BB = AmpDurStatistics(R,BB)
 close all
 for CON = 1:4
-    load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims_CON_' num2str(CON) '.mat'])
+    load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims_CON_' num2str(CON) '_F1.mat'])
     figure
     % Setup Bin Ranges
-    BB.range.Amp = linspace(0,20,20);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
-    BB.range.Amplr = linspace(0,20,10);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
+    BB.range.Amp = linspace(0,150,20);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
+    BB.range.Amplr = linspace(0,150,10);% 1:0.25:5; %0:5:120; % Group: 0:3:120; single: 0:5:80
     % BB.range.Dur = linspace(50,1400,20);
     BB.range.Dur = linspace(log10(20),log10(1800),20);
     BB.range.Durlr = linspace(log10(20),log10(1800),10);
@@ -18,7 +18,7 @@ for CON = 1:4
     BB.plot.lims.PLV = [-100 100]; %[0 0.35];
     BB.plot.lims.PLVun = [0 0.6];
     BB.plot.lims.wPLV = [-10 10];
-    BB.plot.lims.Amp =  [0 20];
+    BB.plot.lims.Amp =  [0 180];
     BB.plot.lims.wAmpPrc =  [-2 6];
     BB.plot.lims.Dur = log10([15 1800]);
     BB.plot.durlogflag = 1;
@@ -81,7 +81,7 @@ for CON = 1:4
     condsel = find(BB.condstat.ssAmp(1,:)<1e3);
     featlist = {'ssAmp','ssDur','ssPLV'};
     featname = {'Burst Amplitude','Burst Duration','Burst PLV'};
-    yl_list = {[0 10],[0 400],[0.5 1]}
+    yl_list = {[0 180],[0 400],[0.5 1]}
     for feat = 1:3
         subplot(2,3,feat+3)
         boundedline(log10(BB.condlist(condsel)),BB.condstat.(featlist{feat})(1,condsel),BB.condstat.(featlist{feat})(2,condsel)./2)

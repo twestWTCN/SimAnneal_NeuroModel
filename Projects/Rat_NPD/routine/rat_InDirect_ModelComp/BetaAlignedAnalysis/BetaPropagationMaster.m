@@ -1,22 +1,24 @@
-function TimeLockAnalysisMaster(R)
+function BetaPropagationMaster(R)
 addpath(R.BBA_path)
-
+condsel = [5 6 7]; % conditions to be selected
+% If doing cond compar
+condsel = 1:10;
 close all
-for CON = [1 3]
+for CON = 4
     figure
-    load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims_CON_' num2str(CON) '_KrSel.mat'],'BB')
+    load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BBA_' R.out.tag '_Sims_CON_' num2str(CON) '.mat'],'BB')
      BB.struccmap = linspecer(4);
     TL.struccmap = BB.struccmap;
 
     ip = 0;
     
-    for cond = 1:3
+    for cond = condsel
         ip = ip + 1;
         TL.periodT = [-250 250];
-%             TL.periodT = [-50 300];
+        %     TL.periodT = [-50 300];
         TL = defineBurstTimeLockEpoch(BB,TL,cond);
         
-        figure((CON*10)+1)
+        figure(1)
         subplot(1,3,ip)
         plotTLTimeEvolutions(TL,cond,'amp',5)
         title(R.condname{cond})
@@ -25,7 +27,7 @@ for CON = [1 3]
         xlim([TL.periodT])        
         
         
-        figure((CON*10)+2)
+        figure(2)
         subplot(3,3,ip)
         a = genBoxPlot(TL.onsetT{cond}',BB.struccmap,'horizontal');
         b= gca;
@@ -91,8 +93,8 @@ for CON = [1 3]
         
     end
     
-    set(figure((CON*10)+1),'Position',[680          36        1076         264])
-    set(figure((CON*10)+2),'Position',[680          36        1076         942])
+    set(figure(1),'Position',[680          36        1076         264])
+    set(figure(2),'Position',[680          36        1076         942])
 %     for i = [3 4 5 6 7 8 9]
 %         set(figure(i),'Position',[364         656        1445         322])
 %     end
