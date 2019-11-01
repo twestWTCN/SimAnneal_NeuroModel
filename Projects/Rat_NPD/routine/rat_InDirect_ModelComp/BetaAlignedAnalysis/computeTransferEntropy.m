@@ -2,6 +2,8 @@ function [TE,P,anTE,peakTau,ZTE] = computeTransferEntropy(X,Y,taulist,MCSamp)
 % Computes the transfer entropy between X and Y (both directions) by
 % scanning over a range of lags (taulist). Statistics are given by MC
 % estimation using MCSamps. X must be in matrix dim ch x time (x trial)
+% TE(:,1) = Y -> X
+% TE(:,2) = X -> Y
 if nargin<3
     taulist = 1:10;
 end
@@ -9,7 +11,7 @@ if nargin<4
     MCSamp = 1000;
 end
 for tau = taulist
-    [transferEntropy,p,ZTE] = quickTE_TW(X, Y, 'MCnSamples',MCSamp,'delayTrans', tau);
+    [transferEntropy,p,ZTE] = quickTE_TW(X, Y, 'MCnSamples',MCSamp,'delayTrans', tau); 
     meanTE(tau,1) = nanmean(transferEntropy);
     meanZTE(tau,1) = nanmean(ZTE);
     meanP(tau,1) = nanmean(p);

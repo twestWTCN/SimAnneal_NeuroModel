@@ -1,30 +1,33 @@
 function [Rorg] = BAA_sim_BetaPropagation(Rorg,simtime,fresh)
 
 
-% Comopute simulations by sweeping across data
-[Rorg,m,permMod,xsimMod{1}] = getSimModelData_v2(Rorg,10,simtime);
-P = permMod{1}.par_rep{1};
-
-
-Rorg.obs.csd.df = 0.25;
-Rorg = setSimTime(Rorg,simtime);
-Rorg.obs.brn = 3; % temporarily!
 cmap = brewermap(18,'Spectral');
 PRC.condcmap = cmap; %([1 4 8 16 4 18],:);
 PRC.condname = {'Fitted','1% STN->GPe','150% STN->GPe'}; %Fitted','1% M2->STN','150% M2->STN',
 
 % connection list
-% Give all timeseries the same input - makes comparable
-uc = innovate_timeseries(Rorg,m);
-uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
-
 fsamp = 1/Rorg.IntP.dt;
 conStren = [1]; %  0.001 1.3];
 % conStren =linspace(0.001,1.3,18);
 ck_1 = logspace(-2,0.7,24);
 phaseShift = linspace(0,2.*pi,24);
-if fresh
-    for connection = 2 %1:2
+for connection = 1:2 %1:2
+    
+    if fresh
+        % Comopute simulations by sweeping across data
+        [Rorg,m,permMod,xsimMod{1}] = getSimModelData_v2(Rorg,10,simtime);
+        P = permMod{1}.par_rep{1};
+        % Give all timeseries the same input - makes comparable
+        uc = innovate_timeseries(Rorg,m);
+        uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
+        
+        
+        Rorg.obs.csd.df = 0.25;
+        Rorg = setSimTime(Rorg,simtime);
+        Rorg.obs.brn = 3; % temporarily!
+        
+        
+        
         intpow = nan(2,2,2,numel(ck_1),numel(phaseShift)); maxpow = nan(2,2,2,numel(ck_1),numel(phaseShift));
         
         for cond = 1:numel(ck_1)
@@ -110,6 +113,8 @@ if fresh
                         xcorrLAmp(seg) = lag(c==max(c));
                         mid = median([XH YH]);
                         [TE(seg,:),Pv(seg,:),anTE(seg,:),peakTau(seg,:),ZTE(seg,:)] = computeTransferEntropy(X',Y',1:25,100);
+                        % TE(1) = STN -> M2
+                        % TE(2) = M2 -> STN
                         %                     nmis(seg) = nmi(XH<mid,YH<mid);
                     end
                 end
@@ -145,83 +150,115 @@ if fresh
         elseif connection == 2
             save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
         end
+    else
+        if connection == 1
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+        elseif connection == 2
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+        end
     end
-else
-    if connection == 1
-        load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
-    elseif connection == 2
-        load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
-    end
-end
-
-
-for i = 1:6
-    if i == 1
-        LP = AEC; titname = 'Envelope Correlation'; cl = [-0.2 0.5];
-    elseif i == 2
-        LP = PLV; titname = 'Phase Locking'; cl = [0.3 1];
-    elseif i == 3
-        LP = squeeze(TE_mean(1,:,:).*(Pv_mean(1,:,:)<0.05)); titname = 'TE1'; LP(LP==0) = NaN;
-    elseif i == 4
-        LP = squeeze(TE_mean(2,:,:).*(Pv_mean(2,:,:)<0.05)); titname = 'TE2'; LP(LP==0) = NaN;
-    elseif i == 5
-        LP = anTE_mean; titname = 'AnTE';
-    elseif i == 6
-        LP = squeeze(peakTau_mean(1,:,:)); titname = 'Tau';
-    end
-    subplot(2,3,i)
     
-    %  [Fig] = CirHeatmap({LP'}, 'GroupLabels', '1','OuterLabels',sprintfc('%.f',rad2deg(phaseShift)), 'CircType', 'o','InnerSpacerSize',0,'LogRadius',1);
-    %  caxis(cl)
-    contourf(phaseShift,log10(ck_1),LP,10)
-    colorbar
-    ylabel('log Coupling Strength'); xlabel('angle'); title(titname)
-    colormap(flipud(brewermap(128,'RdYlBu')))
-    a.XTick = [0 pi/2 pi 3*pi/2 2*pi]
-    %  a.XTickLabel = {'- \pi','-\pi/2','0','+\pi/2','+\pi'}
-end
-
-set(gcf,'Position',[341         503        1255         447])
-
-% Compute Power Responses
-stn_maxpow = squeeze(maxpow(2,1,2,:,:))';
-stn_maxpow_dmin = (stn_maxpow - min(stn_maxpow)); %./std(stn_maxpow);
-stn_maxpow_nmz = 100.*(stn_maxpow - median(stn_maxpow))./median(stn_maxpow);%./std(stn_maxpow);
-condcmap = brewermap(24,'Reds');
-
-for cond = 1:2:18
-    subplot(1,3,1)
-    b = plot(Rorg.frqz,squeeze(powspec(:,2,2,cond,:))');
-    hold on
-    for u = 1:size(b,1)
-        b(u).Color = condcmap(cond+6,:); %.*(1-(u-1)*0.035);
-        b(u).LineWidth = 1;
+    
+    figure
+    for i = 1:4
+        if i == 1
+            LP = AEC; titname = 'Envelope Correlation'; cl = [-0.25 0.35];
+            crng = linspace(cl(1),cl(2),10);
+        elseif i == 2
+            LP = PLV; titname = 'Phase Locking'; cl = [0.20 0.75];
+            crng = linspace(cl(1),cl(2),10);
+        elseif i == 13
+            LP = squeeze(TE_mean(1,:,:)); titname = 'TE1'; %LP(LP==0) = NaN;
+            LP = LP.*squeeze(Pv_mean(1,:,:)<0.05);
+        elseif i == 14
+            LP = squeeze(TE_mean(2,:,:)); titname = 'TE2';
+            LP = LP.*squeeze(Pv_mean(2,:,:)<0.05);
+        elseif i == 12
+            LP = squeeze(Pv_mean(2,:,:)); titname = 'PV'; LP(LP==0) = NaN; cl =[-inf inf];
+            %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.05);
+        elseif i == 5
+            LP = anTE_mean; titname = 'deltaTE'; cl = [-0.05 0.35];
+%             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
+%             LP(LP==0)    = -32;
+            crng = [linspace(-0.1,-0.05,2) linspace(0.05,cl(2),8)];
+%             crng(crng<0.01
+        elseif i == 3
+            LP = squeeze(ZTE_mean(1,:,:)); titname = 'STN -> M2'; cl = [2.25 4];
+%             LP = LP.*squeeze(Pv_mean(1,:,:)<0.1);
+            %             crng = [0 linspace(cl(1),cl(2),9)];
+            crng = linspace(cl(1),cl(2),10);
+        elseif i == 4
+            LP = squeeze(ZTE_mean(2,:,:)); titname = 'M2 -> STN'; cl = [2.25 4];
+%             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
+            %             crng = [0 linspace(cl(1),cl(2),9)];
+            crng = linspace(cl(1),cl(2),10);
+        end
+        LP(isnan(AEC)) = NaN;
+        subplot(2,2,i)
+        
+        %  [Fig] = CirHeatmap({LP'}, 'GroupLabels', '1','OuterLabels',sprintfc('%.f',rad2deg(phaseShift)), 'CircType', 'o','InnerSpacerSize',0,'LogRadius',1);
+        %  caxis(cl)
+        %         newpoints = 100;
+        %         [xq,yq] = meshgrid(...
+        %             linspace(min(min(phaseShift,[],2)),max(max(phaseShift,[],2)),newpoints ),...
+        %             linspace(min(min(log10(ck_1),[],1)),max(max(log10(ck_1),[],1)),newpoints )...
+        %             );
+        %         LPint = interp2(phaseShift,log10(ck_1),LP,xq,yq,'cubic');
+        %         [a b c] = contourf(xq,yq,LPint,crng)
+        contourf(phaseShift,log10(ck_1),LP,crng)
+        colorbar
+        ylabel('log Coupling Strength'); xlabel('angle'); title(titname)
+        colormap(flipud(brewermap(128,'RdYlBu')))
+        a = gca;
+        a.XTick = [0 pi/2 pi 3*pi/2 2*pi];
+        caxis(cl)
+        axis square
+        %  a.XTickLabel = {'- \pi','-\pi/2','0','+\pi/2','+\pi'}
     end
-    hold on
-    xlabel('Frequency (Hz)'); ylabel('STN Power')
-    ylim([4e-16,4e-13]); xlim([6 38])
-    set(gca, 'YScale', 'log')
-    grid on
     
-    subplot(1,3,2)
-    c = plot(phaseShift,stn_maxpow_nmz(:,cond));
-    c.Color =condcmap(cond+6,:);
-    c.LineWidth = 2;
+    set(gcf,'Position',[198         107        1546         871])
     
-    hold on
-    xlabel('Relative Phase (\phi_{M2} - \phi_{STR})'); ylabel('% Change in STN Beta Power')
-    xlim([0 2*pi])
-    grid on
+    % Compute Power Responses
+    stn_maxpow = squeeze(maxpow(2,1,2,:,:))';
+    stn_maxpow_dmin = (stn_maxpow - min(stn_maxpow)); %./std(stn_maxpow);
+    stn_maxpow_nmz = 100.*(stn_maxpow - median(stn_maxpow))./median(stn_maxpow);%./std(stn_maxpow);
+    condcmap = brewermap(24,'Reds');
+    
+    %     figure
+    %     for cond = 1:2:18
+    %         subplot(1,3,1)
+    %         b = plot(Rorg.frqz,squeeze(powspec(:,2,2,cond,:))');
+    %         hold on
+    %         for u = 1:size(b,1)
+    %             b(u).Color = condcmap(cond+6,:); %.*(1-(u-1)*0.035);
+    %             b(u).LineWidth = 1;
+    %         end
+    %         hold on
+    %         xlabel('Frequency (Hz)'); ylabel('STN Power')
+    %         ylim([4e-16,4e-13]); xlim([6 38])
+    %         set(gca, 'YScale', 'log')
+    %         grid on
+    %
+    %         subplot(1,3,2)
+    %         c = plot(phaseShift,stn_maxpow_nmz(:,cond));
+    %         c.Color =condcmap(cond+6,:);
+    %         c.LineWidth = 2;
+    %
+    %         hold on
+    %         xlabel('Relative Phase (\phi_{M2} - \phi_{STR})'); ylabel('% Change in STN Beta Power')
+    %         xlim([0 2*pi])
+    %         grid on
+    %     end
+    %
+    %
+    %     subplot(1,3,3)
+    %     p = plotPRCSumStats(ck_1,max(stn_maxpow_nmz),min(stn_maxpow_nmz),range(stn_maxpow_nmz),1:2:18,condcmap);
+    %
+    %     set(p,'Color',cmap(end,:),'LineWidth',2)
+    %     ylabel('% Change in STN Beta Amplitude')
+    %     xlabel('Connection Strength (% of fitted)')
+    %     grid on
+    %     legend(p,'PRC Max','PRC Min','PRC Range')
+    %     set(gca, 'XScale', 'log')
+    %     set(gcf,'Position',[103 595 1362 360])
 end
-
-
-subplot(1,3,3)
-p = plotPRCSumStats(ck_1,max(stn_maxpow_nmz),min(stn_maxpow_nmz),range(stn_maxpow_nmz),1:2:18,condcmap);
-
-set(p,'Color',cmap(end,:),'LineWidth',2)
-ylabel('% Change in STN Beta Amplitude')
-xlabel('Connection Strength (% of fitted)')
-grid on
-legend(p,'PRC Max','PRC Min','PRC Range')
-set(gca, 'XScale', 'log')
-set(gcf,'Position',[103 595 1362 360])
