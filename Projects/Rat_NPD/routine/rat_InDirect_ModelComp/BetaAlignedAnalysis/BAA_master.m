@@ -7,7 +7,7 @@ clear; close all
 R = simannealsetup_InDirect_ModelComp;
 
 %% Simulate Data
-simulateBurstData(R);
+% simulateBurstData(R);
 % load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim_F1.mat']); % This is the high density one
 % load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat']); % This is the normal one
 %% Plot Model Sweep Spectra

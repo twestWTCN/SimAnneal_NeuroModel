@@ -18,10 +18,10 @@ R.IntP.getNoise = 1;
 [dum1,dum2,feat_sim_noise,dum3,xsim_noise] = computeSimData(R,m,uc,XBase,0);
 R.IntP.getNoise = 0;
 
-for CON = 1:4
+for CON = 1
     feat = {};
     xsim = {};
-    for i = 1:numel(ck_1)
+    parfor i = 1:numel(ck_1)
         % Now Modify
         Pbase = XBase;
         if CON == 1 % Hyperdirect
