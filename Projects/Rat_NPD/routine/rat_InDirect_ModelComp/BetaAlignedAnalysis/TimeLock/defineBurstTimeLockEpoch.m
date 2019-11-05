@@ -16,7 +16,6 @@ for i = 1:numel(segInds)-1
     preBo = [Bo(1)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(1)-1]; %pre burst onset
     postBo = [Bo(1): Bo(1) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
     
-    %
     % If you want to do it aligned to burst termination (epochdef)
     %         preBo = [Bo(end)+ floor((TL.periodT(1)/1e3)*BB.fsamp):Bo(end)-1]; %pre burst onset
     %         postBo = [Bo(end): Bo(end) + floor((TL.periodT(2)/1e3)*BB.fsamp) + 1]; % post burst onset
@@ -26,14 +25,14 @@ for i = 1:numel(segInds)-1
     % Convert from full time to SW time
     if preBo(1)>0 && postBo(end)<size(BB.AEnv{cond},2)
         % Find onset Time aligned to beta onset
-        A = BB.AEnv{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
+        A = BB.AEnv{cond}(:,epochdef);%.*hanning(numel(epochdef))'; % amplitude data
 %         Apost = [zeros(size(A,1),size(preBo,2)) BB.AEnv{cond}(:,postBo)];%.*hanning(numel(epochdef))'; % amplitude data
         AH = BB.AEnv{cond}(:,epochdef).*hanning(numel(epochdef))'; % amplitude data
         % Find Crossing times with respect to STN onset
         epsCross = []; maxCross = []; epsLast = [];
         for L = 1:size(BB.AEnv{cond},1)
             if any(AH(L,:)>localeps(L)) % For finding maximums locally
-                [dum ec] = find(A(L,:)>=prctile(A(L,:),99),1,'first');
+                [dum ec] = find(A(L,:)>=prctile(A(L,:),95),1,'first');
                 maxCross(L) =  TL.epochT(ec);
                 
                 [dum ec] = find(AH(L,:)>localeps(L),1,'first');

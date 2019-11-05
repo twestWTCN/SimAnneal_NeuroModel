@@ -1,7 +1,7 @@
-function [R] = BAA_sim_lesionExp(R,MP,simtime)
+function [R] = BAA_sim_lesionExp(R,simtime)
 % Comopute simulations by sweeping across data
-% [R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
-% MP = permMod{1}.par_rep{1};
+[R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,10,simtime);
+p = permMod{1}.par_rep{1};
 R = setSimTime(R,simtime);
  R.Bcond = -1;
 cmap = brewermap(18,'Spectral');
@@ -9,34 +9,37 @@ cmap = brewermap(18,'Spectral');
 condname = {'Fitted','M2->STR','M2->STN','M2->Thal','STN->GPe','STR-|Gpe','STR->GPi','GPe-|STN','STN->GPi','GPi-|Thal','Thal->M2'};
 AIJ = {[],[1 2 1],[1 4 1],[1 6 1],[1 3 4],[2 3 2],[2 5 2],[2 4 3],[1 5 4],[2 6 5],[1 1 6]};
 
-m = MP.m;
-P = MP.p;
+ MP.m = m;
+ MP.p = p;
 % connection list
 % Give all timeseries the same input - makes comparable
 uc = innovate_timeseries(R,m);
 uc{1} = uc{1}.*sqrt(R.IntP.dt);
 R.obs.trans.norm = 0;
-Pbase = P;
-% for i = 1:size(condname,2)
-%     Pbase_i = Pbase;
-%     if i~=1
-%         Pbase_i.A{AIJ{i}(1)}(AIJ{i}(2),AIJ{i}(3)) = -32;
-%     end
-%     parfor j = 1:size(condname,2)    % Setup the simulations
-%         
-%         Pbase_ij = Pbase_i;
-%         if j~=1
-%             Pbase_ij.A{AIJ{j}(1)}(AIJ{j}(2),AIJ{j}(3)) = -32;
-%         end
-%         [r2,~,feat_sim] = computeSimData(R,m,uc,Pbase_ij,0);
-%         powIJ_B(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>14 & R.frqz<30)));
-%         powIJ_B1(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>14 & R.frqz<21)));
-%         powIJ_B2(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>21 & R.frqz<30)));
-%         fitIJ(j,i) = r2;
-%         disp([i j])
-%     end
-% end
-load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BAA_lesion'],'powIJ_B','powIJ_B1','powIJ_B2','condname')
+% R.obs.outstates = find([MP.m.outstates{:}]);
+% R.obs.obsstates = 1:4;
+Pbase = p;
+for i = 1:size(condname,2)
+    Pbase_i = Pbase;
+    if i~=1
+        Pbase_i.A{AIJ{i}(1)}(AIJ{i}(2),AIJ{i}(3)) = -32;
+    end
+    parfor j = 1:size(condname,2)    % Setup the simulations
+        
+        Pbase_ij = Pbase_i;
+        if j~=1
+            Pbase_ij.A{AIJ{j}(1)}(AIJ{j}(2),AIJ{j}(3)) = -32;
+        end
+        [r2,~,feat_sim] = computeSimData(R,m,uc,Pbase_ij,0);
+        powIJ_B(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>14 & R.frqz<30)));
+        powIJ_B1(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>14 & R.frqz<21)));
+        powIJ_B2(j,i) = sum(feat_sim(1,4,4,3,(R.frqz>21 & R.frqz<30)));
+        fitIJ(j,i) = r2;
+        disp([i j])
+    end
+end
+ save([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BAA_lesion'],'powIJ_B','powIJ_B1','powIJ_B2','condname')
+% load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BAA_lesion'],'powIJ_B','powIJ_B1','powIJ_B2','condname')
 
 % Plot heatmaps
 for band = 1
@@ -76,7 +79,7 @@ end
 
 subplot(1,2,2)
 colormap(bcmap)
-igsc = imagesc(abs(X)-abs(Y))
+igsc = imagesc(Y-X)
 set(gca,'YDir','normal');
 caxis([-100 100])
 
