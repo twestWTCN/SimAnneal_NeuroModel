@@ -1,5 +1,5 @@
 function plotSimulatedPRC(PRC,condsel,conStren)
-
+cmap = brewermap(18,'Spectral');
 for i = condsel
     B_sel = PRC.impBetaLev{i}>0;
     subplot(1,3,2)

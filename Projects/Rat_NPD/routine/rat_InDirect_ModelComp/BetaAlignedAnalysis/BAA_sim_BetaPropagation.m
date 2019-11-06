@@ -6,11 +6,15 @@ coupname = {'M2/GPi','STR/GPi','STN/GPi'};
 N = 12;
 % connection list
 fsamp = 1/Rorg.IntP.dt;
-conStren = [1]; %  0.001 1.3];
-% conStren =linspace(0.001,1.3,18);
-ck_1 = logspace(-0.75,0.75,N);
+% ck_1 = logspace(-0.75,0.75,18);
 phaseShift = linspace(0,2.*pi,N);
-for connection = 1:2 %1:2
+for connection = 1:2
+    
+    if connection ==1
+        ck_1 = linspace(0.05,1.5,18); % [0.1 1 1.15]; STN-> GPe
+    elseif connection == 2
+        ck_1 = linspace(0.05,2.5,18); % [0.1 1 1.15]; M2 -> STN
+    end    
     if fresh
         % Comopute simulations by sweeping across data
         [Rorg,m,permMod,xsimMod{1}] = getSimModelData_v2(Rorg,10,simtime);
@@ -34,6 +38,7 @@ for connection = 1:2 %1:2
                 R.obs.brn = 0;
                 % Setup the simulations
                 Pbase = P;
+                
                 if connection == 1
                     Pbase.A{1}(4,1) = log(exp(Pbase.A{1}(4,1))*ck_1(cond)); %
                 else
@@ -48,7 +53,7 @@ for connection = 1:2 %1:2
                 [R,BB] = compute_BetaBursts_Simulated(R,xsim_ip{1});
                 R.BB.thresh_prctile = 75;% o85; tl 80
                 BB = compute_BurstThreshold(R,BB,1,0);
-                R.BB.minBBlength = 0.5; %o1 tl 1.5; %  Minimum burst period- cycles
+                R.BB.minBBlength = 1.5; %o1 tl 1.5; %  Minimum burst period- cycles
                 BB.plot.durlogflag = 0;
                 BB = defineBetaEvents(R,BB);
                 
@@ -74,8 +79,8 @@ for connection = 1:2 %1:2
                     pulseStart(seg) = BB.segInds{1}{seg}(1) + pulseDelay;
                     pulseInds = pulseStart(seg):pulseStart(seg)+pulseWid-1;
                     if pulseInds(end)<=size(BB.Phi{1},2)
-                        pulse_Phi = BB.Phi{1}(4,pulseInds);
-                        pulseKern = sin(pulse_Phi+(phaseShift(p))); %
+                        pulse_Phi = BB.Phi{1}(4,pulseInds); %shifted relative to STN phase
+                        pulseKern = sin(pulse_Phi+(phaseShift(p))); % shifted
                         pU(pulseInds) = pulseKern;
                     end
                 end
@@ -94,7 +99,7 @@ for connection = 1:2 %1:2
                         X1 = xsim_ip{2}{1}(1,pulseInds);
                         X2 = xsim_ip{2}{1}(2,pulseInds);
                         X3 = xsim_ip{2}{1}(4,pulseInds);
-                        Y = xsim_ip{2}{1}(5,pulseInds);
+                        Y = xsim_ip{2}{1}(6,pulseInds);
                         
                         [corrAmp(seg,:),xcorrAmp(seg,:),corrPhi(seg,:),xcorrLAmp(seg,:),TE(seg,:,:),...
                             Pv(seg,:,:),anTE(seg,:),peakTau(seg,:,:),ZTE(seg,:,:)] = computePropMetrics([X1;X2;X3],Y);
@@ -128,29 +133,28 @@ for connection = 1:2 %1:2
                 intpow(:,:,:,cond,p) = intpow_tmp; % channel band stim K phi
                 maxpow(:,:,:,cond,p) = maxpow_tmp;
                 powspec(:,:,:,cond,p)= powspec_tmp;
-            end
-            
+            end           
         end
         if connection == 1
-            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'XCor','AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
         elseif connection == 2
-            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'XCor','AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
         end
     else
         if connection == 1
-            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'XCor','AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
         elseif connection == 2
-            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'XCor','AEC','AEC_mean','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
         end
     end
 
 for i = 1:8
     if i == 1
-        LP = AEC; titname = 'Envelope Correlation'; cl = [-0.25 0.35];
-        crng = linspace(cl(1),cl(2),10);
+        LP = XCor; titname = 'Envelope Correlation'; cl = [0.75 1];
+        crng = linspace(cl(1),cl(2),12);
     elseif i == 2
-        LP = PLV; titname = 'Phase Locking'; cl = [0.20 0.75];
-        crng = linspace(cl(1),cl(2),10);
+        LP = PLV; titname = 'Phase Locking'; cl = [0.3 1];
+        crng = linspace(cl(1),cl(2),12);
     elseif i == 3
         LP = squeeze(TE_mean(1,:,:,:)); titname = 'TE1'; %LP(LP==0) = NaN;
 %         LP = LP.*squeeze(Pv_mean(1,:,:,:)<0.05);
@@ -190,7 +194,7 @@ for i = 1:8
         %             );
         %         LPint = interp2(phaseShift,log10(ck_1),LP,xq,yq,'cubic');
         %         [a b c] = contourf(xq,yq,LPint,crng)
-        contourf(phaseShift,log10(ck_1),squeeze(LP(p,:,:))); %,crng)
+        contourf(phaseShift,log10(ck_1),squeeze(LP(p,:,:)))
         colorbar
         ylabel('log Coupling Strength'); xlabel('angle'); title([coupname{p} ' ' titname])
         colormap(flipud(brewermap(128,'RdYlBu')))
@@ -211,6 +215,7 @@ stn_maxpow_dmin = (stn_maxpow - min(stn_maxpow)); %./std(stn_maxpow);
 stn_maxpow_nmz = 100.*(stn_maxpow - median(stn_maxpow))./median(stn_maxpow);%./std(stn_maxpow);
 condcmap = brewermap(24,'Reds');
 
+% surf(phaseShift,log10(ck_1),squeeze(PLV(3,:,:))')
 %     figure
 %     for cond = 1:2:18
 %         subplot(1,3,1)
