@@ -63,7 +63,7 @@ for ctype =1:2
     end
     figure(ctype)
     condcmap = cmap;
-    NcS_sel = [1 5 10 14 ];
+    NcS_sel = [1 5 10 14 18];
     for cond = NcS_sel
         subplot(1,3,1)
         b = plot(R.frqz,squeeze(stn_powspec(:,:,cond))');
