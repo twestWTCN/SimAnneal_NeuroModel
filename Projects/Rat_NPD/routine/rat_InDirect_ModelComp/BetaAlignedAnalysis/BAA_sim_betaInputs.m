@@ -80,9 +80,9 @@ for ctype =1:2
         c = plot(pki,stn_maxpow_nmz(:,cond));
         c.Color =condcmap(cond+6,:);
         c.LineWidth = 2;
-    a = gca;
-    a.XTick = [-pi -pi/2 0 pi/2 pi];
-
+        a = gca;
+        a.XTick = [-pi -pi/2 0 pi/2 pi];
+        
         hold on
         xlabel('Relative Phase (\phi_{M2} - \phi_{STR})'); ylabel('% Change in STN Beta Power')
         xlim([-pi pi])
