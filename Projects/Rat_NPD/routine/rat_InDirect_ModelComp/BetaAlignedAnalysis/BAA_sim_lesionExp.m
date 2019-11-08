@@ -26,16 +26,16 @@ if fresh == 1
         if i~=1
             Pbase_i.A{AIJ{i}(1)}(AIJ{i}(2),AIJ{i}(3)) = -32;
         end
-        parfor j = 1:size(condname,2)    % Setup the simulations
+        for j = 1:size(condname,2)    % Setup the simulations
             
             Pbase_ij = Pbase_i;
             if j~=1
                 Pbase_ij.A{AIJ{j}(1)}(AIJ{j}(2),AIJ{j}(3)) = -32;
             end
             [r2,~,feat_sim] = computeSimData(R,m,uc,Pbase_ij,0);
-            [powIJ_B(j,i),peakIJ_B(j,i),freqIJ_B(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),14:30);
-            [powIJ_B1(j,i),peakIJ_B1(j,i),freqIJ_B1(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),14:21);
-            [powIJ_B2(j,i),peakIJ_B2(j,i),freqIJ_B2(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),21:30);
+            [powIJ_B(j,i),peakIJ_B(j,i),freqIJ_B(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),[14 30]);
+            [powIJ_B1(j,i),peakIJ_B1(j,i),freqIJ_B1(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),[14 30]);
+            [powIJ_B2(j,i),peakIJ_B2(j,i),freqIJ_B2(j,i)] = findSpectralStats(R.frqz,squeeze(feat_sim(1,4,4,3,:)),[14 30]);
             fitIJ(j,i) = r2;
             disp([i j])
         end
@@ -61,14 +61,14 @@ for band = 1:3
         X = (powIJ_B2-powIJ_B2(1,1))./(powIJ_B2(1,1)).*100;
         Y = (freqIJ_B2-freqIJ_B2(1,1))./(freqIJ_B2(1,1)).*100;
     end
-    %     bcmap = brewermap(128,'RdGy');
-    %     subplot(1,2,1)
-    %     colormap(bcmap)
-    %     igsc = imagesc(X)
-    %     set(gca,'YDir','normal');
-    %     cb = colorbar;
-    %     caxis([-100 100])
-    %     title(titn)
+        bcmap = brewermap(128,'RdGy');
+        subplot(1,2,1)
+        colormap(bcmap)
+        igsc = imagesc(X)
+        set(gca,'YDir','normal');
+        cb = colorbar;
+        caxis([-100 100])
+%         title(titn)
     
     % Plot as Barplots
     subplot(2,3,band)
