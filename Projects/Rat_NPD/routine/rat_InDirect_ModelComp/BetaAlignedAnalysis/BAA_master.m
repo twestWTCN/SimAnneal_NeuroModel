@@ -8,6 +8,7 @@ R = simannealsetup_InDirect_ModelComp;
 
 %% Plot Model Sweep Spectra
 plotSweepSpectraWrapper(R); % WILL ONLY WORK WITH FI
+R = plotSweepSpectraWrapper_M2_SI(R)
 % %
 simulateBurstData(R);
 
@@ -32,7 +33,7 @@ OnsetEvolveAnalysisMaster(R)
 [R] = BAA_sim_PRC(R,MP,500,0);
 [R] = BAA_sim_fakeCloseLoop(R,500,0);
 
-[R] = BAA_sim_BetaPropagation(R,160,0); %remember reference of Boba and Hamacher 2015 for ZTE
+[R] = BAA_sim_BetaPropagation(R,48,1); %remember reference of Boba and Hamacher 2015 for ZTE
  
  
 % BB.range.RP = linspace(-pi,pi,7);
