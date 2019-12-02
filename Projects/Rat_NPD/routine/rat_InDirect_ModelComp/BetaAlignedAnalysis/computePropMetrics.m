@@ -16,3 +16,4 @@ for i = 1:size(X,1)
     [TE(:,i),Pv(:,i),anTE(i),peakTau(:,i),ZTE(:,i)] = computeTransferEntropy(X(i,:)',Y',1:25,0);
 %    TE(:,i) = nan(2,1); Pv = nan(2,1); anTE(i) = nan; peakTau = nan(2,1); ZTE = nan(2,1);
 end
+ a = 1;

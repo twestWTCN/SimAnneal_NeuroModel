@@ -21,10 +21,8 @@ for tau = taulist
     meanP(tau,2) = nan; %nanmean(p);
 end
 
-meanTE(meanTE(:,1)==0,:) = [];
-meanZTE(meanZTE(:,1)==0,:) = [];
-meanP(meanP(:,1)==0,:) = [];
-[a b] = min(meanP);
+
+[a b] = min(meanP,[],1);
 peakTau = taulist(b);
 TE = [meanTE(b(1),1) meanTE(b(2),2)];
 ZTE = [meanZTE(b(1),1) meanZTE(b(2),2)];

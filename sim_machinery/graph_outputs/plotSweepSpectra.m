@@ -5,7 +5,7 @@ end
 
 for i = condsel
     
-    if max(squeeze(feat{i}(1,4,4,1,:)))<1e-8
+    if max(squeeze(feat{i}(1,chsel(1),chsel(2),chsel(3),:)))<1e-8
         a(i) = plot(Hz,squeeze(feat{i}(1,chsel(1),chsel(2),chsel(3),:)),'color',cmap(i,:),'LineWidth',2);
         %     a(i) = plot(Hz,squeeze(feat{i}(1,4,1,2,:)),'color',cmap(i,:),'LineWidth',2);
         hold on

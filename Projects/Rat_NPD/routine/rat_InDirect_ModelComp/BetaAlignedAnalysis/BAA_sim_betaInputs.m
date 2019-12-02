@@ -43,6 +43,16 @@ for ctype =1:2
             
             [r2mean,pnew,feat_sim,dum,xsim_gl] = computeSimData(R,m,uc_i,Pbase,0);
             
+            
+            X1 = xsim_gl{1}(1,:);
+            X2 = xsim_gl{1}(2,:);
+            X3 = xsim_gl{1}(3,:);
+            X = reshape([X1;X2;X3],3,1,[]);
+            Y = xsim_gl{1}(4,:);
+            
+            [corrAmp(i,cond,:),xcorrAmp(i,cond,:),corrPhi(i,cond,:),xcorrLAmp(i,cond,:),TE(i,cond,:,:),...
+                Pv(i,cond,:,:),anTE(i,cond,:),peakTau(i,cond,:,:),ZTE(i,cond,:,:)] = computePropMetrics(X,Y);
+            
             ts_lp{i,cond} = xsim_gl;
             feat_lp{i,cond} = feat_sim;
             
@@ -53,6 +63,13 @@ for ctype =1:2
         end
         
     end
+        if ctype == 2
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaM2STRInput_HD.mat'],'corrAmp','xcorrAmp','corrPhi','xcorrLAmp','TE','Pv','anTE','peakTau','ZTE','stn_intpow','stn_maxpow')
+        elseif connection == 1
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaM2STRInput_STNGPe.mat'],'corrAmp','xcorrAmp','corrPhi','xcorrLAmp','TE','Pv','anTE','peakTau','ZTE','stn_intpow','stn_maxpow')
+        end
+    
+    
     % load('PRC_betainput_tmp.mat')
     stn_maxpow_dmin = (stn_maxpow - min(stn_maxpow)); %./std(stn_maxpow);
     stn_maxpow_nmz = 100.*(stn_maxpow - median(stn_maxpow))./median(stn_maxpow);%./std(stn_maxpow);

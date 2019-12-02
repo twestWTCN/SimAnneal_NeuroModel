@@ -8,6 +8,7 @@ R = simannealsetup_InDirect_ModelComp;
 
 %% Plot Model Sweep Spectra
 plotSweepSpectraWrapper(R); % WILL ONLY WORK WITH FI
+R = plotSweepSpectraWrapper_M2_SI(R)
 % %
 simulateBurstData(R);
 

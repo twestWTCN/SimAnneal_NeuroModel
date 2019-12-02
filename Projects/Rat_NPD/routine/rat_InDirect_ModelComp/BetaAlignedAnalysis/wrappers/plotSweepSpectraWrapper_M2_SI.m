@@ -1,4 +1,4 @@
-function R = plotSweepSpectraWrapper(R)
+function R = plotSweepSpectraWrapper_M2_SI(R)
 close all
 % load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_feat_F1.mat'],'feat_HD','feat_STR_GPe')
 cmap = brewermap(30,'Spectral');
@@ -16,7 +16,7 @@ for CON = [1 3]
     subplot(2,2,ip)
     plotSweepSpectra(R.frqz,feat,feat{6},cmap1,{R.condname{[2 1 3]}},[1 15 30],1:2:30,[1,1,1])
     title(R.CONnames{CON})
-    ylim([1e-16 1e-11])
+    ylim([1e-15 0.5e-13])
     set(gca, 'YScale', 'log', 'XScale', 'log')
     
     figure(2)
@@ -28,7 +28,7 @@ for CON = [1 3]
 end
 % set(gcf,'Position',[684         501        1024         366])
 
-ck_1 = logspace(-1,0.7,30);
+% ck_1 = logspace(-1,0.7,30);
 
 % cmap = brewermap(30,'Reds');
 
@@ -38,17 +38,17 @@ for CON = [1 3]
     load([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_CON_' num2str(CON) '_feat_F1.mat'])
     bpow = []; fpow = [];
     for ck = 1:numel(feat)
-        [bpowr_br(ck) b] = max(feat{ck}(1,4,4,3,R.frqz>14 & R.frqz<21));
+        [bpowr_br(ck) b] = max(feat{ck}(1,1,1,3,R.frqz>14 & R.frqz<21));
         fpow_br(ck) = R.frqz(b) + R.frqz(1);
-        [bpowr(ck) b] = max(feat{ck}(1,4,4,3,R.frqz>14 & R.frqz<30));
+        [bpowr(ck) b] = max(feat{ck}(1,1,1,3,R.frqz>14 & R.frqz<30));
         fpow(ck) = R.frqz(b) + R.frqz(1);
         [bcohr(ck) b] = max(feat{ck}(1,4,1,2,R.frqz>14 & R.frqz<30));
         fcoh(ck) = R.frqz(b) + R.frqz(1);
     end
     
     % Scale bpow to 0
-    [a zind] = min(abs(ck_1-1)); % base model
-    bpow = 100*(bpowr-bpowr(zind))/bpowr(zind);
+    [a zind] = min(abs(ck_1-1));
+    bpow = 100*(bpowr)/bpowr(zind);
     bpowr_br = 100*(bpowr_br)/bpowr_br(zind);
     % Remove non-physiological
     powInds = find(bpowr>1e-8);
@@ -56,8 +56,6 @@ for CON = [1 3]
     bpow(powInds) = nan(1,numel(powInds));
     fcoh(powInds) = nan(1,numel(powInds));
     bcohr(powInds) = nan(1,numel(powInds));
-    
-    bcohr = 100*(bcohr-bcohr(zind))/bcohr(zind);
     
     % Find the indices of band power
     [dum b1] = min(abs(bpowr_br-10));
@@ -70,8 +68,8 @@ for CON = [1 3]
     subplot(2,2,ip+2)
     br = plot(log10(ck_1(1,:)),(bpow),'k-');
     hold on
-    Sr = scatter(log10(ck_1(1,:)),log10(bpow),50,cmap1,'filled');
-    ylabel('log % of STN Fitted Power')
+    Sr = scatter(log10(ck_1(1,:)),(bpow),50,cmap1,'filled');
+    ylabel('log % of Fitted Power')
     grid on
     
     yyaxis right
@@ -84,8 +82,9 @@ for CON = [1 3]
     title(R.CONnames{CON})
     xlim([-1 1]); ylim([12 25])
     yyaxis left
-    ylim([-100 150])
-    
+    ylim([10 400])
+        set(gcf,'Position',[600         374        760         604])
+
     figure(2)
     subplot(2,2,ip+2)
     br = plot(log10(ck_1(1,:)),bcohr,'k-');
@@ -104,10 +103,9 @@ for CON = [1 3]
     title(R.CONnames{CON})
     xlim([-1 1]); ylim([12 25])
     yyaxis left
-    ylim([-50 50])
-    
-    
+    ylim([0 1])
+        set(gcf,'Position',[600         374        760         604])
+
 end
 R.betaKrange = betaKrange;
 % R.betaKrange(3,3) = 19;
-set(gcf,'Position',[600         374        760         604])
