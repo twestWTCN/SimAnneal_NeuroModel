@@ -11,10 +11,10 @@ fsamp = 1/Rorg.IntP.dt;
 phaseShift = linspace(-pi,pi,N);
 for connection = 1:2
     if connection ==1
-        ck_1 = linspace(0.005,3.5,24); % [0.1 1 1.15]; STN-> GPe
+        ck_1 = 1; %linspace(0.005,3.5,24); % [0.1 1 1.15]; STN-> GPe
         %         ck_1 = logspace(log10(0.05),log10(3.5),18);
     elseif connection == 2
-        ck_1 = linspace(0.005,1.5,24); % [0.1 1 1.15]; M2 -> STN
+        ck_1 = 1; %linspace(0.005,1.5,24); % [0.1 1 1.15]; M2 -> STN
         %         ck_1 = logspace(log10(0.05),log10(1.5),18);
     end
     if fresh
@@ -31,9 +31,10 @@ for connection = 1:2
         uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
         intpow = nan(2,2,2,numel(ck_1),numel(phaseShift)); maxpow = nan(2,2,2,numel(ck_1),numel(phaseShift));
         
-        for cond = 12; %1:numel(ck_1)
+        for cond = 1:numel(ck_1)
             for p = 1:numel(phaseShift) %[1 10] %
                 uc_ip = {};
+                uc{1}(2:end,1) = uc{1}(2:end,1);% + gmx';
                 uc_ip{1} = uc;
                 uc_ip{2} = uc;
                 % Setup pulses for PRC computation
@@ -50,7 +51,6 @@ for connection = 1:2
                 
                 % Unperturbed
                 xsim_ip = {}; feat_sim = {};
-                uc_ip{1}{1}(2:end,1) = uc_ip{1}{1}(2:end,1) + gmx';
                 [~,~,feat_sim{1},~,xsim_ip{1}] = computeSimData(R,m,uc_ip{1},Pbase,0);
                 
                 % Now find bursts!!
@@ -80,21 +80,35 @@ for connection = 1:2
                 for seg = 1:numel(BB.segInds{1})-1
                     pulseStart(seg) = BB.segInds{1}{seg}(1) + pulseDelay;
                     pulseInds = pulseStart(seg):pulseStart(seg)+pulseWid-1;
+                    stngpedata_bfor(:,:,seg) = xsim_ip{1}{1}([3 4],pulseInds);
+                    stngpephi_bfor(:,seg) = BB.Phi{1}(4,pulseInds);
                     if pulseInds(end)<=size(BB.Phi{1},2)
                         pulse_Phi = BB.Phi{1}(4,pulseInds); %shifted relative to STN phase
                         pulseKern = sin(pulse_Phi+(phaseShift(p))); % shifted
                         pU(pulseInds) = pulseKern ;
                     end
                 end
-                pU = (0.5.*std(uc{1}(:,1))).*pU; %.*pulseAmp;
+                pU = (0.25.*std(uc{1}(:,1))).*pU; %.*pulseAmp;
                 uc_ip{2} =  uc_ip{1};
                 uc_ip{2}{1}(:,1) = uc_ip{2}{1}(:,1) + pU'; % Give it a cortical pulse
                 [~,~,feat_sim{2},~,xsim_ip{2}]  = computeSimData(R,m,uc_ip{2},Pbase,0);
                 
-                XAct = xsim_ip{1}{1};
-                XActHB_0 = ft_preproc_bandpassfilter(XAct,2000,[60 80]);
-                XAct = xsim_ip{2}{1};
-                XActHB_1 = ft_preproc_bandpassfilter(XAct,2000,[60 80]);                
+                figure(1)
+                subplot(1,6,p)
+                a = squeeze(mean(stngpedata_bfor,3));
+                plot(a(1,:),a(2,:))
+                
+%                 % Find list of circle crossings
+%                 find((stngpephi_bfor(:,1)>-pi/6) & (stngpephi_bfor(:,1)<pi/6))
+%                 
+%                 [M,I] = min(abs(stngpephi_bfor(:,1)-0))
+%                 
+%                 find(stngpephi_bfor(:,1)-0),1)
+                
+                XAct_0 = xsim_ip{1}{1};
+                XActHB_0 = ft_preproc_bandpassfilter(XAct_0,2000,[60 80]);
+                XAct_1 = xsim_ip{2}{1};
+                XActHB_1 = ft_preproc_bandpassfilter(XAct_1,2000,[60 80]);                
                 %                 XAct = ft_preproc_bandstopfilter(XAct,2000,[14 34]);
 %                 XActLP = ft_preproc_lowpassfilter(XAct,2000,14);
 %                 XActHB = ft_preproc_highpassfilter(XAct,2000,40);
@@ -103,6 +117,7 @@ for connection = 1:2
                 TE = []; Pv = []; anTE = []; peakTau = []; ZTE = [];
                 for seg = 1:numel(BB.segInds{1})-1
                     pulseStart(seg) = BB.segInds{1}{seg}(1) + pulseDelay;
+                    stngpedata_afta(:,:,seg) = xsim_ip{2}{1}([3 4],pulseInds);
                     pulseInds = pulseStart(seg):pulseStart(seg)+pulseWid-1;
                     if pulseInds(end)<=size(BB.Phi{1},2)
                         X1 = XActHB_0(1,pulseInds);
@@ -121,6 +136,11 @@ for connection = 1:2
                         %                     nmis(seg) = nmi(XH<mid,YH<mid);
                     end
                 end
+                
+                a = squeeze(mean(stngpedata_afta,3));
+                hold on
+                plot(a(1,:),a(2,:))    
+                
                 XCor(:,cond,p) = squeeze(mean(xcorrAmp_1'));
                 dXCor(:,cond,p) = squeeze(mean((xcorrAmp_0-xcorrAmp_1)'));
                 PLV(:,cond,p) = squeeze(mean(corrPhi_1'));

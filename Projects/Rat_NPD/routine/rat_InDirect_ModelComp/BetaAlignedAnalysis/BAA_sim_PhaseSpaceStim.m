@@ -1,20 +1,20 @@
-function [Rorg] = BAA_sim_BetaPropagation(Rorg,simtime,fresh)
+function [Rorg] = BAA_sim_PhaseSpaceStim(Rorg,simtime,fresh)
 close all
 cmap = brewermap(24,'Spectral');
 PRC.condcmap = cmap; %([1 4 8 16 4 18],:);
 PRC.condname = {'Fitted','1% STN->GPe','150% STN->GPe'}; %Fitted','1% M2->STN','150% M2->STN',
 coupname = {'M2/Thal.','STR/Thal.','STN/Thal.'};
-N = 12;
+N = 6;
 % connection list
 fsamp = 1/Rorg.IntP.dt;
 % ck_1 = logspace(-0.75,0.75,18);
 phaseShift = linspace(-pi,pi,N);
-for connection = 2
+for connection = 1:2
     if connection ==1
-        ck_1 = linspace(0.005,3.5,24); % [0.1 1 1.15]; STN-> GPe
+        ck_1 = [0.05 1 3.5]; %linspace(0.005,3.5,24); % [0.1 1 1.15]; STN-> GPe
         %         ck_1 = logspace(log10(0.05),log10(3.5),18);
     elseif connection == 2
-        ck_1 = linspace(0.005,1.5,24); % [0.1 1 1.15]; M2 -> STN
+        ck_1 = [0.05 1 1.5]; %linspace(0.005,1.5,24); % [0.1 1 1.15]; M2 -> STN
         %         ck_1 = logspace(log10(0.05),log10(1.5),18);
     end
     if fresh
@@ -25,14 +25,16 @@ for connection = 2
         Rorg.obs.csd.df = 0.25;
         Rorg = setSimTime(Rorg,simtime);
         Rorg.obs.brn = 3; % temporarily!
+        [t,gmx,gmxAmp,gmxPhi] = makeBurstSignal(Rorg.IntP.tvec,70,3);
+        gmx = 5.*gmx;
         uc = innovate_timeseries(Rorg,m);
         uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
-        
         intpow = nan(2,2,2,numel(ck_1),numel(phaseShift)); maxpow = nan(2,2,2,numel(ck_1),numel(phaseShift));
         
-        for cond = 1:numel(ck_1)
-            parfor p = 1:numel(phaseShift) %[1 10] %
+        for cond = 2:numel(ck_1)
+            for p = 1:numel(phaseShift) %[1 10] %
                 uc_ip = {};
+                uc{1}(2:end,1) = uc{1}(2:end,1);% + gmx';
                 uc_ip{1} = uc;
                 uc_ip{2} = uc;
                 % Setup pulses for PRC computation
@@ -78,152 +80,115 @@ for connection = 2
                 for seg = 1:numel(BB.segInds{1})-1
                     pulseStart(seg) = BB.segInds{1}{seg}(1) + pulseDelay;
                     pulseInds = pulseStart(seg):pulseStart(seg)+pulseWid-1;
+                    stngpedata{1}(:,:,seg) = xsim_ip{1}{1}([3 4],pulseInds);
+                    stngpephi{1}(:,:,seg) = BB.Phi{1}([1 3 4],pulseInds);
                     if pulseInds(end)<=size(BB.Phi{1},2)
                         pulse_Phi = BB.Phi{1}(4,pulseInds); %shifted relative to STN phase
                         pulseKern = sin(pulse_Phi+(phaseShift(p))); % shifted
-                        pU(pulseInds) = pulseKern;
+                        pU(pulseInds) = pulseKern ;
                     end
                 end
-                pU = (0.5.*std(uc{1}(:,1))).*pU; %.*pulseAmp;
+                pU = (0.25.*std(uc{1}(:,1))).*pU; %.*pulseAmp;
                 uc_ip{2} =  uc_ip{1};
                 uc_ip{2}{1}(:,1) = uc_ip{2}{1}(:,1) + pU'; % Give it a cortical pulse
                 [~,~,feat_sim{2},~,xsim_ip{2}]  = computeSimData(R,m,uc_ip{2},Pbase,0);
                 
-                XAct = xsim_ip{2}{1};
-                %                 XAct = ft_preproc_bandstopfilter(XAct,2000,[14 34]);
-                %                 XActLP = ft_preproc_lowpassfilter(XAct,2000,14);
-                %                 XActHB = ft_preproc_highpassfilter(XAct,2000,34);
+                [R,BB] = compute_BetaBursts_Simulated(R,xsim_ip{2});
+                BB = compute_BurstThreshold(R,BB,1,0);
+                BB = defineBetaEvents(R,BB);
                 
+%                 % Find list of circle crossings
+%                 find((stngpephi_bfor(:,1)>-pi/6) & (stngpephi_bfor(:,1)<pi/6))
+%                 
+%                 [M,I] = min(abs(stngpephi_bfor(:,1)-0))
+%                 
+%                 find(stngpephi_bfor(:,1)-0),1)
+                
+                XAct_0 = xsim_ip{1}{1};
+                XActHB_0 = ft_preproc_bandpassfilter(XAct_0,2000,[60 80]);
+                XAct_1 = xsim_ip{2}{1};
+                XActHB_1 = ft_preproc_bandpassfilter(XAct_1,2000,[60 80]);                
+                %                 XAct = ft_preproc_bandstopfilter(XAct,2000,[14 34]);
+%                 XActLP = ft_preproc_lowpassfilter(XAct,2000,14);
+%                 XActHB = ft_preproc_highpassfilter(XAct,2000,40);
                 % Recompute the burst Envelopes
-                XH_save = []; YH_save = [];
-                corrAmp_0 = []; corrPhi_0 = []; xcorrAmp_0= []; xcorrLAmp_0 = []; nmis = [];
-                TE_0 = []; Pv_0 = []; anTE_0 = []; peakTau_0 = []; ZTE_0 = [];
-                corrAmp_1 = []; corrPhi_1 = []; xcorrAmp_1= []; xcorrLAmp_1 = []; nmis = [];
-                TE_1 = []; Pv_1 = []; anTE_1 = []; peakTau_1 = []; ZTE_1 = [];
+                XH_save = []; YH_save = []; xcorrAmp_0 = []; xcorrAmp_1 = []; corrPhi_0 = []; corrPhi_1 = []; xcorrAmp = []; xcorrLAmp = []; nmis = [];
+                TE = []; Pv = []; anTE = []; peakTau = []; ZTE = [];
                 for seg = 1:numel(BB.segInds{1})-1
                     pulseStart(seg) = BB.segInds{1}{seg}(1) + pulseDelay;
                     pulseInds = pulseStart(seg):pulseStart(seg)+pulseWid-1;
-                    if pulseInds(end)<=size(BB.Phi{1},2)
-                        X1 = xsim_ip{1}{1}(1,pulseInds);
-                        X2 = xsim_ip{1}{1}(2,pulseInds);
-                        X3 = xsim_ip{1}{1}(4,pulseInds);
-                        X = reshape([X1;X2;X3],3,1,[]);
-                        Y = xsim_ip{1}{1}(5,pulseInds);
-                        
-                        [corrAmp_0(seg,:,:),xcorrAmp_0(seg,:,:),corrPhi_0(seg,:,:),xcorrLAmp_0(seg,:,:),TE_0(seg,:,:,:),...
-                            Pv_0(seg,:,:,:),anTE_0(seg,:,:),peakTau_0(seg,:,:,:),ZTE_0(seg,:,:,:)] = computePropMetrics(X,Y);
-                        
-                        X1 = xsim_ip{2}{1}(1,pulseInds);
-                        X2 = xsim_ip{2}{1}(2,pulseInds);
-                        X3 = xsim_ip{2}{1}(3,pulseInds);
-                        X = reshape([X1;X2;X3],3,1,[]);
-                        Y = xsim_ip{2}{1}(4,pulseInds);
-                        
-                        [corrAmp_1(seg,:,:),xcorrAmp_1(seg,:,:),corrPhi_1(seg,:,:),xcorrLAmp_1(seg,:,:),TE_1(seg,:,:,:),...
-                            Pv_1(seg,:,:,:),anTE_1(seg,:,:),peakTau_1(seg,:,:,:),ZTE_1(seg,:,:,:)] = computePropMetrics(X,Y);
-                        
-                        
-                        
-                        
-                        %                         X1 = XActLP(1,pulseInds);
-                        %                         X2 = XActLP(2,pulseInds);
-                        %                         X3 = XActLP(4,pulseInds);
-                        %                         X4 = XActHB(1,pulseInds);
-                        %                         X5 = XActHB(2,pulseInds);
-                        %                         X6 = XActHB(4,pulseInds);
-                        %                         X = reshape([X1;X2;X3;X4;X5;X6],3,2,[]);
-                        %
-                        %                         Y1 =  XActLP(5,pulseInds);
-                        %                         Y2 =  XActHB(5,pulseInds);
-                        %                         Y = [Y1;Y2];
-                        
-                        % TE(1) = STN -> M2
-                        % TE(2) = M2 -> STN
-                        %                     nmis(seg) = nmi(XH<mid,YH<mid);
-                    end
-                end
-                XCor(:,:,cond,p) = squeeze(mean(xcorrAmp_0))- squeeze(mean(xcorrAmp_1));
-                AEC(:,:,cond,p) = squeeze(mean(corrAmp_0))-squeeze(mean(corrAmp_1));
-                PLV(:,:,cond,p) = squeeze(mean(corrPhi_0))-squeeze(mean(corrPhi_1));
-                TE_mean(:,:,:,cond,p) = squeeze(mean(TE_0))- squeeze(mean(TE_1));
-                ZTE_mean(:,:,:,cond,p) = squeeze(mean(ZTE_0))-squeeze(mean(ZTE_1));
-                Pv_mean(:,:,:,cond,p) = squeeze(mean(Pv_0))-squeeze(mean(Pv_1));
-                anTE_mean(:,:,cond,p) = squeeze(mean(anTE_0))-squeeze(mean(anTE_1));
-                peakTau_mean(:,:,:,cond,p) = (1000.*squeeze(mean(peakTau_1)))./fsamp;
-                intpow_tmp = []; maxpow_tmp = []; powspec_tmp = [];
-                for stm = 1:2
-                    
-                    spec = [squeeze(feat_sim{stm}(1,1,1,1,:)) squeeze(feat_sim{stm}(1,4,4,1,:))];
-                    powspec_tmp(:,:,stm) = spec;
-                    intpow_tmp(:,1,stm) = sum(spec(R.frqz>14 & R.frqz<=21,:));
-                    maxpow_tmp(:,1,stm) = max(spec(R.frqz>14 & R.frqz<=21,:));
-                    intpow_tmp(:,2,stm) = sum(spec(R.frqz>21 & R.frqz<=30,:));
-                    maxpow_tmp(:,2,stm) = max(spec(R.frqz>21 & R.frqz<=30,:));
-                end
+                    stngpedata{2}(:,:,seg) = xsim_ip{2}{1}([3 4],pulseInds);
+                    stngpephi{2}(:,:,seg) = BB.Phi{1}([1 3 4],pulseInds);
+               end
+                figure(connection)
+                subplot(3,6,p+((cond-1)*6))
+                a = squeeze(mean(stngpedata{1},3));
+                plot(a(1,:),a(2,:),'r')
+                a = squeeze(mean(stngpedata{2},3));
+                hold on
+                plot(a(1,:),a(2,:),'b')    
+                ylim([-6 6]*10^-7); ylabel('STN')
+                xlim([-4 4]*10^-7); xlabel('GPe')
                 
-                intpow(:,:,:,cond,p) = intpow_tmp; % channel band stim K phi
-                maxpow(:,:,:,cond,p) = maxpow_tmp;
-                powspec(:,:,:,cond,p)= powspec_tmp;
+                
                 disp([cond p])
             end
         end
-        
-        
         if connection == 1
-            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'XCor','AEC','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_Gamma_HD.mat'],'XCor','dXCor','PLV','dPLV','intpow','powspec','maxpow','ck_1','phaseShift')
         elseif connection == 2
-            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'XCor','AEC','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            save([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_Gamma_STNGPe.mat'],'XCor','dXCor','PLV','dPLV','intpow','powspec','maxpow','ck_1','phaseShift')
         end
     else
         if connection == 1
-            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_HD.mat'],'XCor','AEC','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_Gamma_HD.mat'],'XCor','dXCor','PLV','dPLV','intpow','powspec','maxpow','ck_1','phaseShift')
         elseif connection == 2
-            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_STNGPe.mat'],'XCor','AEC','PLV','intpow','powspec','maxpow','ck_1','phaseShift','TE_mean','Pv_mean','anTE_mean','peakTau_mean','ZTE_mean')
+            load([Rorg.rootn '\routine\' Rorg.out.tag '\BetaBurstAnalysis\Data\BetaPropagation_Gamma_STNGPe.mat'],'XCor','dXCor','PLV','dPLV','intpow','powspec','maxpow','ck_1','phaseShift')
         end
     end
     phaseShift = linspace(-pi,pi,N);
     
-    for bnd = 1
-        for i = 1:9
+    for bnd = 1:2
+        for i = 1:4
             if i == 1
-                LP = squeeze(XCor(:,:,:,:)); titname = 'Envelope Correlation';
+                LP = squeeze(XCor(:,:,:)); titname = 'Envelope Correlation';
                 cl = [0.8 0.95];
                 dcl = [-0.05 0];
             elseif i == 2
-                LP = squeeze(PLV(:,:,:,:)); titname = 'Phase Locking';
+                LP = squeeze(PLV(:,:,:)); titname = 'Phase Locking';
                 cl = [0.25 0.8];
                 dcl = [-0.1 0.04];
             elseif i == 3
-                LP = squeeze(TE_mean(1,:,:,:,:)); titname = 'TE For';
+                LP = squeeze(TE_mean(bnd,1,:,:,:)); titname = 'TE For';
                 cl = [0.01 0.06];
                 dcl = [-0.05 0];
                 %LP(LP==0) = NaN;
                 %         LP = LP.*squeeze(Pv_mean(1,:,:,:)<0.05);
             elseif i == 4
-                LP = squeeze(TE_mean(2,:,:,:,:)); titname ='TE Rev';
+                LP = squeeze(TE_mean(bnd,2,:,:,:)); titname ='TE Rev';
                 cl = [0.015 0.06];
                 dcl = [-0.01 0.01];
                 %         LP = LP.*squeeze(Pv_mean(2,:,:,:)<0.05);
             elseif i == 5
-                LP = squeeze(Pv_mean(1,:,:,:,:)); titname = 'PV'; LP(LP==0) = NaN;
+                LP = squeeze(Pv_mean(1,:,:,:)); titname = 'PV'; LP(LP==0) = NaN;
                 cl = [0.025 0.04];
                 dcl = [-0.01 0.01];
                 %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.05);
             elseif i == 6
-                LP = squeeze(anTE_mean(:,:,:,:)); titname = 'deltaTE';
+                LP = anTE_mean; titname = 'deltaTE';
                 cl = [-0.35 0.15];
                 dcl = [-0.1 0.5];
                 %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
                 %             LP(LP==0)    = -32;
                 %             crng(crng<0.01
             elseif i == 7
-                LP = squeeze(ZTE_mean(1,:,:,:,:)); titname = 'ZTE For';
+                LP = squeeze(ZTE_mean(1,:,:,:)); titname = 'ZTE For';
                 cl = [0.025 0.04];
                 dcl = [-0.01 0.01];
                 %             LP = LP.*squeeze(Pv_mean(1,:,:)<0.1);
                 %             crng = [0 linspace(cl(1),cl(2),9)];
             elseif i == 8
-                LP = squeeze(ZTE_mean(2,:,:,:,:)); titname = 'ZTE Rev';
+                LP = squeeze(ZTE_mean(2,:,:,:)); titname = 'ZTE Rev';
                 cl = [0.025 0.04];
                 dcl = [-0.01 0.01];
                 %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
@@ -240,12 +205,12 @@ for connection = 2
             crng = linspace(cl(1),cl(2),12);
             dcrng = linspace(dcl(1),dcl(2),12);
             
-            %             LP(isnan(AEC)) = NaN;
+%             LP(isnan(AEC)) = NaN;
             figure((connection*10)+i)
             
             if i<9
                 for p= 1:3
-                    subplot(1,3,p)
+                    subplot(2,3,p+(bnd-1)*3)
                     if p<4
                         contourf(phaseShift,(ck_1*100),squeeze(LP(p,:,:))); %,crng);
                         Q = cl;
@@ -264,8 +229,8 @@ for connection = 2
                     %  a.XTickLabel = {'- \pi','-\pi/2','0','+\pi/2','+\pi'}
                 end
             elseif i==9
-                for p= 1:3
-                    subplot(1,3,p)
+                for p= 1:4
+                    subplot(2,2,p)
                     P = fillmissing(squeeze(LP(p,:,:)),'spline');
                     contourf(phaseShift,(ck_1*100),P*100) %,crng);
                     Q = cl;
@@ -276,7 +241,7 @@ for connection = 2
                     a = gca;
                     a.XTick = [-pi -pi/2 0 pi/2 pi ];
                     %                 caxis(Q)
-                    axis sqccuare
+                    axis square
                     
                 end
                 set(gcf,'Position',[680         541        1125         437])
