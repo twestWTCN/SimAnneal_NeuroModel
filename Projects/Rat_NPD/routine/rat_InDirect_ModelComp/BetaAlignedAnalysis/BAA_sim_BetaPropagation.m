@@ -28,8 +28,18 @@ for connection = 2
         uc = innovate_timeseries(Rorg,m);
         uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
         
-        intpow = nan(2,2,2,numel(ck_1),numel(phaseShift)); maxpow = nan(2,2,2,numel(ck_1),numel(phaseShift));
-        
+        null = cell(numel(ck_1),numel(phaseShift));
+        intpow = null;
+        maxpow = null;
+        XCor = null;
+        AEC = null;
+        AEC_mean = null;
+        PLV = null;
+        TE_mean = null;
+        ZTE_mean = null;
+        Pv_mean = null;
+        anTE_mean = null;
+        peakTau_mean = null;
         for cond = 1:numel(ck_1)
             parfor p = 1:numel(phaseShift) %[1 10] %
                 uc_ip = {};
@@ -142,14 +152,16 @@ for connection = 2
                         %                     nmis(seg) = nmi(XH<mid,YH<mid);
                     end
                 end
-                XCor(:,:,cond,p) = squeeze(mean(xcorrAmp_0))- squeeze(mean(xcorrAmp_1));
-                AEC(:,:,cond,p) = squeeze(mean(corrAmp_0))-squeeze(mean(corrAmp_1));
-                PLV(:,:,cond,p) = squeeze(mean(corrPhi_0))-squeeze(mean(corrPhi_1));
-                TE_mean(:,:,:,cond,p) = squeeze(mean(TE_0))- squeeze(mean(TE_1));
-                ZTE_mean(:,:,:,cond,p) = squeeze(mean(ZTE_0))-squeeze(mean(ZTE_1));
-                Pv_mean(:,:,:,cond,p) = squeeze(mean(Pv_0))-squeeze(mean(Pv_1));
-                anTE_mean(:,:,cond,p) = squeeze(mean(anTE_0))-squeeze(mean(anTE_1));
-                peakTau_mean(:,:,:,cond,p) = (1000.*squeeze(mean(peakTau_1)))./fsamp;
+                XCor{cond,p} = mean(xcorrAmp);
+                AEC{cond,p} = mean(corrAmp);
+                ctmp = corrcoef(mean(XH_save,2),mean(YH_save,2));
+                AEC_mean{cond,p} = ctmp(1,2);
+                PLV{cond,p} = mean(corrPhi);
+                TE_mean{cond,p} = mean(TE);
+                ZTE_mean{cond,p} = mean(ZTE);
+                Pv_mean{cond,p} = mean(Pv);
+                anTE_mean{cond,p} = mean(anTE);
+                peakTau_mean{cond,p} = (1000.*mean(peakTau))./fsamp;
                 intpow_tmp = []; maxpow_tmp = []; powspec_tmp = [];
                 for stm = 1:2
                     
@@ -161,10 +173,9 @@ for connection = 2
                     maxpow_tmp(:,2,stm) = max(spec(R.frqz>21 & R.frqz<=30,:));
                 end
                 
-                intpow(:,:,:,cond,p) = intpow_tmp; % channel band stim K phi
-                maxpow(:,:,:,cond,p) = maxpow_tmp;
-                powspec(:,:,:,cond,p)= powspec_tmp;
-                disp([cond p])
+                intpow{cond,p} = intpow_tmp; % channel band stim K phi
+                maxpow{cond,p} = maxpow_tmp;
+                powspec{cond,p} = powspec_tmp;
             end
         end
         
@@ -183,103 +194,77 @@ for connection = 2
     end
     phaseShift = linspace(-pi,pi,N);
     
-    for bnd = 1
-        for i = 1:9
-            if i == 1
-                LP = squeeze(XCor(:,:,:,:)); titname = 'Envelope Correlation';
-                cl = [0.8 0.95];
-                dcl = [-0.05 0];
-            elseif i == 2
-                LP = squeeze(PLV(:,:,:,:)); titname = 'Phase Locking';
-                cl = [0.25 0.8];
-                dcl = [-0.1 0.04];
-            elseif i == 3
-                LP = squeeze(TE_mean(1,:,:,:,:)); titname = 'TE For';
-                cl = [0.01 0.06];
-                dcl = [-0.05 0];
-                %LP(LP==0) = NaN;
-                %         LP = LP.*squeeze(Pv_mean(1,:,:,:)<0.05);
-            elseif i == 4
-                LP = squeeze(TE_mean(2,:,:,:,:)); titname ='TE Rev';
-                cl = [0.015 0.06];
-                dcl = [-0.01 0.01];
-                %         LP = LP.*squeeze(Pv_mean(2,:,:,:)<0.05);
-            elseif i == 5
-                LP = squeeze(Pv_mean(1,:,:,:,:)); titname = 'PV'; LP(LP==0) = NaN;
-                cl = [0.025 0.04];
-                dcl = [-0.01 0.01];
-                %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.05);
-            elseif i == 6
-                LP = squeeze(anTE_mean(:,:,:,:)); titname = 'deltaTE';
-                cl = [-0.35 0.15];
-                dcl = [-0.1 0.5];
-                %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
-                %             LP(LP==0)    = -32;
-                %             crng(crng<0.01
-            elseif i == 7
-                LP = squeeze(ZTE_mean(1,:,:,:,:)); titname = 'ZTE For';
-                cl = [0.025 0.04];
-                dcl = [-0.01 0.01];
-                %             LP = LP.*squeeze(Pv_mean(1,:,:)<0.1);
-                %             crng = [0 linspace(cl(1),cl(2),9)];
-            elseif i == 8
-                LP = squeeze(ZTE_mean(2,:,:,:,:)); titname = 'ZTE Rev';
-                cl = [0.025 0.04];
-                dcl = [-0.01 0.01];
-                %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
-                %             crng = [0 linspace(cl(1),cl(2),9)];
-            elseif i == 9
-                LP(1,:,:) = squeeze(intpow(1,1,2,:,:))./squeeze(intpow(1,1,1,:,:)); titlname{1} = 'M2 LB';
-                LP(2,:,:) = squeeze(intpow(2,1,2,:,:))./squeeze(intpow(2,1,1,:,:)); titlname{2} = 'STN LB';
-                LP(3,:,:) = squeeze(intpow(1,2,2,:,:))./squeeze(intpow(1,2,1,:,:)); titlname{3} = 'M2 HB';
-                LP(4,:,:) = squeeze(intpow(2,2,2,:,:))./squeeze(intpow(2,2,1,:,:)); titlname{4} = 'STN HB';
-                cl = [70 195];
-                dcl = [70 195];
-            end
-            
-            crng = linspace(cl(1),cl(2),12);
-            dcrng = linspace(dcl(1),dcl(2),12);
-            
-            %             LP(isnan(AEC)) = NaN;
-            figure((connection*10)+i)
-            
-            if i<9
-                for p= 1:3
-                    subplot(1,3,p)
-                    if p<4
-                        contourf(phaseShift,(ck_1*100),squeeze(LP(p,:,:))); %,crng);
-                        Q = cl;
-                    else
-                        contourf(phaseShift,(ck_1*100),squeeze(LP(2,:,:))-squeeze(LP(1,:,:))) %,dcrng);
-                        Q = dcl;
-                    end
-                    colorbar
-                    ylabel('log Coupling Strength'); xlabel('angle'); title([coupname{p} ' ' titname])
-                    colormap(flipud(brewermap(128,'RdYlBu')))
-                    a = gca;
-                    a.XTick = [-pi -pi/2 0 pi/2 pi ];
-                    %                 caxis(Q)
-                    axis square
-                    set(gcf,'Position',[680         541        1125         437])
-                    %  a.XTickLabel = {'- \pi','-\pi/2','0','+\pi/2','+\pi'}
-                end
-            elseif i==9
-                for p= 1:3
-                    subplot(1,3,p)
-                    P = fillmissing(squeeze(LP(p,:,:)),'spline');
-                    contourf(phaseShift,(ck_1*100),P*100) %,crng);
-                    Q = cl;
-                    
-                    colorbar
-                    ylabel('log Coupling Strength'); xlabel('angle'); title([titlname{p}])
-                    colormap(flipud(brewermap(128,'RdYlBu')))
-                    a = gca;
-                    a.XTick = [-pi -pi/2 0 pi/2 pi ];
-                    %                 caxis(Q)
-                    axis sqccuare
-                    
-                end
-                set(gcf,'Position',[680         541        1125         437])
+    for i = 1:8
+        if i == 1
+            LP = unPackCell(XCor);
+            titname = 'Envelope Correlation';
+            cl = [0.8 0.95];
+            dcl = [-0.05 0];
+        elseif i == 2
+            LP = unPackCell(XCor);
+            titname = 'Phase Locking';
+            cl = [0.25 0.8];
+            dcl = [-0.1 0.04];
+        elseif i == 3
+            LP = unPackCell(TE1);
+            titname = 'TE1';
+            cl = [0.01 0.04];
+            dcl = [-0.05 0];
+            %LP(LP==0) = NaN;
+            %         LP = LP.*squeeze(Pv_mean(1,:,:,:)<0.05);
+        elseif i == 4
+            LP = squeeze(TE_mean(2,:,:,:)); titname = 'TE2';
+            cl = [0.015 0.04];
+            dcl = [-0.01 0.01];
+            %         LP = LP.*squeeze(Pv_mean(2,:,:,:)<0.05);
+        elseif i == 5
+            LP = squeeze(Pv_mean(1,:,:,:)); titname = 'PV'; LP(LP==0) = NaN;
+            cl = [0.025 0.04];
+            dcl = [-0.01 0.01];
+            %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.05);
+        elseif i == 6
+            LP = anTE_mean; titname = 'deltaTE';
+            cl = [-0.35 0.15];
+            dcl = [-0.1 0.5];
+            %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
+            %             LP(LP==0)    = -32;
+            %             crng(crng<0.01
+        elseif i == 7
+            LP = squeeze(ZTE_mean(1,:,:,:)); titname = 'STN -> M2';
+            cl = [0.025 0.04];
+            dcl = [-0.01 0.01];
+            %             LP = LP.*squeeze(Pv_mean(1,:,:)<0.1);
+            %             crng = [0 linspace(cl(1),cl(2),9)];
+        elseif i == 8
+            LP = squeeze(ZTE_mean(2,:,:,:)); titname = 'M2 -> STN';
+            cl = [0.025 0.04];
+            dcl = [-0.01 0.01];
+            %             LP = LP.*squeeze(Pv_mean(2,:,:)<0.1);
+            %             crng = [0 linspace(cl(1),cl(2),9)];
+        end
+        
+        crng = linspace(cl(1),cl(2),12);
+        dcrng = linspace(dcl(1),dcl(2),12);
+        
+        LP(isnan(AEC)) = NaN;
+        figure((connection*10)+i)
+        for p= 1:3
+            subplot(1,3,p)
+            %  [Fig] = CirHeatmap({LP'}, 'GroupLabels', '1','OuterLabels',sprintfc('%.f',rad2deg(phaseShift)), 'CircType', 'o','InnerSpacerSize',0,'LogRadius',1);
+            %  caxis(cl)
+            %         newpoints = 100;
+            %         [xq,yq] = meshgrid(...
+            %             linspace(min(min(phaseShift,[],2)),max(max(phaseShift,[],2)),newpoints ),...
+            %             linspace(min(min(log10(ck_1),[],1)),max(max(log10(ck_1),[],1)),newpoints )...
+            %             );
+            %         LPint = interp2(phaseShift,log10(ck_1),LP,xq,yq,'cubic');
+            %         [a b c] = contourf(xq,yq,LPint,crng)
+            if p<3
+                contourf(phaseShift,ck_1*100,squeeze(LP(p,:,:)),crng);
+                Q = cl;
+            else
+                contourf(phaseShift,ck_1*100,squeeze(LP(2,:,:))-squeeze(LP(1,:,:)),dcrng);
+                Q = dcl;
             end
         end
         

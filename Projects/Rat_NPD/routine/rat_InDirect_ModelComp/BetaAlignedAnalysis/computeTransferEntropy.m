@@ -11,14 +11,14 @@ if nargin<4
     MCSamp = 1000;
 end
 for tau = taulist
-    [transferEntropy,p,ZTE] = quickTE_TW(X, Y, 'MCnSamples',MCSamp,'delayTrans', tau); 
-    meanTE(tau,1) = nanmean(transferEntropy);
-    meanZTE(tau,1) = nanmean(ZTE);
-    meanP(tau,1) = nanmean(p);
-    [transferEntropy,p,ZTE] = quickTE_TW(Y, X, 'MCnSamples',MCSamp,'delayTrans', tau);
-    meanTE(tau,2) = nanmean(transferEntropy);
-    meanZTE(tau,2) = nanmean(ZTE);
-    meanP(tau,2) = nanmean(p);
+%     [transferEntropy,p,ZTE] = quickTE_TW(X, Y, 'MCnSamples',MCSamp,'delayTrans', tau); 
+    meanTE(tau,1) = nan; %nanmean(transferEntropy);
+    meanZTE(tau,1) = nan; %nanmean(ZTE);
+    meanP(tau,1) =nan; % nanmean(p);
+%     [transferEntropy,p,ZTE] = quickTE_TW(Y, X, 'MCnSamples',MCSamp,'delayTrans', tau);
+    meanTE(tau,2) = nan; %nanmean(transferEntropy);
+    meanZTE(tau,2) = nan; %nanmean(ZTE);
+    meanP(tau,2) = nan; %nanmean(p);
 end
 
 
