@@ -47,8 +47,8 @@ for CON = [1 3]
     end
     
     % Scale bpow to 0
-    [a zind] = min(abs(ck_1-1));
-    bpow = 100*(bpowr)/bpowr(zind);
+    [a zind] = min(abs(ck_1-1)); % base model
+    bpow = 100*(bpowr-bpowr(zind))/bpowr(zind);
     bpowr_br = 100*(bpowr_br)/bpowr_br(zind);
     % Remove non-physiological
     powInds = find(bpowr>1e-8);
@@ -56,6 +56,8 @@ for CON = [1 3]
     bpow(powInds) = nan(1,numel(powInds));
     fcoh(powInds) = nan(1,numel(powInds));
     bcohr(powInds) = nan(1,numel(powInds));
+    
+    bcohr = 100*(bcohr-bcohr(zind))/bcohr(zind);
     
     % Find the indices of band power
     [dum b1] = min(abs(bpowr_br-10));
@@ -66,9 +68,9 @@ for CON = [1 3]
     
     figure(1)
     subplot(2,2,ip+2)
-    br = plot(log10(ck_1(1,:)),log10(bpow),'k-');
+    br = plot(log10(ck_1(1,:)),(bpow),'k-');
     hold on
-    Sr = scatter(log10(ck_1(1,:)),log10(bpow),50,cmap1,'filled');
+    Sr = scatter(log10(ck_1(1,:)),(bpow),50,cmap1,'filled');
     ylabel('log % of Fitted Power')
     grid on
     
@@ -82,7 +84,7 @@ for CON = [1 3]
     title(R.CONnames{CON})
     xlim([-1 1]); ylim([12 25])
     yyaxis left
-    ylim([0 3])
+    ylim([-100 150])
     
     figure(2)
     subplot(2,2,ip+2)
@@ -102,7 +104,7 @@ for CON = [1 3]
     title(R.CONnames{CON})
     xlim([-1 1]); ylim([12 25])
     yyaxis left
-    ylim([0 1])
+    ylim([-50 50])
     
     
 end

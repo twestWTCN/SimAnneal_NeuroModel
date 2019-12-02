@@ -27,10 +27,20 @@ for connection = 1:2
         uc = innovate_timeseries(Rorg,m);
         uc{1} = uc{1}.*sqrt(Rorg.IntP.dt);
         
-        intpow = nan(2,2,2,numel(ck_1),numel(phaseShift)); maxpow = nan(2,2,2,numel(ck_1),numel(phaseShift));
-        
+        null = cell(numel(ck_1),numel(phaseShift));
+        intpow = null;
+        maxpow = null;
+        XCor = null;
+        AEC = null;
+        AEC_mean = null;
+        PLV = null;
+        TE_mean = null;
+        ZTE_mean = null;
+        Pv_mean = null;
+        anTE_mean = null;
+        peakTau_mean = null;
         for cond = 1:numel(ck_1)
-            for p = 1:numel(phaseShift) %[1 10] %
+            parfor p = 1:numel(phaseShift) %[1 10] %
                 uc_ip = {};
                 uc_ip{1} = uc;
                 uc_ip{2} = uc;
@@ -110,16 +120,16 @@ for connection = 1:2
                         %                     nmis(seg) = nmi(XH<mid,YH<mid);
                     end
                 end
-                XCor(:,cond,p) = mean(xcorrAmp);
-                AEC(:,cond,p) = mean(corrAmp);
+                XCor{cond,p} = mean(xcorrAmp);
+                AEC{cond,p} = mean(corrAmp);
                 ctmp = corrcoef(mean(XH_save,2),mean(YH_save,2));
-                AEC_mean(:,cond,p) = ctmp(1,2);
-                PLV(:,cond,p) = mean(corrPhi);
-                TE_mean(:,:,cond,p) = mean(TE);
-                ZTE_mean(:,:,cond,p) = mean(ZTE);
-                Pv_mean(:,:,cond,p) = mean(Pv);
-                anTE_mean(:,cond,p) = mean(anTE);
-                peakTau_mean(:,:,cond,p) = (1000.*mean(peakTau))./fsamp;
+                AEC_mean{cond,p} = ctmp(1,2);
+                PLV{cond,p} = mean(corrPhi);
+                TE_mean{cond,p} = mean(TE);
+                ZTE_mean{cond,p} = mean(ZTE);
+                Pv_mean{cond,p} = mean(Pv);
+                anTE_mean{cond,p} = mean(anTE);
+                peakTau_mean{cond,p} = (1000.*mean(peakTau))./fsamp;
                 intpow_tmp = []; maxpow_tmp = []; powspec_tmp = [];
                 for stm = 1:2
                     
@@ -131,9 +141,9 @@ for connection = 1:2
                     maxpow_tmp(:,2,stm) = max(spec(R.frqz>21 & R.frqz<=30,:));
                 end
                 
-                intpow(:,:,:,cond,p) = intpow_tmp; % channel band stim K phi
-                maxpow(:,:,:,cond,p) = maxpow_tmp;
-                powspec(:,:,:,cond,p)= powspec_tmp;
+                intpow{cond,p} = intpow_tmp; % channel band stim K phi
+                maxpow{cond,p} = maxpow_tmp;
+                powspec{cond,p} = powspec_tmp;
             end
         end
         if connection == 1
@@ -151,15 +161,18 @@ for connection = 1:2
     
     for i = 1:8
         if i == 1
-            LP = XCor; titname = 'Envelope Correlation';
+            LP = unPackCell(XCor);
+            titname = 'Envelope Correlation';
             cl = [0.8 0.95];
             dcl = [-0.05 0];
         elseif i == 2
-            LP = PLV; titname = 'Phase Locking';
+            LP = unPackCell(XCor);
+            titname = 'Phase Locking';
             cl = [0.25 0.8];
             dcl = [-0.1 0.04];
         elseif i == 3
-            LP = squeeze(TE_mean(1,:,:,:)); titname = 'TE1';
+            LP = unPackCell(TE1);
+            titname = 'TE1';
             cl = [0.01 0.04];
             dcl = [-0.05 0];
             %LP(LP==0) = NaN;

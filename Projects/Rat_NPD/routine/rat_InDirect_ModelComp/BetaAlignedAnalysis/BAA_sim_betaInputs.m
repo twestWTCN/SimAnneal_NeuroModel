@@ -37,9 +37,9 @@ for ctype =1:2
         
         parfor i = 1:numel(pki)
             uc_i = uc;
-            uc_i{1}(:,1) = (0.1.*std(uc{1}(:,1)).*sin(2.*20.*pi.*R.IntP.tvec)) + uc{1}(:,1)'; % M2
+            uc_i{1}(:,1) = (0.15.*std(uc{1}(:,1)).*sin(2.*20.*pi.*R.IntP.tvec)) + uc{1}(:,1)'; % M2
             %         uc_i{1}(:,2) = (0.1.*std(uc{1}(:,2)).*sin(2.*20.*pi.*R.IntP.tvec + pki(i))) + uc{1}(:,2)';
-            uc_i{1}(:,4) = (0.1.*std(uc{1}(:,2)).*sin(2.*20.*pi.*R.IntP.tvec + pki(i))) + uc{1}(:,2)'; % STN
+            uc_i{1}(:,4) = (0.15.*std(uc{1}(:,2)).*sin(2.*20.*pi.*R.IntP.tvec + pki(i))) + uc{1}(:,2)'; % STN
             
             [r2mean,pnew,feat_sim,dum,xsim_gl] = computeSimData(R,m,uc_i,Pbase,0);
             
@@ -103,8 +103,9 @@ for ctype =1:2
     
     set(gcf,'Position',[103 595 1362 360])
     
+    
 end
 %  R = simannealsetup_InDirect_ModelComp();
 % mkdir([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data'])
-% save([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_feat.mat'],'feat_HD','feat_STR_GPe')
-% save([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat'],'xsim_HD','xsim_STR_GPe')
+% save([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_feat.mat'],'feat_HD','feat_STR_GPe')
+% save([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_xsim.mat'],'xsim_HD','xsim_STR_GPe')

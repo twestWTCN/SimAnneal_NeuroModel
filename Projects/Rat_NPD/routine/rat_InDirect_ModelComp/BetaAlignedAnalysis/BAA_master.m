@@ -12,9 +12,11 @@ plotSweepSpectraWrapper(R); % WILL ONLY WORK WITH FI
 simulateBurstData(R);
 
 % Lesion analysis
+BAA_sim_lesionExp_cortical_rhythms(R,32,1)
 BAA_sim_lesionExp(R,32,0)
 
 %% Plot Model Sweep Spectra
+BAA_sim_ConnectionSweep_v2(R,10,32,1)
 R = plotSweepSpectraWrapper(R); % You need the R produced here!
 BAA_sim_ConnectionSweep_v2(R,10,500,2) % Compute smaller list
 
@@ -32,7 +34,7 @@ OnsetEvolveAnalysisMaster(R)
 [R] = BAA_sim_PRC(R,MP,500,0);
 [R] = BAA_sim_fakeCloseLoop(R,500,0);
 
-[R] = BAA_sim_BetaPropagation(R,160,0); %remember reference of Boba and Hamacher 2015 for ZTE
+[R] = BAA_sim_BetaPropagation(R,160,1); %remember reference of Boba and Hamacher 2015 for ZTE
  
  
 % BB.range.RP = linspace(-pi,pi,7);

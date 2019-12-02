@@ -31,7 +31,7 @@ R.IntP.getNoise = 1;
 [dum1,dum2,feat_sim_noise,dum3,xsim_noise] = computeSimData(R,m,uc,XBase,0);
 R.IntP.getNoise = 0;
 
-for CON = 1
+for CON = [1 3]
     feat = {};
     xsim = {};
     parfor i = 1:size(ck_1,2)
