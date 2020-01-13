@@ -1,7 +1,7 @@
-function [R] = BAA_sim_lesionExp_cortical_rhythms(R,simtime,fresh)
+function [R] = BAA_sim_lesionExp_cortical_rhythms(R,modID,simtime,fresh)
 close all
 % Comopute simulations by sweeping across data
-[R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,10,simtime);
+[R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,modID,simtime);
 p = permMod{1}.par_rep{1};
 R = setSimTime(R,simtime);
 R.Bcond = -1;

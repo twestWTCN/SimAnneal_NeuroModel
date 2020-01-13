@@ -70,8 +70,8 @@ switch R.data.datatype
         ffxx = [];
 r = [];
         for C = 1:numel(R.condnames)
-            for i = 1:numel(R.chloc_name)
-                for j = 1:numel(R.chloc_name)
+            for i = 1:size(NPDemp,2)
+                for j = 1:size(NPDemp,2)
                     switch R.objfx.feattype
                         case 'ForRev'
                             if i==j

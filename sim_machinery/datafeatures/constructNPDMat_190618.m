@@ -18,8 +18,8 @@ for chloc = 1:size(chloc_name,2)
 end
 O = numel(R.condnames);
 for C = 1:O
-    for chI = 1:size(chloc_name,2)
-        for chJ = 1:size(chloc_name,2)
+    for chI = 1:size(chlist,2)
+        for chJ = 1:size(chlist,2)
             for p = 1:size(chinds{chI},1)
                 chindsP = chinds{chI};
                 for r = 1:size(chinds{chJ},1)

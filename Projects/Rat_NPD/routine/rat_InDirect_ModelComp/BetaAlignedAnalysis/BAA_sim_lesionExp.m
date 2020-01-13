@@ -1,6 +1,6 @@
-function [R] = BAA_sim_lesionExp(R,simtime,fresh)
+function [R] = BAA_sim_lesionExp(Rorg,modID,simtime,fresh)
 % Comopute simulations by sweeping across data
-[R,m,permMod,xsimMod{1}] = getSimModelData_v2(R,10,simtime);
+[R,m,permMod,xsimMod{1}] = getSimModelData_v2(Rorg,modID,simtime);
 p = permMod{1}.par_rep{1};
 R = setSimTime(R,simtime);
 R.Bcond = -1;
@@ -43,11 +43,11 @@ if fresh == 1
             disp([i j])
         end
     end
-    save([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BAA_lesion'],'powIJ_B','peakIJ_B','freqIJ_B',...
+    save([Rorg.rootn '\routine\' Rorg.out.oldtag '\BetaAlignedAnalysis\Data\BAA_lesion'],'powIJ_B','peakIJ_B','freqIJ_B',...
         'powIJ_B1','peakIJ_B1','freqIJ_B1',...
         'powIJ_B2','peakIJ_B2','freqIJ_B2','condname')
 else
-    load([R.rootn '\routine\' R.out.tag '\BetaBurstAnalysis\Data\BAA_lesion'],'powIJ_B','peakIJ_B','freqIJ_B',...
+    load([Rorg.rootn '\routine\' Rorg.out.oldtag '\BetaAlignedAnalysis\Data\BAA_lesion'],'powIJ_B','peakIJ_B','freqIJ_B',...
         'powIJ_B1','peakIJ_B1','freqIJ_B1',...
         'powIJ_B2','peakIJ_B2','freqIJ_B2','condname')
 end

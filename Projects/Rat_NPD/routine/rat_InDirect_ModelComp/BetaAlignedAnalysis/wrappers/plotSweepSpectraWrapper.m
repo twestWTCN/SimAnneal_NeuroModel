@@ -11,12 +11,12 @@ cmap2 = brewermap(30,'Blues');
 ip = 0;
 for CON = [1 3]
     ip = ip + 1;
-    load([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_CON_' num2str(CON) '_feat_F1.mat'])
+    load([R.rootn 'routine\' R.out.oldtag '\BetaAlignedAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_CON_' num2str(CON) '_feat_F1.mat'])
     figure(1)
     subplot(2,2,ip)
     plotSweepSpectra(R.frqz,feat,feat{6},cmap1,{R.condname{[2 1 3]}},[1 15 30],1:2:30,[1,1,1])
     title(R.CONnames{CON})
-    ylim([1e-16 1e-11])
+%     ylim([1e-16 1e-11])
     set(gca, 'YScale', 'log', 'XScale', 'log')
     
     figure(2)
@@ -35,7 +35,7 @@ ck_1 = logspace(-1,0.7,30);
 ip = 0;
 for CON = [1 3]
         ip = ip + 1;
-    load([R.rootn 'routine\' R.out.tag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_CON_' num2str(CON) '_feat_F1.mat'])
+    load([R.rootn 'routine\' R.out.oldtag '\BetaBurstAnalysis\Data\BB_' R.out.tag '_ConnectionSweep_CON_' num2str(CON) '_feat_F1.mat'])
     bpow = []; fpow = [];
     for ck = 1:numel(feat)
         [bpowr_br(ck) b] = max(feat{ck}(1,4,4,3,R.frqz>14 & R.frqz<21));

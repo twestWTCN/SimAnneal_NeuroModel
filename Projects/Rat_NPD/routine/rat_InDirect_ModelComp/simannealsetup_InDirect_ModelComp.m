@@ -2,7 +2,9 @@ function R = simannealsetup_InDirect_ModelComp(R)
 % 
 R.projectn = 'Rat_NPD';
 R.out.tag = 'InDrt_ModCompRev2';
-R.out.oldtag = 'InDrt_ModCompRev2';
+R.out.oldtag = 'rat_InDirect_ModelComp';
+%  R.out.tag = 'InDrt_ModCompRevTest';
+%  R.out.oldtag = 'InDrt_ModCompRevTest';
 
 switch getenv('computername')
     case 'SFLAP-2'
@@ -27,7 +29,7 @@ R.data.datatype = 'NPD'; %%'NPD'
 R.frqz = [6:.2:68];
 R.frqzfull = [1:.2:200]; % used for filters
 R.chloc_name = {'MMC','STR','GPE','STN'};
-R.chsim_name = {'MMC','STR','GPE','STN'};
+R.chsim_name = {'MMC','STR','GPE','STN','GPI','THAL'};
 R.condnames = {'OFF'};
 % Spectral characteristics
 R.obs.csd.df = 0.5;

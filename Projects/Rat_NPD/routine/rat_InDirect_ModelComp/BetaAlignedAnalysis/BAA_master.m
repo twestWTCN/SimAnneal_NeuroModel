@@ -1,25 +1,30 @@
 %% Master - Compute Beta Burst Aligned Analysis for Indirect Comp %%%
 clear; close all
-simAnnealAddPaths()
+% simAnnealAddPaths()
 
 %% Setup
 %% Set Routine Pars
 R = simannealsetup_InDirect_ModelComp;
+modID = 10;
+%% Plot Model Fit
+BAA_plotModelFit(R,modID,128);
+
+% Lesion analysis
+% BAA_sim_lesionExp_cortical_rhythms(R,modID,32,1)
+BAA_sim_lesionExp(R,modID,32,1)
+
+
+%% Plot Model Sweep Spectra
+BAA_sim_ConnectionSweep_v2(R,modID,32,1)
+% 'C:\Users\timot\Documents\GitHub\SimAnneal_NeuroModel\Projects\Rat_NPD\routine\InDrt_ModCompRev2\BetaBurstAnalysis\Data\BB_InDrt_ModCompRev2_ConnectionSweep_CON_1_feat_F1.mat'%
+R = plotSweepSpectraWrapper(R); % You need the R produced here!
+BAA_sim_ConnectionSweep_v2(R,modID,500,2) % Compute smaller list
 
 %% Plot Model Sweep Spectra
 plotSweepSpectraWrapper(R); % WILL ONLY WORK WITH FI
-R = plotSweepSpectraWrapper_M2_SI(R)
+R = plotSweepSpectraWrapper_M2_SI(R);
 % %
 simulateBurstData(R);
-
-% Lesion analysis
-BAA_sim_lesionExp_cortical_rhythms(R,32,1)
-BAA_sim_lesionExp(R,32,0)
-
-%% Plot Model Sweep Spectra
-BAA_sim_ConnectionSweep_v2(R,10,32,1)
-R = plotSweepSpectraWrapper(R); % You need the R produced here!
-BAA_sim_ConnectionSweep_v2(R,10,500,2) % Compute smaller list
 
 R = computeBurstWrapper(R);
 %% Plot TimeLocked Statistics

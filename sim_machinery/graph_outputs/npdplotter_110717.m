@@ -15,8 +15,28 @@ if isempty(labelna)
     labelna = 'NPD';
 end
 NPD_data_n = NPD_data{1};
+
 for L = 1:length(NPD_sim)
     NPD_sim_n = NPD_sim{L};
+    
+    % Align sizes (if one dataset has more channels with other than fill into
+    % NaNs
+    % get size of sim channels
+    simChN = size(NPD_sim_n,3);
+    dataChN = size(NPD_data_n,3);
+    
+    if simChN<dataChN
+        disp('Your simulation has less channels than data!')
+        nullbox = nan(size(NPD_data_n));
+        nullbox(:,1:simChN,1:simChN,:,:) = NPD_sim_n;
+        NPD_sim_n = nullbox;
+    elseif simChN>dataChN
+        disp('Your simulation has more channels than data!')
+        nullbox = nan(size(NPD_sim_n));
+        nullbox(:,1:dataChN,1:dataChN,:,:) = NPD_data_n;
+        NPD_data_n = nullbox;
+    end
+    
     
     if L == bestn
         lwid = 2;
@@ -24,7 +44,7 @@ for L = 1:length(NPD_sim)
         lwid = 0.5;
     end
     k = 0;
-    N = size(NPD_data_n,2); M = size(NPD_data_n,3); O = size(NPD_data_n,1);
+    N = size(NPD_sim_n,2); M = size(NPD_sim_n,3); O = size(NPD_sim_n,1);
     for C = 1:O
         k = 0;
         for i = 1:N
